@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfaf7;
+  --foreground: #1c1b19;
+  --muted: #6b6760;
+  --border: #e4e0d8;
+  --card: #ffffff;
+  --accent: #0f6e63;
+  --accent-foreground: #ffffff;
+  --danger: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121211;
+    --foreground: #eceae5;
+    --muted: #a19d95;
+    --border: #2e2c29;
+    --card: #1a1918;
+    --accent: #3fb8a8;
+    --accent-foreground: #0b1513;
+    --danger: #f97066;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .botao {
+    @apply inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50;
+  }
+  .botao-secundario {
+    @apply inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium disabled:opacity-50;
+  }
+  .campo {
+    @apply w-full rounded-md border border-border bg-card px-3 py-2 text-sm;
+  }
+  .cartao {
+    @apply rounded-lg border border-border bg-card p-4;
+  }
+  .erro {
+    @apply text-sm text-danger;
+  }
 }
