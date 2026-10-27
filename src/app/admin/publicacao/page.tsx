@@ -101,7 +101,7 @@ async function montarRegistro(supabase: Cliente, conteudos: ConteudoVisao[]): Pr
   const [{ data: votos }, participantes] = await Promise.all([
     supabase
       .from("votos")
-      .select("conteudo_id, a_favor, perfis(nome_publico)")
+      .select("conteudo_id, a_favor, perfis!votos_eleitor_id_fkey(nome_publico)")
       .in("conteudo_id", ids)
       .overrideTypes<VotoNominal[], { merge: false }>(),
     Promise.all(

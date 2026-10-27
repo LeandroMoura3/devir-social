@@ -16,6 +16,9 @@ export async function enviarLink(_anterior: EstadoLogin, formData: FormData): Pr
     email,
     options: { shouldCreateUser: false, emailRedirectTo: `${origem}/auth/confirmar` },
   });
+  if (error?.status === 429) {
+    return { enviado: false, erro: "Muitos e-mails enviados na última hora. Tente de novo mais tarde." };
+  }
   if (error) {
     return { enviado: false, erro: "Não foi possível enviar o link. Confira se este e-mail foi convidado." };
   }

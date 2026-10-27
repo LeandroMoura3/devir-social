@@ -36,7 +36,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
     supabase.from("votos").select("a_favor").eq("conteudo_id", conteudoId).eq("eleitor_id", usuarioId).maybeSingle(),
     supabase
       .from("comentarios")
-      .select("id, pai_id, texto, criado_em, removido_motivo, perfis(nome_publico)")
+      .select("id, pai_id, texto, criado_em, removido_motivo, perfis!comentarios_autor_id_fkey(nome_publico)")
       .eq("conteudo_id", conteudoId)
       .order("criado_em")
       .overrideTypes<Comentario[], { merge: false }>(),
@@ -104,7 +104,7 @@ async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao;
   const [{ data: votos }, { data: participantes }] = await Promise.all([
     supabase
       .from("votos")
-      .select("a_favor, perfis(nome_publico)")
+      .select("a_favor, perfis!votos_eleitor_id_fkey(nome_publico)")
       .eq("conteudo_id", conteudo.id)
       .overrideTypes<VotoNominal[], { merge: false }>(),
     lista<{ nome_publico: string }>(supabase.rpc("participantes_janela", { p_conteudo: conteudo.id })),

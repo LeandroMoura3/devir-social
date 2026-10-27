@@ -38,7 +38,7 @@ type LinhaConteudo = {
 type LinhaResultado = { conteudo_id: number; favor: number; contra: number; base: number };
 
 const CAMPOS =
-  "id, texto, imagem_path, imagem_apagada, autor_id, criado_em, fecha_em, publicado_em, removido_em, removido_motivo, perfis(nome_publico)";
+  "id, texto, imagem_path, imagem_apagada, autor_id, criado_em, fecha_em, publicado_em, removido_em, removido_motivo, perfis!conteudos_autor_id_fkey(nome_publico)";
 
 // Resultados só existem para conteúdos fechados e não removidos.
 export async function carregarConteudos(supabase: Cliente, ids?: number[]): Promise<ConteudoVisao[]> {
@@ -46,11 +46,17 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
   if (ids) consulta = consulta.in("id", ids);
   let comentarios = supabase.from("comentarios").select("conteudo_id");
   if (ids) comentarios = comentarios.in("conteudo_id", ids);
-  const [{ data: linhas }, { data: resultados }, { data: listaComentarios }] = await Promise.all([
+  const [respostaConteudos, respostaResultados, respostaComentarios] = await Promise.all([
     consulta.overrideTypes<LinhaConteudo[], { merge: false }>(),
     lista<LinhaResultado>(supabase.rpc("resultados")),
     comentarios.overrideTypes<{ conteudo_id: number }[], { merge: false }>(),
   ]);
+  for (const { error } of [respostaConteudos, respostaResultados, respostaComentarios]) {
+    if (error) throw new Error(`Falha ao carregar conteúdos: ${JSON.stringify(error)}`);
+  }
+  const linhas = respostaConteudos.data;
+  const resultados = respostaResultados.data;
+  const listaComentarios = respostaComentarios.data;
 
   const porId = new Map((resultados ?? []).map((r) => [r.conteudo_id, r]));
   const totalComentarios = new Map<number, number>();
