@@ -14,6 +14,7 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 - **Parâmetros versionados** (prazo do conteúdo, duração do ciclo, participação mínima, quórum): mudanças só valem a partir do próximo ciclo, e o histórico não muda.
 - **Plano de publicação** (só coordenação): monta os posts do Instagram (cascata, rodízio, até 10 imagens, legenda com pesos 4:2:1), gera o registro em HTML para o blog e apaga as imagens depois de publicadas.
 - **Painel semanal público** em `/painel`, sem login.
+- **Blog público** em `/blog`, sem login: textos do projeto (por que, como funciona, regras com parâmetros ao vivo) e o registro automático de cada conteúdo publicado, com votos nominais e base do quórum.
 - **Remoção por exceção legal** (só coordenação), com o motivo registrado.
 
 ## Como colocar no ar
@@ -80,7 +81,7 @@ Nas quartas e domingos, abra **Plano de publicação** na página inicial:
 
 1. Para cada post: baixe as imagens na ordem mostrada, publique no Instagram como carrossel e cole a legenda.
 2. Clique em **Marcar como publicado**. As imagens desse post são apagadas do app; textos e votos ficam guardados.
-3. Copie o **Registro para o blog** e publique no Blogger, no modo HTML.
+3. O registro aparece sozinho em `/blog`.
 
 ## Comandos
 

@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { lista } from "@/lib/supabase/lista";
-import { connection } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { criarClientePublico } from "@/lib/supabase/publico";
 import { formatarData } from "@/lib/datas";
 import { classificar, type Faixa } from "@/lib/regras";
 
@@ -60,20 +59,13 @@ type Parametros = {
   quorum: number;
 };
 
-async function clientePublico() {
-  await connection();
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
-    auth: { persistSession: false },
-  });
-}
-
 // O último dia do ciclo é a véspera do início do próximo.
 function ultimoDia(fim: string): string {
   return formatarData(new Date(Date.parse(fim) - 1).toISOString());
 }
 
 async function Ciclos() {
-  const supabase = await clientePublico();
+  const supabase = await criarClientePublico();
   const [{ data: ciclos, error }, { data: parametros }] = await Promise.all([
     lista<Ciclo>(supabase.rpc("painel_ciclos")),
     supabase
@@ -141,7 +133,7 @@ async function Ciclos() {
 }
 
 async function Tabela() {
-  const supabase = await clientePublico();
+  const supabase = await criarClientePublico();
   const [{ data: semanas, error }, { data: fechados }] = await Promise.all([
     lista<Semana>(supabase.rpc("painel_semanal")),
     lista<Fechado>(supabase.rpc("painel_fechados")),

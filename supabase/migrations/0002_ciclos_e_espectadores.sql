@@ -395,3 +395,6 @@ grant execute on function public.painel_ciclos() to anon, authenticated;
 grant execute on function public.marcar_publicado(bigint[]) to authenticated;
 grant execute on function public.remover_conteudo(bigint, text) to authenticated;
 grant execute on function public.agendar_parametros(int, int, int, int) to authenticated;
+
+-- Faz a API enxergar as funções novas imediatamente.
+notify pgrst, 'reload schema';

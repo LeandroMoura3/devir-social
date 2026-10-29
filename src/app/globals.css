@@ -59,3 +59,26 @@ body {
     @apply text-sm text-danger;
   }
 }
+
+/* Texto corrido do blog */
+.prosa {
+  @apply flex flex-col gap-4 leading-relaxed;
+}
+.prosa h2 {
+  @apply mt-4 text-xl font-semibold;
+}
+.prosa h3 {
+  @apply mt-2 text-lg font-semibold;
+}
+.prosa ul {
+  @apply list-disc pl-5;
+}
+.prosa ol {
+  @apply list-decimal pl-5;
+}
+.prosa li {
+  @apply mt-1;
+}
+.prosa a {
+  @apply underline;
+}

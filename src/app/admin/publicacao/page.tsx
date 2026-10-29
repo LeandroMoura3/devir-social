@@ -1,9 +1,8 @@
 import { Suspense } from "react";
-import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
+import { carregarConteudos } from "@/lib/conteudos";
 import { exigirAdmin, urlsAssinadas } from "@/lib/dados";
 import { instanteDaRequisicao } from "@/lib/datas";
 import { NOME_FAIXA, planejarPublicacao } from "@/lib/regras";
-import { gerarRegistroBlog, type RegistroConteudo } from "@/lib/registro";
 import { BotaoPublicado, TextoCopiavel } from "./componentes";
 
 export const metadata = { title: "Plano de publicação · Devir Social" };
@@ -23,8 +22,6 @@ export default function PlanoPublicacao() {
   );
 }
 
-type Cliente = Awaited<ReturnType<typeof exigirAdmin>>["supabase"];
-
 async function Plano() {
   const { supabase } = await exigirAdmin();
   const agora = instanteDaRequisicao();
@@ -32,9 +29,6 @@ async function Plano() {
   const pendentes = todos.filter(
     (c) => !c.removidoEm && !c.publicadoEm && Date.parse(c.fechaEm) <= agora && c.resultado,
   );
-  const remocoes = todos
-    .filter((c) => c.removidoEm)
-    .map((c) => ({ id: c.id, motivo: c.removidoMotivo ?? "", removidoEm: c.removidoEm! }));
 
   if (pendentes.length === 0) {
     return <p className="text-sm text-muted">Nenhum conteúdo fechado aguardando publicação.</p>;
@@ -44,10 +38,9 @@ async function Plano() {
     pendentes.map((c) => ({ ...c, favor: c.resultado!.favor, contra: c.resultado!.contra, faixa: c.resultado!.faixa })),
   );
   const caminhos = pendentes.flatMap((c) => (c.imagemPath ? [c.imagemPath] : []));
-  const [previas, downloads, registro] = await Promise.all([
+  const [previas, downloads] = await Promise.all([
     urlsAssinadas(supabase, caminhos),
     urlsAssinadas(supabase, caminhos, { download: true }),
-    montarRegistro(supabase, pendentes),
   ]);
 
   return (
@@ -82,37 +75,13 @@ async function Plano() {
         </section>
       ))}
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">Registro para o blog</h2>
-        <p className="text-sm text-muted">
-          Cole no Blogger, no modo HTML, como post da publicação. Inclui textos completos, votos nominais, base do
-          quórum e remoções.
-        </p>
-        <TextoCopiavel texto={gerarRegistroBlog(registro, remocoes)} linhas={14} />
-      </section>
+      <p className="text-sm text-muted">
+        Ao marcar um post como publicado, o registro completo (texto, votos nominais e quórum) aparece sozinho em{" "}
+        <a href="/blog" className="underline">
+          /blog
+        </a>
+        .
+      </p>
     </div>
   );
-}
-
-async function montarRegistro(supabase: Cliente, conteudos: ConteudoVisao[]): Promise<RegistroConteudo[]> {
-  const votacoes = await carregarVotacao(
-    supabase,
-    conteudos.map((c) => c.id),
-  );
-  return conteudos.map((c) => {
-    const r = c.resultado!;
-    return {
-      id: c.id,
-      texto: c.texto,
-      autor: c.autor,
-      faixa: r.faixa,
-      favor: r.favor,
-      contra: r.contra,
-      indiferente: r.indiferente,
-      base: r.base,
-      quorumNecessario: r.quorumNecessario,
-      cicloInicio: r.cicloInicio,
-      votacao: votacoes.get(c.id)!,
-    };
-  });
 }
