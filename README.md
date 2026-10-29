@@ -29,7 +29,7 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 No SQL Editor (os valores são: dias do conteúdo, dias do ciclo, % de participação mínima, % de quórum):
 
 ```sql
-select public.agendar_parametros(14, 14, 50, 20);
+select public.agendar_parametros(7, 7, 50, 20);
 ```
 
 A mudança vale a partir do início do próximo ciclo. Rodar de novo antes disso substitui o agendamento. Todas as versões aparecem no painel público.

@@ -188,6 +188,11 @@ export default function Regras() {
           vale a partir do início do ciclo seguinte, e as versões anteriores continuam registradas, para que os
           resultados antigos nunca mudem.
         </p>
+        <p className="text-sm text-muted">
+          Registro: em 29/10/2026, antes do primeiro conteúdo ser enviado, os parâmetros iniciais foram ajustados de
+          14 para 7 dias (prazo do conteúdo e duração do ciclo). Como nenhum conteúdo existia, nenhum resultado foi
+          afetado. A partir do primeiro conteúdo, mudanças só valem no ciclo seguinte.
+        </p>
         <Suspense fallback={<p className="text-sm text-muted">Carregando parâmetros…</p>}>
           <Parametros />
         </Suspense>
