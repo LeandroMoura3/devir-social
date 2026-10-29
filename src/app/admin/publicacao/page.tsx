@@ -76,11 +76,11 @@ async function Plano() {
       ))}
 
       <p className="text-sm text-muted">
-        Ao marcar um post como publicado, o registro completo (texto, votos nominais e quórum) aparece sozinho em{" "}
+        O registro completo de cada conteúdo (texto, votos nominais e quórum) já está público em{" "}
         <a href="/blog" className="underline">
           /blog
-        </a>
-        .
+        </a>{" "}
+        desde o fechamento da votação. Aqui falta só o Instagram.
       </p>
     </div>
   );

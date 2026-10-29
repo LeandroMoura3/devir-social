@@ -25,7 +25,7 @@ export default function Regras() {
           <li>Ciclos de participação: participantes e espectadores.</li>
           <li>O quórum passou a ser calculado sobre os participantes do ciclo.</li>
           <li>Prazos e porcentagens viraram parâmetros públicos; mudanças valem a partir do ciclo seguinte.</li>
-          <li>O registro de cada publicação passou a ser gerado automaticamente neste blog.</li>
+          <li>O registro de cada conteúdo passou a ser publicado automaticamente neste blog, no fechamento da votação.</li>
         </ul>
 
         <h2>A. Regras que não mudam</h2>
@@ -164,16 +164,17 @@ export default function Regras() {
 
         <h3>10. Blog e registro</h3>
         <p>
-          Cada conteúdo publicado tem uma página neste blog com o texto completo, o nome público do autor, as contagens,
-          os votos nominais, a base do quórum, os indiferentes e os votos de espectadores. A página é gerada
-          automaticamente a partir dos votos. Depois de publicadas, as imagens são apagadas do app; textos e votos
-          ficam guardados para sempre.
+          Assim que a votação fecha, cada conteúdo ganha automaticamente uma página neste blog com o texto completo, o
+          nome público do autor, as contagens, os votos nominais, a base do quórum, os indiferentes e os votos de
+          espectadores. Depois de publicadas no Instagram, as imagens são apagadas do app; textos e votos ficam
+          guardados para sempre.
         </p>
 
         <h3>11. Exceção legal</h3>
         <p>
           Conteúdo ilegal ou que viole as regras da plataforma não é publicado. Nesta fase, quem avalia é o idealizador
-          do projeto. Cada remoção aparece neste blog, com o motivo.
+          do projeto, enquanto o conteúdo está aberto. Se a remoção acontecer depois do fechamento, o conteúdo sai do
+          blog e do Instagram. Cada remoção aparece neste blog, com o motivo.
         </p>
 
         <h3>12. Parâmetros</h3>

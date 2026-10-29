@@ -31,7 +31,8 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
     <article className="prosa">
       <header className="flex flex-col gap-1">
         <p className="text-xs text-muted">
-          #{conteudo.id} · publicado em {formatarData(conteudo.publicadoEm)}
+          #{conteudo.id} · votação fechada em {formatarData(conteudo.fechaEm)}
+          {conteudo.instagramEm ? ` · no Instagram desde ${formatarData(conteudo.instagramEm)}` : ""}
         </p>
         <h1 className="text-2xl font-semibold">{NOME_FAIXA[conteudo.faixa]}</h1>
         <p className="text-sm text-muted">Autor: {conteudo.autor}</p>

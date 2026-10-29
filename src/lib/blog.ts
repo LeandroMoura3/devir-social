@@ -8,7 +8,7 @@ export type Publicado = {
   autor: string;
   criadoEm: string;
   fechaEm: string;
-  publicadoEm: string;
+  instagramEm: string | null;
   cicloInicio: string;
   favor: number;
   contra: number;
@@ -24,7 +24,7 @@ type LinhaPublicado = {
   autor: string;
   criado_em: string;
   fecha_em: string;
-  publicado_em: string;
+  instagram_em: string | null;
   ciclo_inicio: string;
   favor: number;
   contra: number;
@@ -47,7 +47,7 @@ export async function carregarPublicados(): Promise<Publicado[]> {
     autor: l.autor,
     criadoEm: l.criado_em,
     fechaEm: l.fecha_em,
-    publicadoEm: l.publicado_em,
+    instagramEm: l.instagram_em,
     cicloInicio: l.ciclo_inicio,
     favor: l.favor,
     contra: l.contra,

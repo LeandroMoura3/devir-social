@@ -17,9 +17,9 @@ export default function Blog() {
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Devir Social</h1>
         <p className="text-muted">
-          Comunicação construída coletivamente, com regras públicas. Cada conteúdo publicado no Instagram tem aqui o
-          texto completo, os votos nominais e a base do quórum. Esta página é gerada automaticamente: ninguém a edita à
-          mão.
+          Comunicação construída coletivamente, com regras públicas. Todo conteúdo aparece aqui assim que a votação
+          fecha, com o texto completo, os votos nominais e a base do quórum. Esta página é gerada automaticamente:
+          ninguém a edita à mão.
         </p>
         <p className="text-sm">
           Comece por <Link href="/blog/por-que" className="underline">Por que o Devir Social?</Link>, veja{" "}
@@ -39,7 +39,7 @@ async function Publicacoes() {
 
   const porData = new Map<string, Publicado[]>();
   for (const p of publicados) {
-    const data = formatarData(p.publicadoEm);
+    const data = formatarData(p.fechaEm);
     porData.set(data, [...(porData.get(data) ?? []), p]);
   }
 
@@ -48,7 +48,7 @@ async function Publicacoes() {
       {porData.size === 0 && <p className="text-sm text-muted">Nenhuma publicação ainda.</p>}
       {[...porData].map(([data, itens]) => (
         <section key={data} className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Publicação de {data}</h2>
+          <h2 className="text-lg font-semibold">Fechados em {data}</h2>
           {itens.map((p) => (
             <Link key={p.id} href={`/blog/conteudo/${p.id}`} className="cartao flex flex-col gap-1 hover:border-accent">
               <p className="text-xs text-muted">
@@ -57,6 +57,7 @@ async function Publicacoes() {
               <p className="line-clamp-3 text-sm">{p.texto}</p>
               <p className="text-xs font-medium text-accent">
                 {NOME_FAIXA[p.faixa]} · sim {p.favor} · não {p.contra}
+                {p.instagramEm ? " · no Instagram" : ""}
               </p>
             </Link>
           ))}
