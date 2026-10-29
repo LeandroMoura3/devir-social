@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { prepararImagem } from "@/lib/imagem";
 import { criarClienteNavegador } from "@/lib/supabase/client";
 
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const TAMANHO_MAXIMO = 5 * 1024 * 1024;
+const TAMANHO_MAXIMO_ORIGINAL = 25 * 1024 * 1024;
 
 export function FormularioNovo({ usuarioId }: { usuarioId: string }) {
   const router = useRouter();
@@ -18,14 +20,24 @@ export function FormularioNovo({ usuarioId }: { usuarioId: string }) {
     const texto = String(formData.get("texto") ?? "").trim();
     if (!(imagem instanceof File) || imagem.size === 0) return setErro("Escolha uma imagem.");
     if (!TIPOS.includes(imagem.type)) return setErro("Use uma imagem JPG, PNG ou WebP.");
-    if (imagem.size > TAMANHO_MAXIMO) return setErro("A imagem deve ter no máximo 5 MB.");
+    if (imagem.size > TAMANHO_MAXIMO_ORIGINAL) return setErro("A imagem deve ter no máximo 25 MB.");
     if (!texto) return setErro("Escreva o texto do conteúdo.");
 
     setEnviando(true);
+    let jpeg: Blob;
+    try {
+      jpeg = await prepararImagem(imagem);
+    } catch {
+      setEnviando(false);
+      return setErro("Não foi possível ler esta imagem. Tente outra, em JPG ou PNG.");
+    }
+    if (jpeg.size > TAMANHO_MAXIMO) {
+      setEnviando(false);
+      return setErro("A imagem ficou grande demais depois de convertida. Tente outra.");
+    }
     const supabase = criarClienteNavegador();
-    const extensao = imagem.type.split("/")[1];
-    const caminho = `${usuarioId}/${crypto.randomUUID()}.${extensao}`;
-    const envio = await supabase.storage.from("imagens").upload(caminho, imagem, { contentType: imagem.type });
+    const caminho = `${usuarioId}/${crypto.randomUUID()}.jpg`;
+    const envio = await supabase.storage.from("imagens").upload(caminho, jpeg, { contentType: "image/jpeg" });
     if (envio.error) {
       setEnviando(false);
       return setErro("Não foi possível enviar a imagem. Tente de novo.");
@@ -42,7 +54,7 @@ export function FormularioNovo({ usuarioId }: { usuarioId: string }) {
   return (
     <form action={enviar} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1 text-sm">
-        Imagem (JPG, PNG ou WebP, até 5 MB)
+        Imagem (JPG, PNG ou WebP). Fotos muito altas ou muito largas são cortadas pelo centro para caber no Instagram.
         <input name="imagem" type="file" accept={TIPOS.join(",")} required className="text-sm" />
       </label>
       <label className="flex flex-col gap-1 text-sm">

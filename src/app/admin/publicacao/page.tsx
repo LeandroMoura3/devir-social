@@ -1,19 +1,23 @@
 import { Suspense } from "react";
-import { carregarConteudos } from "@/lib/conteudos";
 import { exigirAdmin, urlsAssinadas } from "@/lib/dados";
 import { instanteDaRequisicao } from "@/lib/datas";
-import { NOME_FAIXA, planejarPublicacao } from "@/lib/regras";
-import { BotaoPublicado, TextoCopiavel } from "./componentes";
+import { chaveDoPost, montarPlano } from "@/lib/plano";
+import { NOME_FAIXA } from "@/lib/regras";
+import { BotaoInstagram, BotaoPublicado, TextoCopiavel } from "./componentes";
 
 export const metadata = { title: "Plano de publicação · Devir Social" };
+
+// Publicar um carrossel no Instagram leva alguns segundos por imagem.
+export const maxDuration = 60;
 
 export default function PlanoPublicacao() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Plano de publicação</h1>
       <p className="text-sm text-muted">
-        Calculado automaticamente pelas regras do piloto com todos os conteúdos fechados e ainda não publicados. Publique
-        cada post no Instagram com as imagens na ordem mostrada e a legenda copiada, depois marque como publicado.
+        Calculado automaticamente pelas regras do piloto com todos os conteúdos fechados e ainda não publicados no
+        Instagram. Confira cada post e publique pelo botão. Se preferir publicar à mão, baixe as imagens na ordem
+        mostrada, copie a legenda e depois registre aqui.
       </p>
       <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
         <Plano />
@@ -24,20 +28,16 @@ export default function PlanoPublicacao() {
 
 async function Plano() {
   const { supabase } = await exigirAdmin();
-  const agora = instanteDaRequisicao();
-  const todos = await carregarConteudos(supabase);
-  const pendentes = todos.filter(
-    (c) => !c.removidoEm && !c.publicadoEm && Date.parse(c.fechaEm) <= agora && c.resultado,
-  );
+  const [posts, { data: conexao }] = await Promise.all([
+    montarPlano(supabase, instanteDaRequisicao()),
+    supabase.from("instagram_conexao").select("usuario_id").maybeSingle(),
+  ]);
 
-  if (pendentes.length === 0) {
+  if (posts.length === 0) {
     return <p className="text-sm text-muted">Nenhum conteúdo fechado aguardando publicação.</p>;
   }
 
-  const posts = planejarPublicacao(
-    pendentes.map((c) => ({ ...c, favor: c.resultado!.favor, contra: c.resultado!.contra, faixa: c.resultado!.faixa })),
-  );
-  const caminhos = pendentes.flatMap((c) => (c.imagemPath ? [c.imagemPath] : []));
+  const caminhos = posts.flatMap((p) => p.imagens.flatMap((c) => (c.imagemPath ? [c.imagemPath] : [])));
   const [previas, downloads] = await Promise.all([
     urlsAssinadas(supabase, caminhos),
     urlsAssinadas(supabase, caminhos, { download: true }),
@@ -45,8 +45,13 @@ async function Plano() {
 
   return (
     <div className="flex flex-col gap-8">
+      {!conexao && (
+        <p className="cartao text-sm">
+          O Instagram ainda não está conectado ao app. Por enquanto, publique à mão e registre com o botão de cada post.
+        </p>
+      )}
       {posts.map((post, i) => (
-        <section key={post.imagens[0].id} className="cartao flex flex-col gap-4">
+        <section key={chaveDoPost(post)} className="cartao flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Post {i + 1}</h2>
           <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {post.imagens.map((c, ordem) => (
@@ -71,7 +76,10 @@ async function Plano() {
             <p className="text-xs text-muted">Só na legenda: {post.soTexto.map((c) => `#${c.id}`).join(", ")}</p>
           )}
           <TextoCopiavel texto={post.legenda} linhas={12} />
-          <BotaoPublicado ids={[...post.imagens, ...post.soTexto].map((c) => c.id)} />
+          <div className="flex flex-wrap items-start gap-3">
+            {conexao && <BotaoInstagram chave={chaveDoPost(post)} />}
+            <BotaoPublicado ids={[...post.imagens, ...post.soTexto].map((c) => c.id)} secundario={Boolean(conexao)} />
+          </div>
         </section>
       ))}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { marcarPublicado, type EstadoPublicacao } from "./acoes";
+import { marcarPublicado, publicarNoInstagram, type EstadoPublicacao } from "./acoes";
 
 export function TextoCopiavel({ texto, linhas = 10 }: { texto: string; linhas?: number }) {
   const [copiado, setCopiado] = useState(false);
@@ -22,7 +22,29 @@ export function TextoCopiavel({ texto, linhas = 10 }: { texto: string; linhas?: 
   );
 }
 
-export function BotaoPublicado({ ids }: { ids: number[] }) {
+export function BotaoInstagram({ chave }: { chave: number }) {
+  const [estado, acao, enviando] = useActionState<EstadoPublicacao, FormData>(publicarNoInstagram, {});
+  return (
+    <form
+      action={acao}
+      onSubmit={(evento) => {
+        if (!confirm("Publicar este post no Instagram agora? As imagens serão apagadas do app depois.")) {
+          evento.preventDefault();
+        }
+      }}
+      className="flex flex-col gap-1"
+    >
+      <input type="hidden" name="post" value={chave} />
+      <button className="botao self-start" disabled={enviando}>
+        {enviando ? "Publicando no Instagram… (pode levar 1 minuto)" : "Publicar no Instagram"}
+      </button>
+      {estado.erro && <p className="erro">{estado.erro}</p>}
+      {estado.aviso && <p className="text-sm text-muted">{estado.aviso}</p>}
+    </form>
+  );
+}
+
+export function BotaoPublicado({ ids, secundario = false }: { ids: number[]; secundario?: boolean }) {
   const [estado, acao, enviando] = useActionState<EstadoPublicacao, FormData>(marcarPublicado, {});
   return (
     <form
@@ -35,10 +57,11 @@ export function BotaoPublicado({ ids }: { ids: number[] }) {
       className="flex flex-col gap-1"
     >
       <input type="hidden" name="ids" value={ids.join(",")} />
-      <button className="botao self-start" disabled={enviando}>
-        {enviando ? "Salvando…" : "Marcar como publicado"}
+      <button className={`${secundario ? "botao-secundario" : "botao"} self-start`} disabled={enviando}>
+        {enviando ? "Salvando…" : secundario ? "Já publiquei à mão" : "Marcar como publicado"}
       </button>
       {estado.erro && <p className="erro">{estado.erro}</p>}
+      {estado.aviso && <p className="text-sm text-muted">{estado.aviso}</p>}
     </form>
   );
 }
