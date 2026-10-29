@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { exigirAdmin, urlsAssinadas } from "@/lib/dados";
 import { instanteDaRequisicao } from "@/lib/datas";
-import { publicarPost, renovarToken, RENOVAR_APOS_DIAS } from "@/lib/instagram";
+import { publicarPost, renovarToken, RENOVAR_APOS_DIAS, type Via } from "@/lib/instagram";
 import { chaveDoPost, montarPlano } from "@/lib/plano";
 
 export type EstadoPublicacao = { erro?: string; aviso?: string };
@@ -49,14 +49,16 @@ export async function marcarPublicado(_anterior: EstadoPublicacao, formData: For
   return resultado;
 }
 
-type Conexao = { usuario_id: string; token: string; renovado_em: string };
+type Conexao = { via: Via; usuario_id: string; token: string; renovado_em: string };
 
 async function tokenValido(supabase: Sessao["supabase"], agora: number): Promise<Conexao | null> {
   const { data: conexao } = await supabase
     .from("instagram_conexao")
-    .select("usuario_id, token, renovado_em")
+    .select("via, usuario_id, token, renovado_em")
     .maybeSingle<Conexao>();
   if (!conexao) return null;
+  // Token de página (caminho do Facebook) não vence; só o do login do Instagram precisa ser renovado.
+  if (conexao.via === "facebook") return conexao;
   if (agora - Date.parse(conexao.renovado_em) < RENOVAR_APOS_DIAS * 86_400_000) return conexao;
 
   const novo = await renovarToken(conexao.token);
@@ -83,6 +85,7 @@ export async function publicarNoInstagram(_anterior: EstadoPublicacao, formData:
     const conexao = await tokenValido(supabase, agora);
     if (!conexao) return { erro: "O Instagram ainda não foi conectado ao app." };
     const mediaId = await publicarPost({
+      via: conexao.via,
       usuarioId: conexao.usuario_id,
       token: conexao.token,
       imagens: imagens as string[],

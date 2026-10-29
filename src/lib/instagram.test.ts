@@ -58,6 +58,20 @@ describe("publicarPost", () => {
     expect(criacoes[0].corpo).toMatchObject({ image_url: "https://a/1.jpg", caption: "L" });
   });
 
+  it("usa graph.facebook.com no caminho com Página do Facebook", async () => {
+    const { buscar, chamadas } = apiFalsa({
+      "/media_publish": () => ({ id: "post-final" }),
+      "/media": () => ({ id: "c1" }),
+      "/c1": () => ({ status_code: "FINISHED" }),
+    });
+    await publicarPost(
+      { via: "facebook", usuarioId: "u1", token: "t", imagens: ["https://a/1.jpg"], legenda: "L" },
+      buscar,
+      semEspera,
+    );
+    expect(chamadas.every((c) => c.url.startsWith("https://graph.facebook.com/"))).toBe(true);
+  });
+
   it("propaga o erro da API", async () => {
     const buscar = vi.fn(
       async () => new Response(JSON.stringify({ error: { message: "Only photo or video can be accepted" } }), { status: 400 }),
