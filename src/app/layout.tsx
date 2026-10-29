@@ -29,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               Devir Social
             </Link>
             <Link href="/novo">Enviar</Link>
+            <Link href="/membros">Membros</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/painel">Painel</Link>
             <form action={sair}>

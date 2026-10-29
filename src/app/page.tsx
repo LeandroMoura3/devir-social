@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { carregarConteudos, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
-import { formatarData, instanteDaRequisicao } from "@/lib/datas";
+import { instanteDaRequisicao } from "@/lib/datas";
+import { ultimoDiaDoCiclo, votosNecessarios, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
 import type { Voto } from "@/lib/regras";
 import { CartaoConteudo } from "./cartao-conteudo";
@@ -24,7 +25,7 @@ async function ListaConteudos() {
       .select("conteudo_id, voto")
       .eq("eleitor_id", usuarioId)
       .overrideTypes<{ conteudo_id: number; voto: Voto }[], { merge: false }>(),
-    lista<Status>(supabase.rpc("meu_status")),
+    lista<StatusCiclo>(supabase.rpc("meu_status")),
   ]);
   const meusVotos = new Map((votos ?? []).map((v) => [v.conteudo_id, v.voto]));
   const imagens = await urlsAssinadas(
@@ -79,35 +80,32 @@ async function ListaConteudos() {
   );
 }
 
-type Status = {
-  ciclo_inicio: string;
-  ciclo_fim: string;
-  participante: boolean;
-  novo: boolean;
-  votados: number;
-  total: number;
-  participacao_minima: number;
-};
-
-function AvisoStatus({ status: s }: { status: Status }) {
-  const fimCiclo = formatarData(new Date(Date.parse(s.ciclo_fim) - 1).toISOString());
-  const necessarios = Math.ceil((s.total * s.participacao_minima) / 100);
+function AvisoStatus({ status: s }: { status: StatusCiclo }) {
+  const ate = ultimoDiaDoCiclo(s.ciclo_fim);
+  const necessarios = votosNecessarios(s.total, s.participacao_minima);
   const faltam = Math.max(0, necessarios - s.votados);
   let proximo: string;
-  if (s.novo) proximo = "Como você entrou neste ciclo, no próximo você é participante garantido.";
-  else if (s.total === 0) proximo = "Nenhum conteúdo fecha neste ciclo; no próximo você continua participante.";
+  if (s.novo) proximo = "Você entrou neste ciclo, então no próximo é participante garantido.";
+  else if (s.total === 0) proximo = `Nenhum conteúdo fecha até ${ate}; se continuar assim, todos serão participantes no próximo ciclo.`;
   else if (faltam === 0)
-    proximo = `Você já votou em ${s.votados} de ${s.total} conteúdos que fecham neste ciclo: participante garantido no próximo.`;
+    proximo = `Você já votou em ${s.votados} dos ${s.total} conteúdos que fecham até ${ate}: mantém a vaga de participante no próximo ciclo.`;
   else
-    proximo = `Para ser participante no próximo ciclo, vote em pelo menos ${necessarios} dos ${s.total} conteúdos que fecham até ${fimCiclo} (faltam ${faltam}). Sim, indiferente e não contam.`;
+    proximo = `Para ser participante no próximo ciclo, vote em pelo menos ${necessarios} dos ${s.total} conteúdos que fecham até ${ate} (faltam ${faltam}). Sim, indiferente e não contam.`;
 
   return (
     <section className="cartao flex flex-col gap-1 text-sm">
       <p>
-        Neste ciclo (até {fimCiclo}) você é <strong>{s.participante ? "participante" : "espectador"}</strong>
-        {s.participante ? ": seus votos contam." : ": você pode votar, mas seus votos não contam no resultado."}
+        Neste ciclo você é <strong>{s.participante ? "participante" : "espectador"}</strong>. Isso vale para os
+        conteúdos que fecham até {ate}
+        {s.participante ? ": nesses, seus votos contam." : ": nesses, seus votos não entram no resultado."} Em cada
+        conteúdo, o app mostra se o seu voto vai contar.
       </p>
       <p className="text-muted">{proximo}</p>
+      <p>
+        <Link href="/membros" className="text-accent underline">
+          Ver quem é participante neste ciclo
+        </Link>
+      </p>
     </section>
   );
 }

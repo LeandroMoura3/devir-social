@@ -4,6 +4,8 @@ import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/co
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarData, formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
 import { NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { situacaoDoVoto, type StatusCiclo } from "@/lib/participacao";
+import { lista } from "@/lib/supabase/lista";
 import { FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
 
 export default function PaginaConteudo({ params }: PageProps<"/conteudo/[id]">) {
@@ -16,6 +18,7 @@ export default function PaginaConteudo({ params }: PageProps<"/conteudo/[id]">) 
 
 type Comentario = {
   id: number;
+  autor_id: string;
   pai_id: number | null;
   texto: string;
   criado_em: string;
@@ -28,7 +31,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   if (!Number.isInteger(conteudoId)) notFound();
 
   const { supabase, usuarioId, perfil } = await exigirParticipante();
-  const [[conteudo], { data: meuVoto }, { data: comentarios }] = await Promise.all([
+  const [[conteudo], { data: meuVoto }, { data: comentarios }, { data: status }, { data: membros }] = await Promise.all([
     carregarConteudos(supabase, [conteudoId]),
     supabase
       .from("votos")
@@ -38,11 +41,14 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       .maybeSingle<{ voto: Voto }>(),
     supabase
       .from("comentarios")
-      .select("id, pai_id, texto, criado_em, removido_motivo, perfis!comentarios_autor_id_fkey(nome_publico)")
+      .select("id, autor_id, pai_id, texto, criado_em, removido_motivo, perfis!comentarios_autor_id_fkey(nome_publico)")
       .eq("conteudo_id", conteudoId)
       .order("criado_em")
       .overrideTypes<Comentario[], { merge: false }>(),
+    lista<StatusCiclo>(supabase.rpc("meu_status")),
+    lista<{ perfil_id: string; participante: boolean }>(supabase.rpc("membros_ciclo_atual")),
   ]);
+  const espectadores = new Set((membros ?? []).filter((m) => !m.participante).map((m) => m.perfil_id));
   if (!conteudo) notFound();
 
   const agora = instanteDaRequisicao();
@@ -73,7 +79,11 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       <p className="whitespace-pre-wrap">{conteudo.texto}</p>
 
       {aberto && conteudo.autorId !== usuarioId && (
-        <FormularioVoto conteudoId={conteudo.id} meuVoto={meuVoto?.voto} />
+        <FormularioVoto
+          conteudoId={conteudo.id}
+          meuVoto={meuVoto?.voto}
+          situacao={status?.[0] ? situacaoDoVoto(status[0], conteudo.fechaEm) : undefined}
+        />
       )}
       {aberto && conteudo.autorId === usuarioId && (
         <p className="text-sm text-muted">Você não vota no próprio conteúdo.</p>
@@ -87,7 +97,13 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         ) : (
           <p className="text-sm text-muted">O debate fechou junto com a votação.</p>
         )}
-        <ArvoreComentarios comentarios={comentarios ?? []} paiId={null} conteudoId={conteudo.id} aberto={aberto} />
+        <ArvoreComentarios
+          comentarios={comentarios ?? []}
+          paiId={null}
+          conteudoId={conteudo.id}
+          aberto={aberto}
+          espectadores={espectadores}
+        />
       </section>
 
       {perfil.is_admin && !conteudo.removidoEm && !conteudo.publicadoEm && (
@@ -140,11 +156,13 @@ function ArvoreComentarios({
   paiId,
   conteudoId,
   aberto,
+  espectadores,
 }: {
   comentarios: Comentario[];
   paiId: number | null;
   conteudoId: number;
   aberto: boolean;
+  espectadores: Set<string>;
 }) {
   const filhos = comentarios.filter((c) => c.pai_id === paiId);
   if (filhos.length === 0) return null;
@@ -153,13 +171,21 @@ function ArvoreComentarios({
       {filhos.map((c) => (
         <li key={c.id} className="flex flex-col gap-1">
           <p className="text-xs text-muted">
-            {c.perfis?.nome_publico ?? "participante"} · {formatarDataHora(c.criado_em)}
+            {c.perfis?.nome_publico ?? "participante"}
+            {espectadores.has(c.autor_id) && <span className="ml-1 rounded border border-border px-1">espectador</span>} ·{" "}
+            {formatarDataHora(c.criado_em)}
           </p>
           <p className="whitespace-pre-wrap text-sm">
             {c.removido_motivo ? `Comentário removido: ${c.removido_motivo}` : c.texto}
           </p>
           {aberto && <FormularioComentario conteudoId={conteudoId} paiId={c.id} />}
-          <ArvoreComentarios comentarios={comentarios} paiId={c.id} conteudoId={conteudoId} aberto={aberto} />
+          <ArvoreComentarios
+            comentarios={comentarios}
+            paiId={c.id}
+            conteudoId={conteudoId}
+            aberto={aberto}
+            espectadores={espectadores}
+          />
         </li>
       ))}
     </ul>

@@ -92,6 +92,11 @@ export default function Regras() {
             conteúdo fechou no ciclo anterior, todos são participantes.
           </li>
           <li>Num conteúdo, contam os votos de quem é participante no ciclo em que ele fecha.</li>
+          <li>
+            Espectadores podem enviar conteúdos, comentar e votar normalmente; só o voto não entra no resultado. Todo
+            membro vê, no app, quem é participante ou espectador e quanto falta para cada um, e cada conteúdo mostra a
+            quem vota se aquele voto vai contar.
+          </li>
         </ul>
 
         <h3>5. Quórum</h3>

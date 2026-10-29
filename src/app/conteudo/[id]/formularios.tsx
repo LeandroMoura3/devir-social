@@ -1,16 +1,28 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import type { SituacaoVoto } from "@/lib/participacao";
 import { NOME_VOTO, type Voto } from "@/lib/regras";
 import { comentar, removerConteudo, votar, type EstadoAcao } from "./acoes";
 
-export function FormularioVoto({ conteudoId, meuVoto }: { conteudoId: number; meuVoto?: Voto }) {
+export function FormularioVoto({
+  conteudoId,
+  meuVoto,
+  situacao,
+}: {
+  conteudoId: number;
+  meuVoto?: Voto;
+  situacao?: SituacaoVoto;
+}) {
   const [estado, acao, enviando] = useActionState<EstadoAcao, FormData>(votar, {});
   const opcoes: Voto[] = ["sim", "indiferente", "nao"];
 
   return (
     <form action={acao} className="flex flex-col gap-2">
       <input type="hidden" name="conteudo_id" value={conteudoId} />
+      {situacao && (
+        <p className={`text-sm ${situacao.conta === "sim" ? "text-accent" : "text-muted"}`}>{situacao.mensagem}</p>
+      )}
       <div className="flex flex-wrap gap-2">
         {opcoes.map((opcao) => (
           <button
