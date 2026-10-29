@@ -1,10 +1,19 @@
-import { classificar, type Faixa } from "@/lib/regras";
+import { classificar, type Faixa, type Voto } from "@/lib/regras";
 import { lista } from "@/lib/supabase/lista";
 import type { criarClienteServidor } from "@/lib/supabase/server";
 
 type Cliente = Awaited<ReturnType<typeof criarClienteServidor>>;
 
-export type Resultado = { favor: number; contra: number; base: number; faixa: Faixa };
+// favor = SIM e contra = NÃO de participantes do ciclo; indiferente é só ilustrativo.
+export type Resultado = {
+  favor: number;
+  contra: number;
+  indiferente: number;
+  base: number;
+  quorumNecessario: number;
+  cicloInicio: string;
+  faixa: Faixa;
+};
 
 export type ConteudoVisao = {
   id: number;
@@ -35,7 +44,15 @@ type LinhaConteudo = {
   perfis: { nome_publico: string } | null;
 };
 
-type LinhaResultado = { conteudo_id: number; favor: number; contra: number; base: number };
+type LinhaResultado = {
+  conteudo_id: number;
+  ciclo_inicio: string;
+  favor: number;
+  contra: number;
+  indiferente: number;
+  base: number;
+  quorum_necessario: number;
+};
 
 const CAMPOS =
   "id, texto, imagem_path, imagem_apagada, autor_id, criado_em, fecha_em, publicado_em, removido_em, removido_motivo, perfis!conteudos_autor_id_fkey(nome_publico)";
@@ -77,7 +94,70 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
       removidoEm: l.removido_em,
       removidoMotivo: l.removido_motivo,
       comentarios: totalComentarios.get(l.id) ?? 0,
-      resultado: r ? { favor: r.favor, contra: r.contra, base: r.base, faixa: classificar(r) } : null,
+      resultado: r
+        ? {
+            favor: r.favor,
+            contra: r.contra,
+            indiferente: r.indiferente,
+            base: r.base,
+            quorumNecessario: r.quorum_necessario,
+            cicloInicio: r.ciclo_inicio,
+            faixa: classificar({ favor: r.favor, contra: r.contra, quorumNecessario: r.quorum_necessario }),
+          }
+        : null,
     };
   });
+}
+
+export type VotacaoNominal = {
+  sim: string[];
+  nao: string[];
+  indiferente: string[];
+  espectadores: { nome: string; voto: Voto }[];
+  participantesCiclo: string[];
+};
+
+type LinhaVoto = { conteudo_id: number; eleitor_id: string; voto: Voto; perfis: { nome_publico: string } | null };
+
+const porNome = (a: string, b: string) => a.localeCompare(b, "pt-BR");
+
+// Nomes de quem votou em cada conteúdo fechado, separando participantes e espectadores do ciclo.
+export async function carregarVotacao(supabase: Cliente, ids: number[]): Promise<Map<number, VotacaoNominal>> {
+  const [respostaVotos, ...respostasCiclo] = await Promise.all([
+    supabase
+      .from("votos")
+      .select("conteudo_id, eleitor_id, voto, perfis!votos_eleitor_id_fkey(nome_publico)")
+      .in("conteudo_id", ids)
+      .overrideTypes<LinhaVoto[], { merge: false }>(),
+    ...ids.map((id) =>
+      lista<{ perfil_id: string; nome_publico: string }>(supabase.rpc("participantes_ciclo", { p_conteudo: id })),
+    ),
+  ]);
+  for (const { error } of [respostaVotos, ...respostasCiclo]) {
+    if (error) throw new Error(`Falha ao carregar votos: ${JSON.stringify(error)}`);
+  }
+
+  const resultado = new Map<number, VotacaoNominal>();
+  ids.forEach((id, i) => {
+    const participantes = respostasCiclo[i].data ?? [];
+    const idsParticipantes = new Set(participantes.map((p) => p.perfil_id));
+    const votacao: VotacaoNominal = {
+      sim: [],
+      nao: [],
+      indiferente: [],
+      espectadores: [],
+      participantesCiclo: participantes.map((p) => p.nome_publico).sort(porNome),
+    };
+    for (const v of (respostaVotos.data ?? []).filter((v) => v.conteudo_id === id)) {
+      const nome = v.perfis?.nome_publico ?? "participante";
+      if (idsParticipantes.has(v.eleitor_id)) votacao[v.voto].push(nome);
+      else votacao.espectadores.push({ nome, voto: v.voto });
+    }
+    votacao.sim.sort(porNome);
+    votacao.nao.sort(porNome);
+    votacao.indiferente.sort(porNome);
+    votacao.espectadores.sort((a, b) => porNome(a.nome, b.nome));
+    resultado.set(id, votacao);
+  });
+  return resultado;
 }

@@ -1,27 +1,34 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { NOME_VOTO, type Voto } from "@/lib/regras";
 import { comentar, removerConteudo, votar, type EstadoAcao } from "./acoes";
 
-export function FormularioVoto({ conteudoId, meuVoto }: { conteudoId: number; meuVoto?: boolean }) {
+export function FormularioVoto({ conteudoId, meuVoto }: { conteudoId: number; meuVoto?: Voto }) {
   const [estado, acao, enviando] = useActionState<EstadoAcao, FormData>(votar, {});
-  const classe = (aFavor: boolean) => (meuVoto === aFavor ? "botao" : "botao-secundario");
+  const opcoes: Voto[] = ["sim", "indiferente", "nao"];
 
   return (
     <form action={acao} className="flex flex-col gap-2">
       <input type="hidden" name="conteudo_id" value={conteudoId} />
-      <div className="flex gap-2">
-        <button name="a_favor" value="true" className={classe(true)} disabled={enviando}>
-          A favor
-        </button>
-        <button name="a_favor" value="false" className={classe(false)} disabled={enviando}>
-          Contra
-        </button>
+      <div className="flex flex-wrap gap-2">
+        {opcoes.map((opcao) => (
+          <button
+            key={opcao}
+            name="voto"
+            value={opcao}
+            className={meuVoto === opcao ? "botao" : "botao-secundario"}
+            disabled={enviando}
+          >
+            {NOME_VOTO[opcao][0].toUpperCase() + NOME_VOTO[opcao].slice(1)}
+          </button>
+        ))}
       </div>
       <p className="text-xs text-muted">
         {meuVoto === undefined
           ? "Você ainda não votou. Dá para mudar o voto até o fechamento."
-          : `Seu voto: ${meuVoto ? "a favor" : "contra"}. Dá para mudar até o fechamento.`}
+          : `Seu voto: ${NOME_VOTO[meuVoto]}. Dá para mudar até o fechamento.`}{" "}
+        Indiferente é ilustrativo: não entra na contagem, mas conta como participação.
       </p>
       {estado.erro && <p className="erro">{estado.erro}</p>}
     </form>

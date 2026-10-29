@@ -39,3 +39,26 @@ export async function urlsAssinadas(
   }
   return urls;
 }
+
+export type Parametros = {
+  inicio: string;
+  dias_conteudo: number;
+  dias_ciclo: number;
+  participacao_minima: number;
+  quorum: number;
+};
+
+type ClienteSupabase = Awaited<ReturnType<typeof criarClienteServidor>>;
+
+// Versão em vigor agora e, se houver, a agendada para o próximo ciclo.
+export async function carregarParametros(supabase: ClienteSupabase, agora: number) {
+  const { data, error } = await supabase
+    .from("parametros")
+    .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum")
+    .order("inicio", { ascending: false })
+    .overrideTypes<Parametros[], { merge: false }>();
+  if (error || !data || data.length === 0) throw new Error(`Falha ao carregar parâmetros: ${JSON.stringify(error)}`);
+  const vigente = data.find((p) => Date.parse(p.inicio) <= agora) ?? data[data.length - 1];
+  const agendada = data.find((p) => Date.parse(p.inicio) > agora);
+  return { vigente, agendada };
+}

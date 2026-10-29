@@ -10,10 +10,14 @@ export const metadata = { title: "Painel · Devir Social" };
 export default function Painel() {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Painel semanal</h1>
+      <h1 className="text-2xl font-semibold">Painel</h1>
+      <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
+        <Ciclos />
+      </Suspense>
+      <h2 className="text-lg font-semibold">Semanas</h2>
       <p className="text-sm text-muted">
-        Totais por semana (domingo a sábado, horário de Brasília). Ativo: abriu o app na semana. Participante: votou
-        pelo menos uma vez na semana. Conteúdos fechados contam na semana em que a votação terminou.
+        Totais por semana (domingo a sábado, horário de Brasília). Ativo: abriu o app na semana. Votante: votou pelo
+        menos uma vez na semana. Conteúdos fechados contam na semana em que a votação terminou.
       </p>
       <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
         <Tabela />
@@ -34,19 +38,110 @@ type Semana = {
   inativos_4_semanas: number;
 };
 
-type Fechado = { semana: string; favor: number; contra: number; base: number };
+type Fechado = { semana: string; favor: number; contra: number; indiferente: number; quorum_necessario: number };
 
 function porcentagem(parte: number, todo: number): string {
   return todo > 0 ? `${Math.round((parte * 100) / todo)}%` : "–";
 }
 
-async function Tabela() {
+type Ciclo = {
+  ciclo_inicio: string;
+  ciclo_fim: string;
+  membros: number;
+  participantes: number;
+  conteudos_fechados: number;
+};
+
+type Parametros = {
+  inicio: string;
+  dias_conteudo: number;
+  dias_ciclo: number;
+  participacao_minima: number;
+  quorum: number;
+};
+
+async function clientePublico() {
   await connection();
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false } },
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { persistSession: false },
+  });
+}
+
+// O último dia do ciclo é a véspera do início do próximo.
+function ultimoDia(fim: string): string {
+  return formatarData(new Date(Date.parse(fim) - 1).toISOString());
+}
+
+async function Ciclos() {
+  const supabase = await clientePublico();
+  const [{ data: ciclos, error }, { data: parametros }] = await Promise.all([
+    lista<Ciclo>(supabase.rpc("painel_ciclos")),
+    supabase
+      .from("parametros")
+      .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum")
+      .order("inicio", { ascending: false })
+      .overrideTypes<Parametros[], { merge: false }>(),
+  ]);
+  if (error) return <p className="erro">Não foi possível carregar os ciclos.</p>;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <section className="flex flex-col gap-2 text-sm">
+        <h2 className="text-lg font-semibold">Parâmetros</h2>
+        <p className="text-muted">
+          Mudanças nos parâmetros só valem a partir do ciclo seguinte. Versões anteriores ficam registradas aqui.
+        </p>
+        <ul className="flex flex-col gap-1">
+          {(parametros ?? []).map((p) => (
+            <li key={p.inicio}>
+              <strong>A partir de {formatarData(p.inicio)}:</strong> conteúdo aberto por {p.dias_conteudo} dias; ciclos de{" "}
+              {p.dias_ciclo} dias; participação mínima de {p.participacao_minima}%; quórum de {p.quorum}% dos
+              participantes do ciclo.
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-lg font-semibold">Ciclos</h2>
+        <p className="text-sm text-muted">
+          Participante: votou (sim, indiferente ou não) em pelo menos a participação mínima dos conteúdos que fecharam
+          no ciclo anterior, ou entrou no ciclo anterior. Os demais membros são espectadores: podem votar, mas o voto
+          não conta no resultado.
+        </p>
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <table className="w-full text-right text-sm tabular-nums">
+            <thead className="bg-card text-xs text-muted">
+              <tr>
+                {["Ciclo", "Membros", "Participantes", "Espectadores", "Conteúdos fechados"].map((c) => (
+                  <th key={c} className="px-3 py-2 font-medium first:text-left">
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[...(ciclos ?? [])].reverse().map((c) => (
+                <tr key={c.ciclo_inicio} className="border-t border-border">
+                  <td className="whitespace-nowrap px-3 py-2 text-left">
+                    {formatarData(c.ciclo_inicio)} a {ultimoDia(c.ciclo_fim)}
+                  </td>
+                  <td className="px-3 py-2">{c.membros}</td>
+                  <td className="px-3 py-2">{c.participantes}</td>
+                  <td className="px-3 py-2">{c.membros - c.participantes}</td>
+                  <td className="px-3 py-2">{c.conteudos_fechados}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
+}
+
+async function Tabela() {
+  const supabase = await clientePublico();
   const [{ data: semanas, error }, { data: fechados }] = await Promise.all([
     lista<Semana>(supabase.rpc("painel_semanal")),
     lista<Fechado>(supabase.rpc("painel_fechados")),
@@ -57,7 +152,7 @@ async function Tabela() {
   const faixas = new Map<string, Record<Faixa, number> & { contra: number; total: number }>();
   for (const f of fechados ?? []) {
     const linha = faixas.get(f.semana) ?? { maioria: 0, minoria: 0, tribuna_livre: 0, sem_quorum: 0, contra: 0, total: 0 };
-    linha[classificar(f)] += 1;
+    linha[classificar({ favor: f.favor, contra: f.contra, quorumNecessario: f.quorum_necessario })] += 1;
     linha.contra += f.contra;
     linha.total += 1;
     faixas.set(f.semana, linha);
@@ -68,8 +163,8 @@ async function Tabela() {
     "Membros",
     "Novos",
     "Ativos",
-    "Participantes",
-    "Participação",
+    "Votantes",
+    "Votantes/ativos",
     "Envios",
     "Votos",
     "Comentários",
@@ -77,7 +172,7 @@ async function Tabela() {
     "Minoria",
     "Tribuna",
     "Sem quórum",
-    "Contra/conteúdo",
+    "Não/conteúdo",
     "Inativos 4+ sem.",
   ];
 

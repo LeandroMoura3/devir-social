@@ -9,7 +9,7 @@ export async function votar(_anterior: EstadoAcao, formData: FormData): Promise<
   const supabase = await criarClienteServidor();
   const { error } = await supabase.rpc("votar", {
     p_conteudo: Number(formData.get("conteudo_id")),
-    p_a_favor: formData.get("a_favor") === "true",
+    p_voto: String(formData.get("voto")),
   });
   if (error) return { erro: error.message };
   refresh();

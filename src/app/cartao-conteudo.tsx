@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { ConteudoVisao } from "@/lib/conteudos";
 import { tempoRestante } from "@/lib/datas";
-import { NOME_FAIXA } from "@/lib/regras";
+import { NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
 
 type Props = {
   conteudo: ConteudoVisao;
   imagemUrl?: string;
   agora: number;
-  meuVoto?: boolean;
+  meuVoto?: Voto;
   souAutor: boolean;
 };
 
@@ -20,11 +20,11 @@ export function CartaoConteudo({ conteudo: c, imagemUrl, agora, meuVoto, souAuto
       ? "seu conteúdo"
       : meuVoto === undefined
         ? "você ainda não votou"
-        : `você votou ${meuVoto ? "a favor" : "contra"}`;
+        : `você votou ${NOME_VOTO[meuVoto]}`;
     situacao = `${tempoRestante(c.fechaEm, agora)} · ${voto}`;
   } else if (c.resultado) {
     const { favor, contra, faixa } = c.resultado;
-    situacao = `${NOME_FAIXA[faixa]} · a favor ${favor} · contra ${contra}${c.publicadoEm ? " · publicado" : ""}`;
+    situacao = `${NOME_FAIXA[faixa]} · sim ${favor} · não ${contra}${c.publicadoEm ? " · publicado" : ""}`;
   } else situacao = "fechado";
 
   return (

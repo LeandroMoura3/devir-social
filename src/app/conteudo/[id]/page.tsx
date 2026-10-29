@@ -1,10 +1,9 @@
 import { Suspense } from "react";
-import { lista } from "@/lib/supabase/lista";
 import { notFound } from "next/navigation";
-import { carregarConteudos, type ConteudoVisao } from "@/lib/conteudos";
+import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarData, formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
-import { NOME_FAIXA, quorumNecessario } from "@/lib/regras";
+import { NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
 import { FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
 
 export default function PaginaConteudo({ params }: PageProps<"/conteudo/[id]">) {
@@ -24,8 +23,6 @@ type Comentario = {
   perfis: { nome_publico: string } | null;
 };
 
-type VotoNominal = { a_favor: boolean; perfis: { nome_publico: string } | null };
-
 async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   const conteudoId = Number((await params).id);
   if (!Number.isInteger(conteudoId)) notFound();
@@ -33,7 +30,12 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   const { supabase, usuarioId, perfil } = await exigirParticipante();
   const [[conteudo], { data: meuVoto }, { data: comentarios }] = await Promise.all([
     carregarConteudos(supabase, [conteudoId]),
-    supabase.from("votos").select("a_favor").eq("conteudo_id", conteudoId).eq("eleitor_id", usuarioId).maybeSingle(),
+    supabase
+      .from("votos")
+      .select("voto")
+      .eq("conteudo_id", conteudoId)
+      .eq("eleitor_id", usuarioId)
+      .maybeSingle<{ voto: Voto }>(),
     supabase
       .from("comentarios")
       .select("id, pai_id, texto, criado_em, removido_motivo, perfis!comentarios_autor_id_fkey(nome_publico)")
@@ -71,7 +73,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       <p className="whitespace-pre-wrap">{conteudo.texto}</p>
 
       {aberto && conteudo.autorId !== usuarioId && (
-        <FormularioVoto conteudoId={conteudo.id} meuVoto={meuVoto?.a_favor} />
+        <FormularioVoto conteudoId={conteudo.id} meuVoto={meuVoto?.voto} />
       )}
       {aberto && conteudo.autorId === usuarioId && (
         <p className="text-sm text-muted">Você não vota no próprio conteúdo.</p>
@@ -101,19 +103,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
 type Cliente = Awaited<ReturnType<typeof exigirParticipante>>["supabase"];
 
 async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao; supabase: Cliente }) {
-  const [{ data: votos }, { data: participantes }] = await Promise.all([
-    supabase
-      .from("votos")
-      .select("a_favor, perfis!votos_eleitor_id_fkey(nome_publico)")
-      .eq("conteudo_id", conteudo.id)
-      .overrideTypes<VotoNominal[], { merge: false }>(),
-    lista<{ nome_publico: string }>(supabase.rpc("participantes_janela", { p_conteudo: conteudo.id })),
-  ]);
-  const nomes = (aFavor: boolean) =>
-    (votos ?? [])
-      .filter((v) => v.a_favor === aFavor)
-      .map((v) => v.perfis?.nome_publico ?? "participante")
-      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const votacao = (await carregarVotacao(supabase, [conteudo.id])).get(conteudo.id)!;
   const r = conteudo.resultado!;
   const juntarNomes = (itens: string[]) => (itens.length > 0 ? itens.join(", ") : "ninguém");
 
@@ -121,19 +111,26 @@ async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao;
     <section className="cartao flex flex-col gap-2 text-sm">
       <h2 className="text-lg font-semibold">{NOME_FAIXA[r.faixa]}</h2>
       <p>
-        A favor {r.favor} · contra {r.contra} · total {r.favor + r.contra}
+        Sim {r.favor} · não {r.contra} · total {r.favor + r.contra}
       </p>
       <p>
-        <strong>A favor:</strong> {juntarNomes(nomes(true))}
+        <strong>Sim:</strong> {juntarNomes(votacao.sim)}
       </p>
       <p>
-        <strong>Contra:</strong> {juntarNomes(nomes(false))}
+        <strong>Não:</strong> {juntarNomes(votacao.nao)}
       </p>
       <p className="text-muted">
-        Quórum: {r.base} participantes votaram entre {formatarData(conteudo.criadoEm)} e{" "}
-        {formatarData(conteudo.fechaEm)}; mínimo de {quorumNecessario(r.base)} votos.
+        Quórum: {r.base} participantes no ciclo iniciado em {formatarData(r.cicloInicio)}; mínimo de{" "}
+        {r.quorumNecessario} votos (sim + não).
       </p>
-      <p className="text-muted">Participantes na janela: {juntarNomes((participantes ?? []).map((p) => p.nome_publico))}</p>
+      <p className="text-muted">Participantes do ciclo: {juntarNomes(votacao.participantesCiclo)}</p>
+      <p className="text-muted">
+        Indiferente (ilustrativo, não conta): {r.indiferente} · {juntarNomes(votacao.indiferente)}
+      </p>
+      <p className="text-muted">
+        Votos de espectadores (não contam):{" "}
+        {juntarNomes(votacao.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`))}
+      </p>
     </section>
   );
 }

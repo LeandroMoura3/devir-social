@@ -1,10 +1,15 @@
-// Regras do piloto (versão 0.2), em código. Tudo aqui é determinístico:
+// Regras do piloto, em código. Tudo aqui é determinístico:
 // as mesmas entradas sempre geram a mesma saída, em qualquer ordem.
+// Prazos, ciclos, participação mínima e quórum são parâmetros versionados no banco
+// (tabela parametros); as contagens chegam prontas da função _resultados().
+// "favor" = votos SIM e "contra" = votos NÃO de participantes do ciclo; indiferente não entra.
 
 export type Faixa = "maioria" | "minoria" | "tribuna_livre" | "sem_quorum";
 
-export const DIAS_ABERTO = 14;
-export const QUORUM_PERCENTUAL = 20;
+export type Voto = "sim" | "indiferente" | "nao";
+
+export const NOME_VOTO: Record<Voto, string> = { sim: "sim", indiferente: "indiferente", nao: "não" };
+
 export const LIMITE_LEGENDA = 2200;
 export const MAX_ITENS_POST = 10;
 export const RODAPE_LEGENDA = "Texto completo e votos: link na bio";
@@ -13,13 +18,17 @@ const PESOS = { maioria: 4, minoria: 2, tribuna: 1 } as const;
 
 type Grupo = keyof typeof PESOS;
 
-export function quorumNecessario(base: number): number {
-  return Math.ceil((base * QUORUM_PERCENTUAL) / 100);
-}
-
-export function classificar({ favor, contra, base }: { favor: number; contra: number; base: number }): Faixa {
+export function classificar({
+  favor,
+  contra,
+  quorumNecessario,
+}: {
+  favor: number;
+  contra: number;
+  quorumNecessario: number;
+}): Faixa {
   const total = favor + contra;
-  if (total === 0 || total < quorumNecessario(base)) return "sem_quorum";
+  if (total === 0 || total < quorumNecessario) return "sem_quorum";
   if (favor * 100 > 50 * total) return "maioria";
   if (favor * 100 >= 20 * total) return "minoria";
   return "tribuna_livre";
@@ -53,7 +62,7 @@ export type Post<C extends ConteudoClassificado = ConteudoClassificado> = {
   legenda: string;
 };
 
-// Mais votos a favor; empate: menos votos contra; depois o mais antigo.
+// Mais votos sim; empate: menos votos não; depois o mais antigo.
 export function compararConteudos(a: ConteudoClassificado, b: ConteudoClassificado): number {
   return (
     b.favor - a.favor ||
@@ -136,7 +145,7 @@ function rotulos(conteudos: ConteudoClassificado[]): string[] {
 }
 
 function bloco(rotulo: string, c: ConteudoClassificado, texto: string): string {
-  return `${rotulo} · #${c.id}\n${texto}\na favor ${c.favor} · contra ${c.contra} · total ${c.favor + c.contra}`;
+  return `${rotulo} · #${c.id}\n${texto}\nsim ${c.favor} · não ${c.contra} · total ${c.favor + c.contra}`;
 }
 
 function juntar(blocos: string[]): string {

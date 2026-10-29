@@ -5,7 +5,6 @@ import {
   LIMITE_LEGENDA,
   limitesDeTexto,
   planejarPublicacao,
-  quorumNecessario,
   type ConteudoClassificado,
   type Faixa,
 } from "./regras";
@@ -28,21 +27,20 @@ const ids = (lista: ConteudoClassificado[]) => lista.map((c) => c.id);
 
 describe("classificar", () => {
   it("separa as faixas nos limites exatos", () => {
-    expect(classificar({ favor: 51, contra: 49, base: 0 })).toBe("maioria");
-    expect(classificar({ favor: 50, contra: 50, base: 0 })).toBe("minoria");
-    expect(classificar({ favor: 20, contra: 80, base: 0 })).toBe("minoria");
-    expect(classificar({ favor: 19, contra: 81, base: 0 })).toBe("tribuna_livre");
+    expect(classificar({ favor: 51, contra: 49, quorumNecessario: 0 })).toBe("maioria");
+    expect(classificar({ favor: 50, contra: 50, quorumNecessario: 0 })).toBe("minoria");
+    expect(classificar({ favor: 20, contra: 80, quorumNecessario: 0 })).toBe("minoria");
+    expect(classificar({ favor: 19, contra: 81, quorumNecessario: 0 })).toBe("tribuna_livre");
   });
 
-  it("exige quórum de 20% dos participantes da janela", () => {
-    expect(quorumNecessario(40)).toBe(8);
-    expect(quorumNecessario(41)).toBe(9);
-    expect(classificar({ favor: 7, contra: 0, base: 40 })).toBe("sem_quorum");
-    expect(classificar({ favor: 8, contra: 0, base: 40 })).toBe("maioria");
+  it("exige o quórum calculado no banco (sim + não)", () => {
+    expect(classificar({ favor: 7, contra: 0, quorumNecessario: 8 })).toBe("sem_quorum");
+    expect(classificar({ favor: 8, contra: 0, quorumNecessario: 8 })).toBe("maioria");
+    expect(classificar({ favor: 4, contra: 4, quorumNecessario: 8 })).toBe("minoria");
   });
 
   it("sem nenhum voto fica sem quórum", () => {
-    expect(classificar({ favor: 0, contra: 0, base: 0 })).toBe("sem_quorum");
+    expect(classificar({ favor: 0, contra: 0, quorumNecessario: 0 })).toBe("sem_quorum");
   });
 });
 
@@ -139,7 +137,7 @@ describe("legenda", () => {
   it("textos curtos aparecem inteiros", () => {
     const m1 = conteudo("maioria", 20, { texto: "Mensagem curta" });
     const [post] = planejarPublicacao([m1]);
-    expect(post.legenda).toContain("Mensagem curta\na favor 20 · contra 0 · total 20");
+    expect(post.legenda).toContain("Mensagem curta\nsim 20 · não 0 · total 20");
   });
 });
 

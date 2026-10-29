@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { lista } from "@/lib/supabase/lista";
-import { carregarConteudos, type ConteudoVisao } from "@/lib/conteudos";
+import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirAdmin, urlsAssinadas } from "@/lib/dados";
 import { instanteDaRequisicao } from "@/lib/datas";
 import { NOME_FAIXA, planejarPublicacao } from "@/lib/regras";
@@ -25,7 +24,6 @@ export default function PlanoPublicacao() {
 }
 
 type Cliente = Awaited<ReturnType<typeof exigirAdmin>>["supabase"];
-type VotoNominal = { conteudo_id: number; a_favor: boolean; perfis: { nome_publico: string } | null };
 
 async function Plano() {
   const { supabase } = await exigirAdmin();
@@ -97,37 +95,24 @@ async function Plano() {
 }
 
 async function montarRegistro(supabase: Cliente, conteudos: ConteudoVisao[]): Promise<RegistroConteudo[]> {
-  const ids = conteudos.map((c) => c.id);
-  const [{ data: votos }, participantes] = await Promise.all([
-    supabase
-      .from("votos")
-      .select("conteudo_id, a_favor, perfis!votos_eleitor_id_fkey(nome_publico)")
-      .in("conteudo_id", ids)
-      .overrideTypes<VotoNominal[], { merge: false }>(),
-    Promise.all(
-      ids.map((id) =>
-        lista<{ nome_publico: string }>(supabase.rpc("participantes_janela", { p_conteudo: id })),
-      ),
-    ),
-  ]);
-  const nomes = (id: number, aFavor: boolean) =>
-    (votos ?? [])
-      .filter((v) => v.conteudo_id === id && v.a_favor === aFavor)
-      .map((v) => v.perfis?.nome_publico ?? "participante")
-      .sort((a, b) => a.localeCompare(b, "pt-BR"));
-
-  return conteudos.map((c, i) => ({
-    id: c.id,
-    texto: c.texto,
-    autor: c.autor,
-    faixa: c.resultado!.faixa,
-    favor: c.resultado!.favor,
-    contra: c.resultado!.contra,
-    base: c.resultado!.base,
-    criadoEm: c.criadoEm,
-    fechaEm: c.fechaEm,
-    nomesFavor: nomes(c.id, true),
-    nomesContra: nomes(c.id, false),
-    participantesJanela: (participantes[i].data ?? []).map((p) => p.nome_publico),
-  }));
+  const votacoes = await carregarVotacao(
+    supabase,
+    conteudos.map((c) => c.id),
+  );
+  return conteudos.map((c) => {
+    const r = c.resultado!;
+    return {
+      id: c.id,
+      texto: c.texto,
+      autor: c.autor,
+      faixa: r.faixa,
+      favor: r.favor,
+      contra: r.contra,
+      indiferente: r.indiferente,
+      base: r.base,
+      quorumNecessario: r.quorumNecessario,
+      cicloInicio: r.cicloInicio,
+      votacao: votacoes.get(c.id)!,
+    };
+  });
 }

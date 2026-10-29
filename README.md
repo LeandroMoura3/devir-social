@@ -8,8 +8,10 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 - **Login por link no e-mail**, só para pessoas convidadas.
 - **Cadastro com tela de consentimento** (nome, nome público e 5 autorizações).
 - **Envio de conteúdo** (imagem de até 5 MB + texto).
-- **Debate** com comentários e respostas em thread, e **votação** a favor ou contra, durante 14 dias. O voto pode ser mudado até o fechamento; contagens e nomes ficam escondidos até lá.
-- **Classificação automática** (maioria, minoria, tribuna livre, sem quórum), com quórum de 20% dos participantes da janela.
+- **Debate** com comentários e respostas em thread, e **votação** sim, indiferente ou não, durante o prazo do conteúdo. O voto pode ser mudado até o fechamento; contagens e nomes ficam escondidos até lá. Indiferente é ilustrativo: não entra na classificação.
+- **Ciclos de participação**: quem votou em pelo menos X% dos conteúdos do ciclo anterior é participante; os demais são espectadores (votam, mas não contam). Quem entrou agora é participante garantido no ciclo seguinte.
+- **Classificação automática** (maioria, minoria, tribuna livre, sem quórum), com quórum sobre os participantes do ciclo em que o conteúdo fecha.
+- **Parâmetros versionados** (prazo do conteúdo, duração do ciclo, participação mínima, quórum): mudanças só valem a partir do próximo ciclo, e o histórico não muda.
 - **Plano de publicação** (só coordenação): monta os posts do Instagram (cascata, rodízio, até 10 imagens, legenda com pesos 4:2:1), gera o registro em HTML para o blog e apaga as imagens depois de publicadas.
 - **Painel semanal público** em `/painel`, sem login.
 - **Remoção por exceção legal** (só coordenação), com o motivo registrado.
@@ -19,7 +21,17 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 ### 1. Banco de dados (Supabase)
 
 1. No Supabase, abra o projeto e vá em **SQL Editor → New query**.
-2. Cole todo o conteúdo de [`supabase/migrations/0001_esquema.sql`](supabase/migrations/0001_esquema.sql) e clique em **Run**.
+2. Rode, um de cada vez e nesta ordem, os arquivos de [`supabase/migrations/`](supabase/migrations/): cole o conteúdo inteiro e clique em **Run**.
+
+### Mudar parâmetros
+
+No SQL Editor (os valores são: dias do conteúdo, dias do ciclo, % de participação mínima, % de quórum):
+
+```sql
+select public.agendar_parametros(14, 14, 50, 20);
+```
+
+A mudança vale a partir do início do próximo ciclo. Rodar de novo antes disso substitui o agendamento. Todas as versões aparecem no painel público.
 
 ### 2. Login (Supabase → Authentication)
 
