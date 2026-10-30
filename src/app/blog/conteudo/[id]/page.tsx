@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { carregarPublicados, carregarRegistro } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
-import { NOME_FAIXA, NOME_VOTO } from "@/lib/regras";
+import { NOME_FAIXA } from "@/lib/regras";
+import { ResultadoVotos } from "../../../resultado-votos";
 import { MenuBlog } from "../../menu";
 
 export default function ConteudoPublicado({ params }: PageProps<"/blog/conteudo/[id]">) {
@@ -14,10 +15,6 @@ export default function ConteudoPublicado({ params }: PageProps<"/blog/conteudo/
       </Suspense>
     </div>
   );
-}
-
-function nomes(itens: string[]): string {
-  return itens.length > 0 ? itens.join(", ") : "ninguém";
 }
 
 async function Registro({ params }: { params: Promise<{ id: string }> }) {
@@ -40,31 +37,11 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
 
       <p className="whitespace-pre-wrap">{conteudo.texto}</p>
 
-      <section className="cartao flex flex-col gap-2 text-sm">
-        <p>
-          <strong>
-            Sim {conteudo.favor} · não {conteudo.contra} · total {conteudo.favor + conteudo.contra}
-          </strong>
-        </p>
-        <p>
-          <strong>Sim:</strong> {nomes(registro.sim)}
-        </p>
-        <p>
-          <strong>Não:</strong> {nomes(registro.nao)}
-        </p>
-        <p className="text-muted">
-          Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.fechaEm)}. Quórum: {conteudo.base}{" "}
-          participantes no ciclo iniciado em {formatarData(conteudo.cicloInicio)}; mínimo de{" "}
-          {conteudo.quorumNecessario} votos (sim + não).
-        </p>
-        <p className="text-muted">Participantes do ciclo: {nomes(registro.participantesCiclo)}</p>
-        <p className="text-muted">
-          Indiferente (ilustrativo, não conta): {conteudo.indiferente} · {nomes(registro.indiferente)}
-        </p>
-        <p className="text-muted">
-          Votos de espectadores (não contam):{" "}
-          {nomes(registro.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`))}
-        </p>
+      <p className="text-sm text-muted">
+        Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.fechaEm)}.
+      </p>
+      <section className="cartao">
+        <ResultadoVotos {...conteudo} votacao={registro} />
       </section>
     </article>
   );

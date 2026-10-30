@@ -50,7 +50,7 @@ async function Lista() {
         {ciclo.participacao_minima}% dos conteúdos que fecharam no ciclo anterior (ou entrou no ciclo anterior); os
         demais são espectadores, e seus votos não entram no resultado dos conteúdos que fecham até {ate}. A coluna
         &quot;Próximo ciclo&quot; mostra a situação de cada um com os votos dados até agora nos conteúdos que fecham até{" "}
-        {ate} (sim, indiferente e não contam).
+        {ate} (qualquer opção conta, inclusive indiferente).
       </p>
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-left text-sm">

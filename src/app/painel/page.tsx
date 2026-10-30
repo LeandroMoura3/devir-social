@@ -97,7 +97,7 @@ async function Ciclos() {
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">Ciclos</h2>
         <p className="text-sm text-muted">
-          Participante: votou (sim, indiferente ou não) em pelo menos a participação mínima dos conteúdos que fecharam
+          Participante: votou (com qualquer opção) em pelo menos a participação mínima dos conteúdos que fecharam
           no ciclo anterior, ou entrou no ciclo anterior. Os demais membros são espectadores: podem votar, mas o voto
           não conta no resultado.
         </p>
@@ -164,7 +164,7 @@ async function Tabela() {
     "Minoria",
     "Tribuna",
     "Sem quórum",
-    "Não/conteúdo",
+    "Protesto/conteúdo",
     "Inativos 4+ sem.",
   ];
 

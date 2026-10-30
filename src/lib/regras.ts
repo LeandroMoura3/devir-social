@@ -2,13 +2,51 @@
 // as mesmas entradas sempre geram a mesma saída, em qualquer ordem.
 // Prazos, ciclos, participação mínima e quórum são parâmetros versionados no banco
 // (tabela parametros); as contagens chegam prontas da função _resultados().
-// "favor" = votos SIM e "contra" = votos NÃO de participantes do ciclo; indiferente não entra.
+// "favor" = votos de APOIO e "contra" = votos de PROTESTO de participantes do ciclo; indiferente não entra.
 
 export type Faixa = "maioria" | "minoria" | "tribuna_livre" | "sem_quorum";
 
-export type Voto = "sim" | "indiferente" | "nao";
+// Voto por sentimento: 4 de apoio, indiferente e 4 de protesto, em pares espelhados
+// (identidade, informação, justiça e diálogo). Mesma lista em public.lado_do_voto no banco.
+export const VOTOS_APOIO = ["me_representa", "utilidade_publica", "expoe_injustica", "merece_ser_ouvido"] as const;
+export const VOTOS_PROTESTO = ["nao_me_representa", "falso_ou_enganoso", "ofende_ou_ataca", "so_gera_briga"] as const;
 
-export const NOME_VOTO: Record<Voto, string> = { sim: "sim", indiferente: "indiferente", nao: "não" };
+export type VotoApoio = (typeof VOTOS_APOIO)[number];
+export type VotoProtesto = (typeof VOTOS_PROTESTO)[number];
+export type Voto = VotoApoio | "indiferente" | VotoProtesto;
+export type Lado = "apoio" | "protesto" | "indiferente";
+
+export const NOME_VOTO: Record<Voto, string> = {
+  me_representa: "me representa",
+  utilidade_publica: "utilidade pública",
+  expoe_injustica: "expõe injustiça",
+  merece_ser_ouvido: "merece ser ouvido",
+  indiferente: "indiferente",
+  nao_me_representa: "não me representa",
+  falso_ou_enganoso: "falso ou enganoso",
+  ofende_ou_ataca: "ofende ou ataca",
+  so_gera_briga: "só gera briga",
+};
+
+export function ladoDoVoto(voto: Voto): Lado {
+  if ((VOTOS_APOIO as readonly string[]).includes(voto)) return "apoio";
+  if ((VOTOS_PROTESTO as readonly string[]).includes(voto)) return "protesto";
+  return "indiferente";
+}
+
+export type Detalhe = Partial<Record<Voto, number>>;
+
+// "apoio 5 (me representa 3 · utilidade pública 2)": sentimentos sem votos ficam de fora;
+// ordem: mais votado primeiro, empate pela ordem fixa da lista.
+export function resumoDoLado(lado: "apoio" | "protesto", total: number, detalhe: Detalhe = {}): string {
+  const opcoes = lado === "apoio" ? VOTOS_APOIO : VOTOS_PROTESTO;
+  const partes = opcoes
+    .map((v, ordem) => ({ v, n: detalhe[v] ?? 0, ordem }))
+    .filter((x) => x.n > 0)
+    .sort((a, b) => b.n - a.n || a.ordem - b.ordem)
+    .map((x) => `${NOME_VOTO[x.v]} ${x.n}`);
+  return partes.length > 0 ? `${lado} ${total} (${partes.join(" · ")})` : `${lado} ${total}`;
+}
 
 export const LIMITE_LEGENDA = 2200;
 export const MAX_ITENS_POST = 10;
@@ -52,6 +90,7 @@ export type ConteudoClassificado = {
   texto: string;
   favor: number;
   contra: number;
+  detalhe?: Detalhe;
   criadoEm: string;
   faixa: Faixa;
 };
@@ -62,7 +101,7 @@ export type Post<C extends ConteudoClassificado = ConteudoClassificado> = {
   legenda: string;
 };
 
-// Mais votos sim; empate: menos votos não; depois o mais antigo.
+// Mais votos de apoio; empate: menos votos de protesto; depois o mais antigo.
 export function compararConteudos(a: ConteudoClassificado, b: ConteudoClassificado): number {
   return (
     b.favor - a.favor ||
@@ -145,7 +184,12 @@ function rotulos(conteudos: ConteudoClassificado[]): string[] {
 }
 
 function bloco(rotulo: string, c: ConteudoClassificado, texto: string): string {
-  return `${rotulo} · #${c.id}\n${texto}\nsim ${c.favor} · não ${c.contra} · total ${c.favor + c.contra}`;
+  return [
+    `${rotulo} · #${c.id}`,
+    texto,
+    resumoDoLado("apoio", c.favor, c.detalhe),
+    resumoDoLado("protesto", c.contra, c.detalhe),
+  ].join("\n");
 }
 
 function juntar(blocos: string[]): string {

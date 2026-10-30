@@ -11,7 +11,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.3)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.4)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -19,7 +19,17 @@ export default function Regras() {
           Em caso de dúvida, vale o código.
         </p>
 
-        <h2>O que mudou em relação à versão 0.2</h2>
+        <h2>O que mudou em relação à versão 0.3</h2>
+        <ul>
+          <li>
+            O voto passou a ser por sentimento: quatro opções de apoio, quatro de protesto e indiferente. A
+            classificação continua comparando apoio e protesto; o detalhamento por sentimento aparece neste blog e na
+            legenda do Instagram.
+          </li>
+          <li>Mudança feita em 30/10/2026, antes de qualquer voto ser registrado.</li>
+        </ul>
+
+        <h2>O que mudou da versão 0.2 para a 0.3</h2>
         <ul>
           <li>Três opções de voto: sim, indiferente e não. Indiferente é ilustrativo e não conta.</li>
           <li>Ciclos de participação: participantes e espectadores.</li>
@@ -62,7 +72,16 @@ export default function Regras() {
             o debate (comentários com respostas em thread) e a votação.
           </li>
           <li>
-            As opções são <strong>sim</strong>, <strong>indiferente</strong> e <strong>não</strong>. O voto pode ser
+            Cada pessoa escolhe <strong>um</strong> sentimento, em pares espelhados:
+            <ul>
+              <li>Identidade: <strong>me representa</strong> ou <strong>não me representa</strong>.</li>
+              <li>Informação: <strong>utilidade pública</strong> ou <strong>falso ou enganoso</strong>.</li>
+              <li>Justiça: <strong>expõe injustiça</strong> ou <strong>ofende ou ataca</strong>.</li>
+              <li>Diálogo: <strong>merece ser ouvido</strong> ou <strong>só gera briga</strong>.</li>
+            </ul>
+            Os quatro primeiros contam como <strong>apoio</strong>; os quatro últimos, como <strong>protesto</strong>.
+            Também é possível votar <strong>indiferente</strong>. Conteúdo ilegal não se resolve com voto: a
+            coordenação aplica a exceção legal (item 11). O voto pode ser
             mudado até o fechamento. Ninguém vota no próprio conteúdo.
           </li>
           <li>As contagens e os nomes ficam escondidos até o fechamento.</li>
@@ -72,7 +91,7 @@ export default function Regras() {
           </li>
           <li>
             <strong>Indiferente é ilustrativo:</strong> não entra na porcentagem, no quórum nem no Instagram. Aparece
-            neste blog, à parte.
+            neste blog, à parte. Mas conta como participação (item 4).
           </li>
         </ul>
 
@@ -80,7 +99,7 @@ export default function Regras() {
         <ul>
           <li>O tempo é dividido em ciclos de duração fixa, iguais para todos.</li>
           <li>
-            É <strong>participante</strong> num ciclo quem votou (sim, indiferente ou não) em pelo menos a participação
+            É <strong>participante</strong> num ciclo quem votou (com qualquer opção) em pelo menos a participação
             mínima dos conteúdos que fecharam no ciclo anterior, sem contar os próprios conteúdos.
           </li>
           <li>
@@ -101,28 +120,28 @@ export default function Regras() {
 
         <h3>5. Quórum</h3>
         <p>
-          Para ser classificado, o conteúdo precisa de votos sim + não em número igual ou maior que o quórum (uma
+          Para ser classificado, o conteúdo precisa de votos de apoio + protesto em número igual ou maior que o quórum (uma
           porcentagem dos participantes do ciclo em que ele fecha, arredondada para cima). Sem quórum, ele vai para a
           tribuna livre.
         </p>
 
         <h3>6. Classificação</h3>
-        <p>A porcentagem é calculada como sim ÷ (sim + não), só com votos de participantes.</p>
+        <p>A porcentagem é calculada como apoio ÷ (apoio + protesto), só com votos de participantes.</p>
         <ul>
           <li>
-            <strong>Maioria:</strong> mais de 50% de sim.
+            <strong>Maioria:</strong> mais de 50% de apoio.
           </li>
           <li>
-            <strong>Minoria:</strong> de 20% a 50% de sim.
+            <strong>Minoria:</strong> de 20% a 50% de apoio.
           </li>
           <li>
-            <strong>Tribuna livre:</strong> menos de 20% de sim, ou sem quórum.
+            <strong>Tribuna livre:</strong> menos de 20% de apoio, ou sem quórum.
           </li>
         </ul>
 
         <h3>7. Ordem dentro de cada faixa</h3>
         <p>
-          Primeiro quem tem mais votos sim. Em caso de empate, quem tem menos votos não. Persistindo o empate, o conteúdo
+          Primeiro quem tem mais votos de apoio. Em caso de empate, quem tem menos votos de protesto. Persistindo o empate, o conteúdo
           mais antigo.
         </p>
 
@@ -157,7 +176,7 @@ export default function Regras() {
         <ul>
           <li>Cada post traz na legenda os textos de todos os seus conteúdos.</li>
           <li>
-            Cada texto aparece com sua classificação, seu número e os votos sim, não e total. No Instagram não aparecem
+            Cada texto aparece com sua classificação, seu número e os totais de apoio e protesto, com o detalhamento por sentimento (só os que receberam votos). No Instagram não aparecem
             nomes nem indiferentes.
           </li>
           <li>

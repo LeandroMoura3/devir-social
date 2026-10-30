@@ -56,7 +56,7 @@ async function Publicacoes() {
               </p>
               <p className="line-clamp-3 text-sm">{p.texto}</p>
               <p className="text-xs font-medium text-accent">
-                {NOME_FAIXA[p.faixa]} · sim {p.favor} · não {p.contra}
+                {NOME_FAIXA[p.faixa]} · apoio {p.favor} · protesto {p.contra}
                 {p.instagramEm ? " · no Instagram" : ""}
               </p>
             </Link>

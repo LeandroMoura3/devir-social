@@ -90,7 +90,7 @@ function AvisoStatus({ status: s }: { status: StatusCiclo }) {
   else if (faltam === 0)
     proximo = `Você já votou em ${s.votados} dos ${s.total} conteúdos que fecham até ${ate}: mantém a vaga de participante no próximo ciclo.`;
   else
-    proximo = `Para ser participante no próximo ciclo, vote em pelo menos ${necessarios} dos ${s.total} conteúdos que fecham até ${ate} (faltam ${faltam}). Sim, indiferente e não contam.`;
+    proximo = `Para ser participante no próximo ciclo, vote em pelo menos ${necessarios} dos ${s.total} conteúdos que fecham até ${ate} (faltam ${faltam}). Qualquer opção conta, inclusive indiferente.`;
 
   return (
     <section className="cartao flex flex-col gap-1 text-sm">

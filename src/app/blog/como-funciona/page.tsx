@@ -21,8 +21,10 @@ export default function ComoFunciona() {
         <ol>
           <li>Você envia um conteúdo: uma imagem com um texto.</li>
           <li>
-            O grupo debate nos comentários e vota <strong>sim</strong>, <strong>indiferente</strong> ou{" "}
-            <strong>não</strong> durante o prazo do conteúdo. O indiferente é ilustrativo: não entra na contagem.
+            O grupo debate nos comentários e vota durante o prazo do conteúdo, escolhendo um sentimento de{" "}
+            <strong>apoio</strong> (me representa, utilidade pública, expõe injustiça, merece ser ouvido), de{" "}
+            <strong>protesto</strong> (não me representa, falso ou enganoso, ofende ou ataca, só gera briga) ou{" "}
+            <strong>indiferente</strong>, que é ilustrativo e não entra na contagem.
           </li>
           <li>
             Para o voto contar, é preciso participar com regularidade. Quem votou em pelo menos uma parte mínima dos

@@ -24,7 +24,7 @@ export function CartaoConteudo({ conteudo: c, imagemUrl, agora, meuVoto, souAuto
     situacao = `${tempoRestante(c.fechaEm, agora)} · ${voto}`;
   } else if (c.resultado) {
     const { favor, contra, faixa } = c.resultado;
-    situacao = `${NOME_FAIXA[faixa]} · sim ${favor} · não ${contra}${c.publicadoEm ? " · publicado" : ""}`;
+    situacao = `${NOME_FAIXA[faixa]} · apoio ${favor} · protesto ${contra}${c.publicadoEm ? " · publicado" : ""}`;
   } else situacao = "fechado";
 
   return (

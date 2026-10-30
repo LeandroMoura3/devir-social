@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
-import { formatarData, formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
-import { NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
+import { NOME_FAIXA, type Voto } from "@/lib/regras";
+import { ResultadoVotos } from "../../resultado-votos";
 import { situacaoDoVoto, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
 import { FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
@@ -121,32 +122,10 @@ type Cliente = Awaited<ReturnType<typeof exigirParticipante>>["supabase"];
 async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao; supabase: Cliente }) {
   const votacao = (await carregarVotacao(supabase, [conteudo.id])).get(conteudo.id)!;
   const r = conteudo.resultado!;
-  const juntarNomes = (itens: string[]) => (itens.length > 0 ? itens.join(", ") : "ninguém");
-
   return (
-    <section className="cartao flex flex-col gap-2 text-sm">
+    <section className="cartao flex flex-col gap-3">
       <h2 className="text-lg font-semibold">{NOME_FAIXA[r.faixa]}</h2>
-      <p>
-        Sim {r.favor} · não {r.contra} · total {r.favor + r.contra}
-      </p>
-      <p>
-        <strong>Sim:</strong> {juntarNomes(votacao.sim)}
-      </p>
-      <p>
-        <strong>Não:</strong> {juntarNomes(votacao.nao)}
-      </p>
-      <p className="text-muted">
-        Quórum: {r.base} participantes no ciclo iniciado em {formatarData(r.cicloInicio)}; mínimo de{" "}
-        {r.quorumNecessario} votos (sim + não).
-      </p>
-      <p className="text-muted">Participantes do ciclo: {juntarNomes(votacao.participantesCiclo)}</p>
-      <p className="text-muted">
-        Indiferente (ilustrativo, não conta): {r.indiferente} · {juntarNomes(votacao.indiferente)}
-      </p>
-      <p className="text-muted">
-        Votos de espectadores (não contam):{" "}
-        {juntarNomes(votacao.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`))}
-      </p>
+      <ResultadoVotos {...r} votacao={votacao} />
     </section>
   );
 }

@@ -1,4 +1,5 @@
-import { classificar, type Faixa, type Voto } from "@/lib/regras";
+import { votacaoVazia, type VotacaoNominal } from "@/lib/conteudos";
+import { classificar, type Detalhe, type Faixa, type Voto } from "@/lib/regras";
 import { lista } from "@/lib/supabase/lista";
 import { criarClientePublico } from "@/lib/supabase/publico";
 
@@ -15,6 +16,7 @@ export type Publicado = {
   indiferente: number;
   base: number;
   quorumNecessario: number;
+  detalhe: Detalhe;
   faixa: Faixa;
 };
 
@@ -31,6 +33,7 @@ type LinhaPublicado = {
   indiferente: number;
   base: number;
   quorum_necessario: number;
+  detalhe: Detalhe;
 };
 
 function verificar<T>(resposta: { data: T[] | null; error: unknown }, oQue: string): T[] {
@@ -54,6 +57,7 @@ export async function carregarPublicados(): Promise<Publicado[]> {
     indiferente: l.indiferente,
     base: l.base,
     quorumNecessario: l.quorum_necessario,
+    detalhe: l.detalhe ?? {},
     faixa: classificar({ favor: l.favor, contra: l.contra, quorumNecessario: l.quorum_necessario }),
   }));
 }
@@ -69,13 +73,7 @@ export async function carregarRemocoes(): Promise<Remocao[]> {
   return linhas.map((l) => ({ id: l.conteudo_id, motivo: l.motivo, removidoEm: l.removido_em }));
 }
 
-export type Registro = {
-  sim: string[];
-  nao: string[];
-  indiferente: string[];
-  espectadores: { nome: string; voto: Voto }[];
-  participantesCiclo: string[];
-};
+export type Registro = VotacaoNominal;
 
 export async function carregarRegistro(id: number): Promise<Registro> {
   const supabase = await criarClientePublico();
@@ -85,15 +83,9 @@ export async function carregarRegistro(id: number): Promise<Registro> {
     ),
     lista<{ nome_publico: string }>(supabase.rpc("blog_participantes", { p_conteudo: id })),
   ]);
-  const registro: Registro = {
-    sim: [],
-    nao: [],
-    indiferente: [],
-    espectadores: [],
-    participantesCiclo: verificar(participantes, "participantes").map((p) => p.nome_publico),
-  };
+  const registro = votacaoVazia(verificar(participantes, "participantes").map((p) => p.nome_publico));
   for (const v of verificar(votos, "votos")) {
-    if (v.participante) registro[v.voto].push(v.nome_publico);
+    if (v.participante) registro.porVoto[v.voto].push(v.nome_publico);
     else registro.espectadores.push({ nome: v.nome_publico, voto: v.voto });
   }
   return registro;

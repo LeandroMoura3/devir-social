@@ -4,7 +4,9 @@ import {
   cortar,
   LIMITE_LEGENDA,
   limitesDeTexto,
+  ladoDoVoto,
   planejarPublicacao,
+  resumoDoLado,
   type ConteudoClassificado,
   type Faixa,
 } from "./regras";
@@ -137,7 +139,35 @@ describe("legenda", () => {
   it("textos curtos aparecem inteiros", () => {
     const m1 = conteudo("maioria", 20, { texto: "Mensagem curta" });
     const [post] = planejarPublicacao([m1]);
-    expect(post.legenda).toContain("Mensagem curta\nsim 20 · não 0 · total 20");
+    expect(post.legenda).toContain("Mensagem curta\napoio 20\nprotesto 0");
+  });
+});
+
+describe("detalhamento por sentimento", () => {
+  it("lista os sentimentos com votos, do mais votado para o menos votado", () => {
+    expect(resumoDoLado("apoio", 5, { utilidade_publica: 2, me_representa: 3, nao_me_representa: 1 })).toBe(
+      "apoio 5 (me representa 3 · utilidade pública 2)",
+    );
+    expect(resumoDoLado("protesto", 1, { nao_me_representa: 1 })).toBe("protesto 1 (não me representa 1)");
+    expect(resumoDoLado("protesto", 0, {})).toBe("protesto 0");
+  });
+
+  it("empate segue a ordem fixa da lista", () => {
+    expect(resumoDoLado("apoio", 2, { merece_ser_ouvido: 1, me_representa: 1 })).toBe(
+      "apoio 2 (me representa 1 · merece ser ouvido 1)",
+    );
+  });
+
+  it("classifica o lado de cada voto", () => {
+    expect(ladoDoVoto("expoe_injustica")).toBe("apoio");
+    expect(ladoDoVoto("so_gera_briga")).toBe("protesto");
+    expect(ladoDoVoto("indiferente")).toBe("indiferente");
+  });
+
+  it("a legenda leva o detalhamento", () => {
+    const m1 = conteudo("maioria", 3, { detalhe: { me_representa: 2, expoe_injustica: 1 }, texto: "T" });
+    const [post] = planejarPublicacao([m1]);
+    expect(post.legenda).toContain("T\napoio 3 (me representa 2 · expõe injustiça 1)\nprotesto 0");
   });
 });
 

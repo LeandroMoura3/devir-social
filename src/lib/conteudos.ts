@@ -1,10 +1,10 @@
-import { classificar, type Faixa, type Voto } from "@/lib/regras";
+import { classificar, VOTOS_APOIO, VOTOS_PROTESTO, type Detalhe, type Faixa, type Voto } from "@/lib/regras";
 import { lista } from "@/lib/supabase/lista";
 import type { criarClienteServidor } from "@/lib/supabase/server";
 
 type Cliente = Awaited<ReturnType<typeof criarClienteServidor>>;
 
-// favor = SIM e contra = NÃO de participantes do ciclo; indiferente é só ilustrativo.
+// favor = APOIO e contra = PROTESTO de participantes do ciclo; indiferente é só ilustrativo.
 export type Resultado = {
   favor: number;
   contra: number;
@@ -12,6 +12,7 @@ export type Resultado = {
   base: number;
   quorumNecessario: number;
   cicloInicio: string;
+  detalhe: Detalhe;
   faixa: Faixa;
 };
 
@@ -52,6 +53,7 @@ type LinhaResultado = {
   indiferente: number;
   base: number;
   quorum_necessario: number;
+  detalhe: Detalhe;
 };
 
 const CAMPOS =
@@ -102,6 +104,7 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
             base: r.base,
             quorumNecessario: r.quorum_necessario,
             cicloInicio: r.ciclo_inicio,
+            detalhe: r.detalhe ?? {},
             faixa: classificar({ favor: r.favor, contra: r.contra, quorumNecessario: r.quorum_necessario }),
           }
         : null,
@@ -109,13 +112,21 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
   });
 }
 
+export const ORDEM_VOTOS: Voto[] = [...VOTOS_APOIO, "indiferente", ...VOTOS_PROTESTO];
+
 export type VotacaoNominal = {
-  sim: string[];
-  nao: string[];
-  indiferente: string[];
+  porVoto: Record<Voto, string[]>;
   espectadores: { nome: string; voto: Voto }[];
   participantesCiclo: string[];
 };
+
+export function votacaoVazia(participantesCiclo: string[] = []): VotacaoNominal {
+  return {
+    porVoto: Object.fromEntries(ORDEM_VOTOS.map((v) => [v, []])) as unknown as Record<Voto, string[]>,
+    espectadores: [],
+    participantesCiclo,
+  };
+}
 
 type LinhaVoto = { conteudo_id: number; eleitor_id: string; voto: Voto; perfis: { nome_publico: string } | null };
 
@@ -141,21 +152,13 @@ export async function carregarVotacao(supabase: Cliente, ids: number[]): Promise
   ids.forEach((id, i) => {
     const participantes = respostasCiclo[i].data ?? [];
     const idsParticipantes = new Set(participantes.map((p) => p.perfil_id));
-    const votacao: VotacaoNominal = {
-      sim: [],
-      nao: [],
-      indiferente: [],
-      espectadores: [],
-      participantesCiclo: participantes.map((p) => p.nome_publico).sort(porNome),
-    };
+    const votacao = votacaoVazia(participantes.map((p) => p.nome_publico).sort(porNome));
     for (const v of (respostaVotos.data ?? []).filter((v) => v.conteudo_id === id)) {
       const nome = v.perfis?.nome_publico ?? "participante";
-      if (idsParticipantes.has(v.eleitor_id)) votacao[v.voto].push(nome);
+      if (idsParticipantes.has(v.eleitor_id)) votacao.porVoto[v.voto].push(nome);
       else votacao.espectadores.push({ nome, voto: v.voto });
     }
-    votacao.sim.sort(porNome);
-    votacao.nao.sort(porNome);
-    votacao.indiferente.sort(porNome);
+    for (const nomes of Object.values(votacao.porVoto)) nomes.sort(porNome);
     votacao.espectadores.sort((a, b) => porNome(a.nome, b.nome));
     resultado.set(id, votacao);
   });

@@ -12,7 +12,13 @@ export async function montarPlano(supabase: Cliente, agora: number): Promise<Pos
     (c) => !c.removidoEm && !c.publicadoEm && Date.parse(c.fechaEm) <= agora && c.resultado,
   );
   return planejarPublicacao(
-    pendentes.map((c) => ({ ...c, favor: c.resultado!.favor, contra: c.resultado!.contra, faixa: c.resultado!.faixa })),
+    pendentes.map((c) => ({
+      ...c,
+      favor: c.resultado!.favor,
+      contra: c.resultado!.contra,
+      detalhe: c.resultado!.detalhe,
+      faixa: c.resultado!.faixa,
+    })),
   );
 }
 

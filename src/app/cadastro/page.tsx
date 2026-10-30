@@ -34,8 +34,8 @@ function TextoConsentimento() {
       <section>
         <h2 className="font-semibold">O que você pode fazer aqui</h2>
         <p>
-          Enviar conteúdos (imagem e texto), comentar, debater e votar sim, indiferente ou não nos conteúdos de outros
-          participantes.
+          Enviar conteúdos (imagem e texto), comentar, debater e votar nos conteúdos de outros
+          participantes, escolhendo um sentimento de apoio, de protesto ou indiferente.
         </p>
         <p className="mt-2">
           Para o seu voto contar, é preciso participar com regularidade: o tempo é dividido em ciclos, e quem votou em
@@ -50,8 +50,8 @@ function TextoConsentimento() {
         <h2 className="font-semibold">O que fica visível para os outros participantes</h2>
         <p>
           Seu <strong>nome público</strong>, que você escolhe abaixo (pode ser seu nome real, um apelido ou suas
-          iniciais), seus conteúdos, seus comentários e <strong>os seus votos</strong> (quem votou sim, indiferente
-          ou não em cada conteúdo, depois que a votação fecha).
+          iniciais), seus conteúdos, seus comentários e <strong>os seus votos</strong> (o sentimento que cada um
+          escolheu em cada conteúdo, depois que a votação fecha).
         </p>
       </section>
 
@@ -59,7 +59,7 @@ function TextoConsentimento() {
         <h2 className="font-semibold">O que fica visível para o público (Instagram e blog)</h2>
         <ul className="list-disc pl-5">
           <li>
-            <strong>No Instagram:</strong> os conteúdos, a classificação de cada um e o total de votos sim e não.
+            <strong>No Instagram:</strong> os conteúdos, a classificação de cada um e os totais de apoio e protesto, com o detalhamento por sentimento.
             Seu nome não aparece.
           </li>
           <li>
@@ -67,7 +67,7 @@ function TextoConsentimento() {
             dos conteúdos que você enviou. O blog é público e aparece em buscadores como o Google.
           </li>
           <li>
-            <strong>No blog também aparece a lista de quem votou sim, indiferente e não</strong> cada conteúdo, com o seu nome
+            <strong>No blog também aparece a lista de quem votou em cada sentimento</strong> de cada conteúdo, com o seu nome
             público. Não existe voto privado: cada participante assume publicamente o seu voto.
           </li>
           <li>
