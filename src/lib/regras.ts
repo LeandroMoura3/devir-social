@@ -2,7 +2,8 @@
 // as mesmas entradas sempre geram a mesma saída, em qualquer ordem.
 // Prazos, ciclos, participação mínima e quórum são parâmetros versionados no banco
 // (tabela parametros); as contagens chegam prontas da função _resultados().
-// "favor" = votos de APOIO e "contra" = votos de PROTESTO de participantes do ciclo; indiferente não entra.
+// "favor" = votos de APOIO e "contra" = votos de PROTESTO de participantes do ciclo.
+// Indiferente conta para o quórum, mas não para a porcentagem.
 
 export type Faixa = "maioria" | "minoria" | "tribuna_livre" | "sem_quorum";
 
@@ -59,14 +60,19 @@ type Grupo = keyof typeof PESOS;
 export function classificar({
   favor,
   contra,
+  indiferente,
   quorumNecessario,
 }: {
   favor: number;
   contra: number;
+  indiferente: number;
   quorumNecessario: number;
 }): Faixa {
+  const presentes = favor + contra + indiferente;
+  if (presentes === 0 || presentes < quorumNecessario) return "sem_quorum";
   const total = favor + contra;
-  if (total === 0 || total < quorumNecessario) return "sem_quorum";
+  // Quórum atingido só com indiferentes: ninguém apoiou (0% de apoio).
+  if (total === 0) return "tribuna_livre";
   if (favor * 100 > 50 * total) return "maioria";
   if (favor * 100 >= 20 * total) return "minoria";
   return "tribuna_livre";
@@ -76,7 +82,7 @@ export const NOME_FAIXA: Record<Faixa, string> = {
   maioria: "Maioria",
   minoria: "Minoria",
   tribuna_livre: "Tribuna livre",
-  sem_quorum: "Tribuna livre (sem quórum)",
+  sem_quorum: "Sem quórum",
 };
 
 function grupoDe(faixa: Faixa): Grupo {
@@ -172,14 +178,13 @@ export function planejarPublicacao<C extends ConteudoClassificado>(conteudos: C[
 }
 
 function rotulos(conteudos: ConteudoClassificado[]): string[] {
-  const contagem: Record<Grupo, number> = { maioria: 0, minoria: 0, tribuna: 0 };
+  const contagem: Record<Faixa, number> = { maioria: 0, minoria: 0, tribuna_livre: 0, sem_quorum: 0 };
   return conteudos.map((c) => {
-    const grupo = grupoDe(c.faixa);
-    contagem[grupo] += 1;
-    if (grupo === "maioria") return "MAIORIA";
-    if (grupo === "minoria") return `MINORIA ${contagem.minoria}`;
-    const sufixo = c.faixa === "sem_quorum" ? " (sem quórum)" : "";
-    return `TRIBUNA LIVRE ${contagem.tribuna}${sufixo}`;
+    contagem[c.faixa] += 1;
+    if (c.faixa === "maioria") return "MAIORIA";
+    if (c.faixa === "minoria") return `MINORIA ${contagem.minoria}`;
+    if (c.faixa === "sem_quorum") return `SEM QUÓRUM ${contagem.sem_quorum}`;
+    return `TRIBUNA LIVRE ${contagem.tribuna_livre}`;
   });
 }
 

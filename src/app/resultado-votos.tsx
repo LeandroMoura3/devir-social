@@ -54,11 +54,11 @@ export function ResultadoVotos(p: Props) {
         <Lado titulo="Protesto" total={p.contra} opcoes={VOTOS_PROTESTO} detalhe={p.detalhe} votacao={p.votacao} />
       </div>
       <p className="text-muted">
-        Indiferente (ilustrativo, não conta): {p.indiferente} · {nomes(p.votacao.porVoto.indiferente ?? [])}
+        Indiferente (conta para o quórum, não para a porcentagem): {p.indiferente} · {nomes(p.votacao.porVoto.indiferente ?? [])}
       </p>
       <p className="text-muted">
         Quórum: {p.base} participantes no ciclo iniciado em {formatarData(p.cicloInicio)}; mínimo de{" "}
-        {p.quorumNecessario} votos (apoio + protesto).
+        {p.quorumNecessario} votos (apoio, protesto e indiferente).
       </p>
       <p className="text-muted">Participantes do ciclo: {nomes(p.votacao.participantesCiclo)}</p>
       <p className="text-muted">

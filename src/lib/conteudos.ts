@@ -4,7 +4,7 @@ import type { criarClienteServidor } from "@/lib/supabase/server";
 
 type Cliente = Awaited<ReturnType<typeof criarClienteServidor>>;
 
-// favor = APOIO e contra = PROTESTO de participantes do ciclo; indiferente é só ilustrativo.
+// favor = APOIO e contra = PROTESTO de participantes do ciclo; indiferente conta só para o quórum.
 export type Resultado = {
   favor: number;
   contra: number;
@@ -105,7 +105,7 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
             quorumNecessario: r.quorum_necessario,
             cicloInicio: r.ciclo_inicio,
             detalhe: r.detalhe ?? {},
-            faixa: classificar({ favor: r.favor, contra: r.contra, quorumNecessario: r.quorum_necessario }),
+            faixa: classificar({ favor: r.favor, contra: r.contra, indiferente: r.indiferente, quorumNecessario: r.quorum_necessario }),
           }
         : null,
     };

@@ -11,7 +11,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.4)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.5)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -78,8 +78,9 @@ export default function Regras() {
             existe voto secreto.
           </li>
           <li>
-            <strong>Indiferente é ilustrativo:</strong> não entra na porcentagem, no quórum nem no Instagram. Aparece
-            neste blog, à parte. Mas conta como participação (item 4).
+            <strong>Indiferente é um posicionamento:</strong> quem escolhe indiferente diz que tanto faz o resultado.
+            Por isso conta para o quórum (item 5) e como participação (item 4), mas não entra na porcentagem de apoio
+            nem no Instagram. Aparece neste blog, à parte.
           </li>
         </ul>
 
@@ -108,13 +109,18 @@ export default function Regras() {
 
         <h3>5. Quórum</h3>
         <p>
-          Para ser classificado, o conteúdo precisa de votos de apoio + protesto em número igual ou maior que o quórum (uma
-          porcentagem dos participantes do ciclo em que ele fecha, arredondada para cima). Sem quórum, ele vai para a
-          tribuna livre.
+          Para ser classificado, o conteúdo precisa de votos de apoio, protesto e indiferente, somados, em número igual
+          ou maior que o quórum (uma porcentagem dos participantes do ciclo em que ele fecha, arredondada para cima).
+          Só contam votos de participantes. Sem quórum, ele é publicado junto com a tribuna livre, com o rótulo
+          &quot;sem quórum&quot;.
         </p>
 
         <h3>6. Classificação</h3>
-        <p>A porcentagem é calculada como apoio ÷ (apoio + protesto), só com votos de participantes.</p>
+        <p>
+          Com o quórum atingido, a porcentagem é calculada sobre quem tomou lado: apoio ÷ (apoio + protesto), só com
+          votos de participantes. Indiferente não entra nessa conta. Se o quórum foi atingido só com indiferentes, o
+          apoio é 0%.
+        </p>
         <ul>
           <li>
             <strong>Maioria:</strong> mais de 50% de apoio.
@@ -123,7 +129,10 @@ export default function Regras() {
             <strong>Minoria:</strong> de 20% a 50% de apoio.
           </li>
           <li>
-            <strong>Tribuna livre:</strong> menos de 20% de apoio, ou sem quórum.
+            <strong>Tribuna livre:</strong> menos de 20% de apoio.
+          </li>
+          <li>
+            <strong>Sem quórum:</strong> não atingiu o quórum. Na publicação, fica no mesmo lugar da tribuna livre.
           </li>
         </ul>
 
@@ -224,6 +233,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.5 (30/10/2026)</h3>
+        <ul>
+          <li>Indiferente passou a contar para o quórum. A porcentagem de apoio continua só com apoio e protesto.</li>
+          <li>Quórum atingido só com indiferentes: o conteúdo vai para a tribuna livre (0% de apoio).</li>
+          <li>Na legenda do Instagram, conteúdos sem quórum ganharam rótulo e numeração próprios (SEM QUÓRUM 1, 2…).</li>
+          <li>Mudança feita antes de qualquer voto ser registrado.</li>
+        </ul>
 
         <h3>0.4 (30/10/2026)</h3>
         <ul>

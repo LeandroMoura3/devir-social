@@ -58,7 +58,7 @@ export async function carregarPublicados(): Promise<Publicado[]> {
     base: l.base,
     quorumNecessario: l.quorum_necessario,
     detalhe: l.detalhe ?? {},
-    faixa: classificar({ favor: l.favor, contra: l.contra, quorumNecessario: l.quorum_necessario }),
+    faixa: classificar({ favor: l.favor, contra: l.contra, indiferente: l.indiferente, quorumNecessario: l.quorum_necessario }),
   }));
 }
 

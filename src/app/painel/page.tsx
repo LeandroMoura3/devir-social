@@ -144,7 +144,7 @@ async function Tabela() {
   const faixas = new Map<string, Record<Faixa, number> & { contra: number; total: number }>();
   for (const f of fechados ?? []) {
     const linha = faixas.get(f.semana) ?? { maioria: 0, minoria: 0, tribuna_livre: 0, sem_quorum: 0, contra: 0, total: 0 };
-    linha[classificar({ favor: f.favor, contra: f.contra, quorumNecessario: f.quorum_necessario })] += 1;
+    linha[classificar({ favor: f.favor, contra: f.contra, indiferente: f.indiferente, quorumNecessario: f.quorum_necessario })] += 1;
     linha.contra += f.contra;
     linha.total += 1;
     faixas.set(f.semana, linha);

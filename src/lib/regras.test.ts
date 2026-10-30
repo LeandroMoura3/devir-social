@@ -29,20 +29,32 @@ const ids = (lista: ConteudoClassificado[]) => lista.map((c) => c.id);
 
 describe("classificar", () => {
   it("separa as faixas nos limites exatos", () => {
-    expect(classificar({ favor: 51, contra: 49, quorumNecessario: 0 })).toBe("maioria");
-    expect(classificar({ favor: 50, contra: 50, quorumNecessario: 0 })).toBe("minoria");
-    expect(classificar({ favor: 20, contra: 80, quorumNecessario: 0 })).toBe("minoria");
-    expect(classificar({ favor: 19, contra: 81, quorumNecessario: 0 })).toBe("tribuna_livre");
+    expect(classificar({ favor: 51, contra: 49, indiferente: 0, quorumNecessario: 0 })).toBe("maioria");
+    expect(classificar({ favor: 50, contra: 50, indiferente: 0, quorumNecessario: 0 })).toBe("minoria");
+    expect(classificar({ favor: 20, contra: 80, indiferente: 0, quorumNecessario: 0 })).toBe("minoria");
+    expect(classificar({ favor: 19, contra: 81, indiferente: 0, quorumNecessario: 0 })).toBe("tribuna_livre");
   });
 
-  it("exige o quórum calculado no banco (sim + não)", () => {
-    expect(classificar({ favor: 7, contra: 0, quorumNecessario: 8 })).toBe("sem_quorum");
-    expect(classificar({ favor: 8, contra: 0, quorumNecessario: 8 })).toBe("maioria");
-    expect(classificar({ favor: 4, contra: 4, quorumNecessario: 8 })).toBe("minoria");
+  it("exige o quórum calculado no banco", () => {
+    expect(classificar({ favor: 7, contra: 0, indiferente: 0, quorumNecessario: 8 })).toBe("sem_quorum");
+    expect(classificar({ favor: 8, contra: 0, indiferente: 0, quorumNecessario: 8 })).toBe("maioria");
+    expect(classificar({ favor: 4, contra: 4, indiferente: 0, quorumNecessario: 8 })).toBe("minoria");
   });
 
   it("sem nenhum voto fica sem quórum", () => {
-    expect(classificar({ favor: 0, contra: 0, quorumNecessario: 0 })).toBe("sem_quorum");
+    expect(classificar({ favor: 0, contra: 0, indiferente: 0, quorumNecessario: 0 })).toBe("sem_quorum");
+  });
+
+  it("indiferente conta para o quórum, mas não para a porcentagem", () => {
+    expect(classificar({ favor: 2, contra: 0, indiferente: 5, quorumNecessario: 8 })).toBe("sem_quorum");
+    expect(classificar({ favor: 2, contra: 0, indiferente: 6, quorumNecessario: 8 })).toBe("maioria");
+    expect(classificar({ favor: 1, contra: 2, indiferente: 10, quorumNecessario: 8 })).toBe("minoria");
+    expect(classificar({ favor: 1, contra: 9, indiferente: 10, quorumNecessario: 8 })).toBe("tribuna_livre");
+  });
+
+  it("quórum atingido só com indiferentes vai para a tribuna livre", () => {
+    expect(classificar({ favor: 0, contra: 0, indiferente: 8, quorumNecessario: 8 })).toBe("tribuna_livre");
+    expect(classificar({ favor: 0, contra: 0, indiferente: 7, quorumNecessario: 8 })).toBe("sem_quorum");
   });
 });
 
@@ -134,6 +146,17 @@ describe("legenda", () => {
     expect(post.legenda).toContain("MAIORIA");
     expect(post.legenda).toContain("MINORIA 1");
     expect(post.legenda).toContain("TRIBUNA LIVRE 1");
+  });
+
+  it("sem quórum tem rótulo e numeração próprios", () => {
+    const m1 = conteudo("maioria", 20);
+    const n1 = conteudo("minoria", 5);
+    const t1 = conteudo("tribuna_livre", 2);
+    const s1 = conteudo("sem_quorum", 1);
+    const [post] = planejarPublicacao([m1, n1, t1, s1]);
+    expect(post.legenda).toContain(`TRIBUNA LIVRE 1 · #${t1.id}`);
+    expect(post.legenda).toContain(`SEM QUÓRUM 1 · #${s1.id}`);
+    expect(post.legenda).not.toContain("TRIBUNA LIVRE 2");
   });
 
   it("textos curtos aparecem inteiros", () => {

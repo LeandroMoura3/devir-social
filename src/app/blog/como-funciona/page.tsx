@@ -24,7 +24,7 @@ export default function ComoFunciona() {
             O grupo debate nos comentários e vota durante o prazo do conteúdo, escolhendo um sentimento de{" "}
             <strong>apoio</strong> (me representa, utilidade pública, expõe injustiça, merece ser ouvido), de{" "}
             <strong>protesto</strong> (não me representa, falso ou enganoso, ofende ou ataca, só gera briga) ou{" "}
-            <strong>indiferente</strong>, que é ilustrativo e não entra na contagem.
+            <strong>indiferente</strong>, que conta para o quórum mas não para a porcentagem de apoio.
           </li>
           <li>
             Para o voto contar, é preciso participar com regularidade. Quem votou em pelo menos uma parte mínima dos
