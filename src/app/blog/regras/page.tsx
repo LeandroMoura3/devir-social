@@ -18,25 +18,10 @@ export default function Regras() {
           <a href="https://github.com/LeandroMoura3/devir-social/tree/main/supabase/migrations">supabase/migrations</a>.
           Em caso de dúvida, vale o código.
         </p>
-
-        <h2>O que mudou em relação à versão 0.3</h2>
-        <ul>
-          <li>
-            O voto passou a ser por sentimento: quatro opções de apoio, quatro de protesto e indiferente. A
-            classificação continua comparando apoio e protesto; o detalhamento por sentimento aparece neste blog e na
-            legenda do Instagram.
-          </li>
-          <li>Mudança feita em 30/10/2026, antes de qualquer voto ser registrado.</li>
-        </ul>
-
-        <h2>O que mudou da versão 0.2 para a 0.3</h2>
-        <ul>
-          <li>Três opções de voto: sim, indiferente e não. Indiferente é ilustrativo e não conta.</li>
-          <li>Ciclos de participação: participantes e espectadores.</li>
-          <li>O quórum passou a ser calculado sobre os participantes do ciclo.</li>
-          <li>Prazos e porcentagens viraram parâmetros públicos; mudanças valem a partir do ciclo seguinte.</li>
-          <li>O registro de cada conteúdo passou a ser publicado automaticamente neste blog, no fechamento da votação.</li>
-        </ul>
+        <p className="text-sm text-muted">
+          Esta página traz sempre as regras completas em vigor. O que mudou entre versões fica no{" "}
+          <a href="#historico">histórico</a>, no fim da página.
+        </p>
 
         <h2>A. Regras que não mudam</h2>
         <p>Qualquer instância que mantiver estas três regras pode usar o nome Devir:</p>
@@ -84,7 +69,10 @@ export default function Regras() {
             coordenação aplica a exceção legal (item 11). O voto pode ser
             mudado até o fechamento. Ninguém vota no próprio conteúdo.
           </li>
-          <li>As contagens e os nomes ficam escondidos até o fechamento.</li>
+          <li>
+            Durante o debate, o voto atual de quem comenta aparece ao lado do nome, e muda se a pessoa mudar o voto. As
+            contagens e os votos de quem não comentou ficam escondidos até o fechamento.
+          </li>
           <li>
             O voto é nominal: depois da publicação, a lista de quem votou aparece neste blog, com o nome público. Não
             existe voto secreto.
@@ -235,9 +223,35 @@ export default function Regras() {
           </li>
         </ul>
 
-        <p className="text-sm text-muted">
-          Versão anterior:{" "}
-          <a href="https://devirsocial.blogspot.com/2026/10/devir-social-regras-do-piloto-versao-01.html">0.1</a>.
+        <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.4 (30/10/2026)</h3>
+        <ul>
+          <li>
+            O voto passou a ser por sentimento: quatro opções de apoio, quatro de protesto e indiferente. A
+            classificação continua comparando apoio e protesto; o detalhamento por sentimento aparece neste blog e na
+            legenda do Instagram.
+          </li>
+          <li>
+            Revisão no mesmo dia: o voto atual de quem comenta passou a aparecer ao lado do nome durante o debate. As
+            contagens continuam escondidas até o fechamento.
+          </li>
+          <li>As duas mudanças foram feitas antes de qualquer voto ser registrado.</li>
+        </ul>
+
+        <h3>0.3</h3>
+        <ul>
+          <li>Três opções de voto: sim, indiferente e não. Indiferente é ilustrativo e não conta.</li>
+          <li>Ciclos de participação: participantes e espectadores.</li>
+          <li>O quórum passou a ser calculado sobre os participantes do ciclo.</li>
+          <li>Prazos e porcentagens viraram parâmetros públicos; mudanças valem a partir do ciclo seguinte.</li>
+          <li>O registro de cada conteúdo passou a ser publicado automaticamente neste blog, no fechamento da votação.</li>
+        </ul>
+
+        <h3>0.1 e 0.2</h3>
+        <p>
+          Anteriores ao app. A versão 0.1 está{" "}
+          <a href="https://devirsocial.blogspot.com/2026/10/devir-social-regras-do-piloto-versao-01.html">no blog antigo</a>.
         </p>
       </article>
     </div>

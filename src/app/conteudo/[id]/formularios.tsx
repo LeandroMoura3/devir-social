@@ -48,7 +48,8 @@ export function FormularioVoto({
         {meuVoto === undefined
           ? "Você ainda não votou. Dá para mudar o voto até o fechamento."
           : `Seu voto: ${NOME_VOTO[meuVoto]}. Dá para mudar até o fechamento.`}{" "}
-        Uma escolha por conteúdo. Indiferente é ilustrativo: não entra na contagem, mas conta como participação.
+        Uma escolha por conteúdo. Indiferente é ilustrativo: não entra na contagem, mas conta como participação. Se
+        você comentar, seu voto aparece ao lado do seu nome no debate; as contagens só aparecem no fechamento.
       </p>
       {estado.erro && <p className="erro">{estado.erro}</p>}
     </form>

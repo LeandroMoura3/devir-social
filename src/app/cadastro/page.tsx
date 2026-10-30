@@ -51,7 +51,8 @@ function TextoConsentimento() {
         <p>
           Seu <strong>nome público</strong>, que você escolhe abaixo (pode ser seu nome real, um apelido ou suas
           iniciais), seus conteúdos, seus comentários e <strong>os seus votos</strong> (o sentimento que cada um
-          escolheu em cada conteúdo, depois que a votação fecha).
+          escolheu em cada conteúdo: durante o debate, ao lado dos seus comentários; de todos, depois que a votação
+          fecha).
         </p>
       </section>
 

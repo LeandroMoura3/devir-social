@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
-import { NOME_FAIXA, type Voto } from "@/lib/regras";
+import { ladoDoVoto, NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
 import { ResultadoVotos } from "../../resultado-votos";
 import { situacaoDoVoto, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
@@ -32,7 +32,8 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   if (!Number.isInteger(conteudoId)) notFound();
 
   const { supabase, usuarioId, perfil } = await exigirParticipante();
-  const [[conteudo], { data: meuVoto }, { data: comentarios }, { data: status }, { data: membros }] = await Promise.all([
+  const [[conteudo], { data: meuVoto }, { data: comentarios }, { data: status }, { data: membros }, { data: votosDoDebate }] =
+    await Promise.all([
     carregarConteudos(supabase, [conteudoId]),
     supabase
       .from("votos")
@@ -48,8 +49,10 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       .overrideTypes<Comentario[], { merge: false }>(),
     lista<StatusCiclo>(supabase.rpc("meu_status")),
     lista<{ perfil_id: string; participante: boolean }>(supabase.rpc("membros_ciclo_atual")),
+    lista<{ perfil_id: string; voto: Voto }>(supabase.rpc("votos_de_comentaristas", { p_conteudo: conteudoId })),
   ]);
   const espectadores = new Set((membros ?? []).filter((m) => !m.participante).map((m) => m.perfil_id));
+  const votos = new Map((votosDoDebate ?? []).map((v) => [v.perfil_id, v.voto]));
   if (!conteudo) notFound();
 
   const agora = instanteDaRequisicao();
@@ -104,6 +107,8 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
           conteudoId={conteudo.id}
           aberto={aberto}
           espectadores={espectadores}
+          votos={votos}
+          autorConteudo={conteudo.autorId}
         />
       </section>
 
@@ -130,18 +135,35 @@ async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao;
   );
 }
 
+// Voto atual de quem comenta (muda junto com o voto até o fechamento).
+function SeloVoto({ autorId, votos, autorConteudo }: { autorId: string; votos: Map<string, Voto>; autorConteudo: string }) {
+  if (autorId === autorConteudo) return <span>autor</span>;
+  const voto = votos.get(autorId);
+  if (!voto) return <span>ainda não votou</span>;
+  const lado = ladoDoVoto(voto);
+  return (
+    <span className={lado === "apoio" ? "text-accent" : lado === "protesto" ? "text-danger" : undefined}>
+      <em>{NOME_VOTO[voto]}</em>
+    </span>
+  );
+}
+
 function ArvoreComentarios({
   comentarios,
   paiId,
   conteudoId,
   aberto,
   espectadores,
+  votos,
+  autorConteudo,
 }: {
   comentarios: Comentario[];
   paiId: number | null;
   conteudoId: number;
   aberto: boolean;
   espectadores: Set<string>;
+  votos: Map<string, Voto>;
+  autorConteudo: string;
 }) {
   const filhos = comentarios.filter((c) => c.pai_id === paiId);
   if (filhos.length === 0) return null;
@@ -152,6 +174,7 @@ function ArvoreComentarios({
           <p className="text-xs text-muted">
             {c.perfis?.nome_publico ?? "participante"}
             {espectadores.has(c.autor_id) && <span className="ml-1 rounded border border-border px-1">espectador</span>} ·{" "}
+            <SeloVoto autorId={c.autor_id} votos={votos} autorConteudo={autorConteudo} /> ·{" "}
             {formatarDataHora(c.criado_em)}
           </p>
           <p className="whitespace-pre-wrap text-sm">
@@ -164,6 +187,8 @@ function ArvoreComentarios({
             conteudoId={conteudoId}
             aberto={aberto}
             espectadores={espectadores}
+            votos={votos}
+            autorConteudo={autorConteudo}
           />
         </li>
       ))}
