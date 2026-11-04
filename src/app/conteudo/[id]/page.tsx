@@ -4,7 +4,9 @@ import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/co
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
 import { ladoDoVoto, NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { NavegacaoConteudos, vizinhos } from "../../navegacao";
 import { ResultadoVotos } from "../../resultado-votos";
+import { TextoFormatado } from "../../texto-formatado";
 import { situacaoDoVoto, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
 import { FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
@@ -57,8 +59,17 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
 
   const agora = instanteDaRequisicao();
   const aberto = !conteudo.removidoEm && Date.parse(conteudo.fechaEm) > agora;
-  const imagens = await urlsAssinadas(supabase, conteudo.imagemPath ? [conteudo.imagemPath] : []);
+  const [imagens, { data: abertos }] = await Promise.all([
+    urlsAssinadas(supabase, conteudo.imagemPath ? [conteudo.imagemPath] : []),
+    supabase
+      .from("conteudos")
+      .select("id")
+      .is("removido_em", null)
+      .gt("fecha_em", new Date(agora).toISOString()),
+  ]);
   const imagemUrl = conteudo.imagemPath ? imagens.get(conteudo.imagemPath) : undefined;
+  // Durante a votação, navega só entre os conteúdos abertos.
+  const navegacao = aberto ? vizinhos((abertos ?? []).map((a) => a.id), conteudo.id) : {};
 
   return (
     <article className="flex flex-col gap-6">
@@ -75,12 +86,18 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         </p>
       </header>
 
-      {imagemUrl ? (
-        <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />
+      {aberto && imagemUrl ? (
+        <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} />
       ) : (
-        <p className="text-sm text-muted">A imagem já foi publicada e removida do app.</p>
+        <>
+          {imagemUrl ? (
+            <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />
+          ) : (
+            <p className="text-sm text-muted">A imagem já foi publicada e removida do app.</p>
+          )}
+          <TextoFormatado texto={conteudo.texto} />
+        </>
       )}
-      <p className="whitespace-pre-wrap">{conteudo.texto}</p>
 
       {aberto && conteudo.autorId !== usuarioId && (
         <FormularioVoto
@@ -112,6 +129,8 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         />
       </section>
 
+      <NavegacaoConteudos {...navegacao} href={(id) => `/conteudo/${id}`} />
+
       {perfil.is_admin && !conteudo.removidoEm && !conteudo.publicadoEm && (
         <section className="cartao flex flex-col gap-2">
           <h2 className="font-semibold">Coordenação</h2>
@@ -119,6 +138,23 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         </section>
       )}
     </article>
+  );
+}
+
+// Prévia enquanto o conteúdo está aberto: a imagem já sai do app no recorte do Instagram.
+function MolduraInstagram({ imagemUrl, texto }: { imagemUrl: string; texto: string }) {
+  return (
+    <figure className="mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <figcaption className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
+        <span aria-hidden className="size-7 rounded-full bg-accent" />
+        devir_social
+        <span className="ml-auto text-xs font-normal text-muted">prévia</span>
+      </figcaption>
+      <img src={imagemUrl} alt="" className="w-full" />
+      <div className="px-3 py-3 text-sm">
+        <TextoFormatado texto={texto} />
+      </div>
+    </figure>
   );
 }
 

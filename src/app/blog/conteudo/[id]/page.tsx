@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { carregarPublicados, carregarRegistro } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
 import { NOME_FAIXA } from "@/lib/regras";
+import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
 import { ResultadoVotos } from "../../../resultado-votos";
+import { TextoFormatado } from "../../../texto-formatado";
 import { MenuBlog } from "../../menu";
 
 export default function ConteudoPublicado({ params }: PageProps<"/blog/conteudo/[id]">) {
@@ -20,7 +22,8 @@ export default function ConteudoPublicado({ params }: PageProps<"/blog/conteudo/
 async function Registro({ params }: { params: Promise<{ id: string }> }) {
   const id = Number((await params).id);
   if (!Number.isInteger(id)) notFound();
-  const conteudo = (await carregarPublicados()).find((p) => p.id === id);
+  const publicados = await carregarPublicados();
+  const conteudo = publicados.find((p) => p.id === id);
   if (!conteudo) notFound();
   const registro = await carregarRegistro(id);
 
@@ -35,7 +38,7 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
         <p className="text-sm text-muted">Autor: {conteudo.autor}</p>
       </header>
 
-      <p className="whitespace-pre-wrap">{conteudo.texto}</p>
+      <TextoFormatado texto={conteudo.texto} />
 
       <p className="text-sm text-muted">
         Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.fechaEm)}.
@@ -43,6 +46,13 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
       <section className="cartao">
         <ResultadoVotos {...conteudo} votacao={registro} />
       </section>
+      <NavegacaoConteudos
+        {...vizinhos(
+          publicados.map((p) => p.id),
+          id,
+        )}
+        href={(i) => `/blog/conteudo/${i}`}
+      />
     </article>
   );
 }

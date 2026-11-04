@@ -3,6 +3,7 @@ import Link from "next/link";
 import { carregarPublicados, carregarRemocoes, type Publicado } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
 import { NOME_FAIXA } from "@/lib/regras";
+import { TextoFormatado } from "../texto-formatado";
 import { MenuBlog } from "./menu";
 
 export const metadata = {
@@ -54,7 +55,7 @@ async function Publicacoes() {
               <p className="text-xs text-muted">
                 #{p.id} · {p.autor}
               </p>
-              <p className="line-clamp-3 text-sm">{p.texto}</p>
+              <TextoFormatado texto={p.texto} className="line-clamp-3 text-sm" />
               <p className="text-xs font-medium text-accent">
                 {NOME_FAIXA[p.faixa]} · apoio {p.favor} · protesto {p.contra}
                 {p.instagramEm ? " · no Instagram" : ""}

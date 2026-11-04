@@ -5,6 +5,8 @@
 // "favor" = votos de APOIO e "contra" = votos de PROTESTO de participantes do ciclo.
 // Indiferente conta para o quórum, mas não para a porcentagem.
 
+import { semFormatacao } from "./formatacao";
+
 export type Faixa = "maioria" | "minoria" | "tribuna_livre" | "sem_quorum";
 
 // Voto por sentimento: 4 de apoio, indiferente e 4 de protesto, em pares espelhados
@@ -236,7 +238,7 @@ export function cortar(texto: string, limite: number): string {
 
 export function montarLegenda(conteudos: ConteudoClassificado[]): string {
   const nomes = rotulos(conteudos);
-  const textos = conteudos.map((c) => c.texto.trim());
+  const textos = conteudos.map((c) => semFormatacao(c.texto).trim());
   const fixo = juntar(conteudos.map((c, i) => bloco(nomes[i], c, ""))).length;
   const limites = limitesDeTexto(
     conteudos.map((c, i) => ({ tamanho: textos[i].length, peso: PESOS[grupoDe(c.faixa)] })),

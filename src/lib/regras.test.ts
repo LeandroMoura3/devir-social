@@ -148,6 +148,13 @@ describe("legenda", () => {
     expect(post.legenda).toContain("TRIBUNA LIVRE 1");
   });
 
+  it("tira os asteriscos de negrito da legenda", () => {
+    const m1 = conteudo("maioria", 20, { texto: "**Título** e o resto" });
+    const [post] = planejarPublicacao([m1]);
+    expect(post.legenda).toContain("Título e o resto");
+    expect(post.legenda).not.toContain("**");
+  });
+
   it("sem quórum tem rótulo e numeração próprios", () => {
     const m1 = conteudo("maioria", 20);
     const n1 = conteudo("minoria", 5);
