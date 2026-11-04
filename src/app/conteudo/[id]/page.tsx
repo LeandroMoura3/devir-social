@@ -146,7 +146,7 @@ function MolduraInstagram({ imagemUrl, texto }: { imagemUrl: string; texto: stri
   return (
     <figure className="mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-border bg-card">
       <figcaption className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
-        <span aria-hidden className="size-7 rounded-full bg-accent" />
+        <img src="/logo.png" alt="" className="size-7 rounded-full border border-border" />
         devir_social
         <span className="ml-auto text-xs font-normal text-muted">prévia</span>
       </figcaption>
