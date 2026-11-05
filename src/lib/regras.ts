@@ -39,6 +39,12 @@ export function ladoDoVoto(voto: Voto): Lado {
 
 export type Detalhe = Partial<Record<Voto, number>>;
 
+export function totaisDoDetalhe(detalhe: Detalhe): Record<Lado, number> {
+  const totais: Record<Lado, number> = { apoio: 0, protesto: 0, indiferente: 0 };
+  for (const [voto, n] of Object.entries(detalhe) as [Voto, number][]) totais[ladoDoVoto(voto)] += n;
+  return totais;
+}
+
 // "apoio 5 (me representa 3 · utilidade pública 2)": sentimentos sem votos ficam de fora;
 // ordem: mais votado primeiro, empate pela ordem fixa da lista.
 export function resumoDoLado(lado: "apoio" | "protesto", total: number, detalhe: Detalhe = {}): string {

@@ -73,6 +73,41 @@ export async function carregarRemocoes(): Promise<Remocao[]> {
   return linhas.map((l) => ({ id: l.conteudo_id, motivo: l.motivo, removidoEm: l.removido_em }));
 }
 
+export type Cancelado = {
+  id: number;
+  texto: string;
+  autor: string;
+  criadoEm: string;
+  canceladoEm: string;
+  motivo: string | null;
+  detalhe: Detalhe;
+};
+
+export async function carregarCancelados(): Promise<Cancelado[]> {
+  const supabase = await criarClientePublico();
+  const linhas = verificar(
+    await lista<{
+      conteudo_id: number;
+      texto: string;
+      autor: string;
+      criado_em: string;
+      cancelado_em: string;
+      motivo: string | null;
+      detalhe: Detalhe | null;
+    }>(supabase.rpc("blog_cancelados")),
+    "cancelados",
+  );
+  return linhas.map((l) => ({
+    id: l.conteudo_id,
+    texto: l.texto,
+    autor: l.autor,
+    criadoEm: l.criado_em,
+    canceladoEm: l.cancelado_em,
+    motivo: l.motivo,
+    detalhe: l.detalhe ?? {},
+  }));
+}
+
 export type Registro = VotacaoNominal;
 
 export async function carregarRegistro(id: number): Promise<Registro> {

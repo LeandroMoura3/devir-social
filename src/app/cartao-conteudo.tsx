@@ -14,7 +14,7 @@ type Props = {
 export function CartaoConteudo({ conteudo: c, imagemUrl, agora, meuVoto, souAutor }: Props) {
   const aberto = Date.parse(c.fechaEm) > agora;
   let situacao: string;
-  if (c.removidoEm) situacao = "Removido (exceção legal)";
+  if (c.removidoEm) situacao = c.cancelado ? "Cancelado pelo autor" : "Removido (exceção legal)";
   else if (aberto) {
     const voto = souAutor
       ? "seu conteúdo"

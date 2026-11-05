@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import type { SituacaoVoto } from "@/lib/participacao";
 import { NOME_VOTO, VOTOS_APOIO, VOTOS_PROTESTO, type Voto } from "@/lib/regras";
-import { comentar, removerConteudo, votar, type EstadoAcao } from "./acoes";
+import { cancelarConteudo, comentar, removerConteudo, votar, type EstadoAcao } from "./acoes";
 
 export function FormularioVoto({
   conteudoId,
@@ -112,6 +112,40 @@ export function FormularioRemocao({ conteudoId }: { conteudoId: number }) {
       <button className="botao-secundario self-start text-danger" disabled={enviando}>
         Remover por exceção legal
       </button>
+    </form>
+  );
+}
+
+export function FormularioCancelamento({ conteudoId }: { conteudoId: number }) {
+  const [aberto, setAberto] = useState(false);
+  const [estado, acao, enviando] = useActionState<EstadoAcao, FormData>(cancelarConteudo, {});
+  if (!aberto) {
+    return (
+      <button type="button" onClick={() => setAberto(true)} className="botao-secundario self-start">
+        Cancelar meu conteúdo
+      </button>
+    );
+  }
+  return (
+    <form action={acao} className="flex flex-col gap-2">
+      <input type="hidden" name="conteudo_id" value={conteudoId} />
+      <p className="text-sm">
+        O conteúdo não vai para o Instagram nem é classificado, e a votação e o debate fecham agora. O blog registra o
+        cancelamento com o texto completo e os votos dados até aqui. Não dá para desfazer.
+      </p>
+      <label className="flex flex-col gap-1 text-sm">
+        Motivo (opcional, aparece no blog)
+        <input name="motivo" maxLength={500} className="campo" placeholder="Ex.: mudei de ideia depois do debate" />
+      </label>
+      {estado.erro && <p className="erro">{estado.erro}</p>}
+      <div className="flex gap-2">
+        <button className="botao-secundario text-danger" disabled={enviando}>
+          {enviando ? "Cancelando…" : "Confirmar cancelamento"}
+        </button>
+        <button type="button" onClick={() => setAberto(false)} className="botao-secundario" disabled={enviando}>
+          Voltar
+        </button>
+      </div>
     </form>
   );
 }

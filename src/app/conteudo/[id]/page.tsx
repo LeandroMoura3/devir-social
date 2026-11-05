@@ -9,7 +9,7 @@ import { ResultadoVotos } from "../../resultado-votos";
 import { TextoFormatado } from "../../texto-formatado";
 import { situacaoDoVoto, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
-import { FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
+import { FormularioCancelamento, FormularioComentario, FormularioRemocao, FormularioVoto } from "./formularios";
 
 export default function PaginaConteudo({ params }: PageProps<"/conteudo/[id]">) {
   return (
@@ -79,7 +79,9 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         </p>
         <p className="text-sm font-medium text-accent">
           {conteudo.removidoEm
-            ? `Removido: ${conteudo.removidoMotivo}`
+            ? conteudo.cancelado
+              ? `Cancelado pelo autor em ${formatarDataHora(conteudo.removidoEm)}${conteudo.removidoMotivo ? `: ${conteudo.removidoMotivo}` : ""}`
+              : `Removido: ${conteudo.removidoMotivo}`
             : aberto
               ? `Em debate e votação · ${tempoRestante(conteudo.fechaEm, agora)}`
               : `Fechado em ${formatarDataHora(conteudo.fechaEm)}`}
@@ -107,7 +109,10 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         />
       )}
       {aberto && conteudo.autorId === usuarioId && (
-        <p className="text-sm text-muted">Você não vota no próprio conteúdo.</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-muted">Você não vota no próprio conteúdo.</p>
+          <FormularioCancelamento conteudoId={conteudo.id} />
+        </div>
       )}
       {!aberto && conteudo.resultado && <BlocoResultado conteudo={conteudo} supabase={supabase} />}
 
@@ -116,7 +121,9 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         {aberto ? (
           <FormularioComentario conteudoId={conteudo.id} />
         ) : (
-          <p className="text-sm text-muted">O debate fechou junto com a votação.</p>
+          <p className="text-sm text-muted">
+            {conteudo.cancelado ? "O debate fechou com o cancelamento." : "O debate fechou junto com a votação."}
+          </p>
         )}
         <ArvoreComentarios
           comentarios={comentarios ?? []}

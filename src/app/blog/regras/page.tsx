@@ -11,7 +11,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.5)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.6)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -100,6 +100,7 @@ export default function Regras() {
             conteúdo fechou no ciclo anterior, todos são participantes.
           </li>
           <li>Num conteúdo, contam os votos de quem é participante no ciclo em que ele fecha.</li>
+          <li>Conteúdos cancelados pelo autor ou removidos pela coordenação não entram na conta de participação.</li>
           <li>
             Espectadores podem enviar conteúdos, comentar e votar normalmente; só o voto não entra no resultado. Todo
             membro vê, no app, quem é participante ou espectador e quanto falta para cada um, e cada conteúdo mostra a
@@ -198,7 +199,23 @@ export default function Regras() {
           blog e do Instagram. Cada remoção aparece neste blog, com o motivo.
         </p>
 
-        <h3>12. Parâmetros</h3>
+        <h3>12. Cancelamento pelo autor</h3>
+        <ul>
+          <li>
+            Enquanto o conteúdo está aberto, o autor pode cancelá-lo, por exemplo se mudou de ideia durante o debate.
+            O motivo é opcional. Não dá para desfazer.
+          </li>
+          <li>
+            O conteúdo cancelado não é classificado e não vai para o Instagram. A votação e o debate fecham na hora; os
+            comentários continuam visíveis no app.
+          </li>
+          <li>
+            Este blog registra o cancelamento, com o texto completo, o nome público do autor, as datas, o motivo (se
+            houver) e a contagem por sentimento de todos os votos dados até o cancelamento.
+          </li>
+        </ul>
+
+        <h3>13. Parâmetros</h3>
         <p>
           Prazo do conteúdo, duração do ciclo, participação mínima e quórum são parâmetros públicos. Uma mudança só
           vale a partir do início do ciclo seguinte, e as versões anteriores continuam registradas, para que os
@@ -233,6 +250,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.6 (05/11/2026)</h3>
+        <ul>
+          <li>
+            O autor pode cancelar o próprio conteúdo enquanto ele está aberto (item 12). O cancelamento fica registrado
+            neste blog, com o texto completo e os votos até aquele momento.
+          </li>
+        </ul>
 
         <h3>0.5 (30/10/2026)</h3>
         <ul>

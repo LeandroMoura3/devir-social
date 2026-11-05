@@ -27,6 +27,8 @@ export type ConteudoVisao = {
   publicadoEm: string | null;
   removidoEm: string | null;
   removidoMotivo: string | null;
+  // Cancelado pelo próprio autor (usa removidoEm/removidoMotivo; motivo opcional).
+  cancelado: boolean;
   comentarios: number;
   resultado: Resultado | null;
 };
@@ -42,6 +44,7 @@ type LinhaConteudo = {
   publicado_em: string | null;
   removido_em: string | null;
   removido_motivo: string | null;
+  cancelado: boolean;
   perfis: { nome_publico: string } | null;
 };
 
@@ -57,7 +60,7 @@ type LinhaResultado = {
 };
 
 const CAMPOS =
-  "id, texto, imagem_path, imagem_apagada, autor_id, criado_em, fecha_em, publicado_em, removido_em, removido_motivo, perfis!conteudos_autor_id_fkey(nome_publico)";
+  "id, texto, imagem_path, imagem_apagada, autor_id, criado_em, fecha_em, publicado_em, removido_em, removido_motivo, cancelado, perfis!conteudos_autor_id_fkey(nome_publico)";
 
 // Resultados só existem para conteúdos fechados e não removidos.
 export async function carregarConteudos(supabase: Cliente, ids?: number[]): Promise<ConteudoVisao[]> {
@@ -95,6 +98,7 @@ export async function carregarConteudos(supabase: Cliente, ids?: number[]): Prom
       publicadoEm: l.publicado_em,
       removidoEm: l.removido_em,
       removidoMotivo: l.removido_motivo,
+      cancelado: l.cancelado,
       comentarios: totalComentarios.get(l.id) ?? 0,
       resultado: r
         ? {

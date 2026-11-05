@@ -37,6 +37,8 @@ export default function ComoFunciona() {
           </li>
           <li>
             <strong>Nenhum conteúdo fica de fora.</strong> Tudo é publicado neste blog, com o texto completo e os votos.
+            Quem mudar de ideia durante o debate pode cancelar o próprio conteúdo: ele não vai para o Instagram, mas o
+            cancelamento fica registrado aqui.
           </li>
         </ol>
 

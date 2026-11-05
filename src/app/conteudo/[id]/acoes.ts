@@ -43,3 +43,14 @@ export async function removerConteudo(_anterior: EstadoAcao, formData: FormData)
   refresh();
   return { ok: true };
 }
+
+export async function cancelarConteudo(_anterior: EstadoAcao, formData: FormData): Promise<EstadoAcao> {
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.rpc("cancelar_conteudo", {
+    p_id: Number(formData.get("conteudo_id")),
+    p_motivo: String(formData.get("motivo") ?? ""),
+  });
+  if (error) return { erro: error.message };
+  refresh();
+  return { ok: true };
+}

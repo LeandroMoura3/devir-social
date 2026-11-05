@@ -7,6 +7,7 @@ import {
   ladoDoVoto,
   planejarPublicacao,
   resumoDoLado,
+  totaisDoDetalhe,
   type ConteudoClassificado,
   type Faixa,
 } from "./regras";
@@ -216,5 +217,16 @@ describe("cortar", () => {
     expect(cortar("abcdefghij", 5)).toBe("abcd…");
     expect(cortar("abc", 5)).toBe("abc");
     expect(cortar("abc", 0)).toBe("");
+  });
+});
+
+describe("totaisDoDetalhe", () => {
+  it("soma os sentimentos por lado", () => {
+    expect(totaisDoDetalhe({ me_representa: 2, utilidade_publica: 1, so_gera_briga: 3, indiferente: 4 })).toEqual({
+      apoio: 3,
+      protesto: 3,
+      indiferente: 4,
+    });
+    expect(totaisDoDetalhe({})).toEqual({ apoio: 0, protesto: 0, indiferente: 0 });
   });
 });

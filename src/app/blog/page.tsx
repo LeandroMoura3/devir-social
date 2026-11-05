@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { carregarPublicados, carregarRemocoes, type Publicado } from "@/lib/blog";
+import { carregarCancelados, carregarPublicados, carregarRemocoes, type Publicado } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
-import { NOME_FAIXA } from "@/lib/regras";
+import { NOME_FAIXA, resumoDoLado, totaisDoDetalhe } from "@/lib/regras";
 import { TextoFormatado } from "../texto-formatado";
 import { MenuBlog } from "./menu";
 
@@ -36,7 +36,11 @@ export default function Blog() {
 }
 
 async function Publicacoes() {
-  const [publicados, remocoes] = await Promise.all([carregarPublicados(), carregarRemocoes()]);
+  const [publicados, remocoes, cancelados] = await Promise.all([
+    carregarPublicados(),
+    carregarRemocoes(),
+    carregarCancelados(),
+  ]);
 
   const porData = new Map<string, Publicado[]>();
   for (const p of publicados) {
@@ -64,6 +68,34 @@ async function Publicacoes() {
           ))}
         </section>
       ))}
+
+      {cancelados.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold">Cancelados pelo autor</h2>
+          <p className="text-sm text-muted">
+            O autor cancelou o conteúdo durante o debate. Ele não foi classificado nem vai para o Instagram; o registro
+            fica aqui, com os votos dados até o cancelamento (de participantes e espectadores).
+          </p>
+          {cancelados.map((c) => {
+            const t = totaisDoDetalhe(c.detalhe);
+            return (
+              <article key={c.id} className="cartao flex flex-col gap-2">
+                <p className="text-xs text-muted">
+                  #{c.id} · {c.autor} · enviado em {formatarData(c.criadoEm)} · cancelado em {formatarData(c.canceladoEm)}
+                </p>
+                <p className="text-sm">
+                  <strong>Motivo:</strong> {c.motivo ?? "não informado"}
+                </p>
+                <TextoFormatado texto={c.texto} className="text-sm" />
+                <p className="text-xs text-muted">
+                  Votos até o cancelamento: {resumoDoLado("apoio", t.apoio, c.detalhe)} ·{" "}
+                  {resumoDoLado("protesto", t.protesto, c.detalhe)} · indiferente {t.indiferente}
+                </p>
+              </article>
+            );
+          })}
+        </section>
+      )}
 
       {remocoes.length > 0 && (
         <section className="flex flex-col gap-2">
