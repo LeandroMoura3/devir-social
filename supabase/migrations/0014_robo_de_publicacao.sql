@@ -96,3 +96,33 @@ create policy "robô apaga imagens já publicadas" on storage.objects
   );
 
 notify pgrst, 'reload schema';
+
+-- Correção (06/11/2026): a política rodava com as permissões do anon, que não lê public.conteudos,
+-- então nunca liberava nada. As checagens passam para funções security definer.
+create or replace function public.imagem_pronta_para_publicar(p_nome text)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select exists (
+    select 1 from public.conteudos c
+    where c.imagem_path = p_nome and c.fecha_em <= now() and c.removido_em is null and c.publicado_em is null
+  );
+$$;
+
+create or replace function public.imagem_ja_publicada(p_nome text)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select exists (select 1 from public.conteudos c where c.imagem_path = p_nome and c.publicado_em is not null);
+$$;
+
+grant execute on function public.imagem_pronta_para_publicar(text) to anon;
+grant execute on function public.imagem_ja_publicada(text) to anon;
+
+drop policy "robô lê imagens prontas para publicar" on storage.objects;
+create policy "robô lê imagens prontas para publicar" on storage.objects
+  for select to anon using (bucket_id = 'imagens' and public.imagem_pronta_para_publicar(name));
+
+drop policy "robô apaga imagens já publicadas" on storage.objects;
+create policy "robô apaga imagens já publicadas" on storage.objects
+  for delete to anon using (bucket_id = 'imagens' and public.imagem_ja_publicada(name));
