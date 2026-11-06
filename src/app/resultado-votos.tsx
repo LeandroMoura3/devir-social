@@ -14,8 +14,21 @@ type Props = {
   votacao: VotacaoNominal;
 };
 
-function nomes(itens: string[]): string {
-  return itens.length > 0 ? itens.join(", ") : "ninguém";
+const VISIVEIS = 8;
+
+// Todos os nomes ficam acessíveis (voto nominal); listas longas mostram os primeiros e recolhem o resto.
+function Nomes({ itens }: { itens: string[] }) {
+  if (itens.length === 0) return <>ninguém</>;
+  if (itens.length <= VISIVEIS) return <>{itens.join(", ")}</>;
+  return (
+    <>
+      {itens.slice(0, VISIVEIS).join(", ")}{" "}
+      <details className="inline">
+        <summary className="inline cursor-pointer text-accent">e mais {itens.length - VISIVEIS}</summary>
+        {itens.slice(VISIVEIS).join(", ")}
+      </details>
+    </>
+  );
 }
 
 function Lado({ titulo, total, opcoes, detalhe, votacao }: {
@@ -25,19 +38,24 @@ function Lado({ titulo, total, opcoes, detalhe, votacao }: {
   detalhe: Detalhe;
   votacao: VotacaoNominal;
 }) {
+  // Só os sentimentos que receberam votos; o total do lado continua visível.
+  const comVotos = opcoes.filter((v) => (detalhe[v] ?? 0) > 0);
   return (
     <div className="flex flex-col gap-1">
       <h3 className="font-semibold">
         {titulo} {total}
       </h3>
+      {comVotos.length === 0 && <p className="text-muted">nenhum voto</p>}
       <ul className="flex flex-col gap-1">
-        {opcoes.map((v) => (
+        {comVotos.map((v) => (
           <li key={v}>
             <span className="font-medium">
-              {NOME_VOTO[v]} {detalhe[v] ?? 0}
+              {NOME_VOTO[v]} {detalhe[v]}
             </span>
             {(votacao.porVoto[v] ?? []).length > 0 && (
-              <span className="text-muted">: {votacao.porVoto[v].join(", ")}</span>
+              <div className="text-muted">
+                <Nomes itens={votacao.porVoto[v]} />
+              </div>
             )}
           </li>
         ))}
@@ -48,25 +66,35 @@ function Lado({ titulo, total, opcoes, detalhe, votacao }: {
 
 // Votos de participantes por sentimento, com nomes; indiferentes e espectadores à parte.
 export function ResultadoVotos(p: Props) {
+  const minimo = p.quorumNecessario === 1 ? "1 voto" : `${p.quorumNecessario} votos`;
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div className="grid gap-4 sm:grid-cols-2">
         <Lado titulo="Apoio" total={p.favor} opcoes={VOTOS_APOIO} detalhe={p.detalhe} votacao={p.votacao} />
         <Lado titulo="Protesto" total={p.contra} opcoes={VOTOS_PROTESTO} detalhe={p.detalhe} votacao={p.votacao} />
       </div>
-      <p className="text-muted">
-        Indiferente (conta para o quórum, não para a porcentagem): {p.indiferente} · {nomes(p.votacao.porVoto.indiferente ?? [])}
-      </p>
+      <div className="text-muted">
+        Indiferente (conta para o quórum, não para a porcentagem): {p.indiferente}
+        {p.indiferente > 0 && (
+          <>
+            {" "}
+            · <Nomes itens={p.votacao.porVoto.indiferente ?? []} />
+          </>
+        )}
+      </div>
       <p className="text-muted">
         {p.quorumNecessario === undefined
           ? `Cancelado antes de fechar, sem quórum nem classificação. Base: ${p.base} participantes no ciclo iniciado em ${formatarData(p.cicloInicio)}, o do cancelamento.`
-          : `Quórum: ${p.base} participantes no ciclo iniciado em ${formatarData(p.cicloInicio)}; mínimo de ${p.quorumNecessario} votos (apoio, protesto e indiferente).`}
+          : `Quórum: ${p.base} participantes no ciclo iniciado em ${formatarData(p.cicloInicio)}; mínimo de ${minimo} (apoio, protesto e indiferente).`}
       </p>
-      <p className="text-muted">Participantes do ciclo: {nomes(p.votacao.participantesCiclo)}</p>
-      <p className="text-muted">
+      <details className="text-muted">
+        <summary className="cursor-pointer">Participantes do ciclo: {p.votacao.participantesCiclo.length} (ver nomes)</summary>
+        <p className="mt-1">{p.votacao.participantesCiclo.join(", ") || "ninguém"}</p>
+      </details>
+      <div className="text-muted">
         Votos de espectadores (não contam):{" "}
-        {nomes(p.votacao.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`))}
-      </p>
+        <Nomes itens={p.votacao.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`)} />
+      </div>
     </div>
   );
 }
