@@ -59,7 +59,11 @@ export function resumoDoLado(lado: "apoio" | "protesto", total: number, detalhe:
 
 export const LIMITE_LEGENDA = 2200;
 export const MAX_ITENS_POST = 10;
-export const RODAPE_LEGENDA = "Texto completo, links e votos: link na bio → Verificar postagem → código (#)";
+// O rodapé diz quais códigos procurar no verificador do blog (link na bio).
+export function rodapeLegenda(ids: number[]): string {
+  const codigos = ids.length === 1 ? `código ${ids[0]}` : `códigos ${ids.join(", ")}`;
+  return `Texto completo, links e votos: link na bio → Verificar postagem → ${codigos}`;
+}
 
 const PESOS = { maioria: 4, minoria: 2, tribuna: 1 } as const;
 
@@ -205,8 +209,8 @@ function bloco(rotulo: string, c: ConteudoClassificado, texto: string): string {
   ].join("\n");
 }
 
-function juntar(blocos: string[]): string {
-  return [...blocos, RODAPE_LEGENDA].join("\n\n");
+function juntar(blocos: string[], ids: number[]): string {
+  return [...blocos, rodapeLegenda(ids)].join("\n\n");
 }
 
 // Divide o espaço por peso (4:2:1). Textos que cabem inteiros liberam a sobra para os outros.
@@ -245,10 +249,11 @@ export function cortar(texto: string, limite: number): string {
 export function montarLegenda(conteudos: ConteudoClassificado[]): string {
   const nomes = rotulos(conteudos);
   const textos = conteudos.map((c) => semFormatacao(c.texto).trim());
-  const fixo = juntar(conteudos.map((c, i) => bloco(nomes[i], c, ""))).length;
+  const ids = conteudos.map((c) => c.id);
+  const fixo = juntar(conteudos.map((c, i) => bloco(nomes[i], c, "")), ids).length;
   const limites = limitesDeTexto(
     conteudos.map((c, i) => ({ tamanho: textos[i].length, peso: PESOS[grupoDe(c.faixa)] })),
     LIMITE_LEGENDA - fixo,
   );
-  return juntar(conteudos.map((c, i) => bloco(nomes[i], c, cortar(textos[i], limites[i]))));
+  return juntar(conteudos.map((c, i) => bloco(nomes[i], c, cortar(textos[i], limites[i]))), ids);
 }

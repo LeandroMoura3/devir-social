@@ -149,6 +149,15 @@ describe("legenda", () => {
     expect(post.legenda).toContain("TRIBUNA LIVRE 1");
   });
 
+  it("o rodapé diz quais códigos procurar no verificador", () => {
+    const m1 = conteudo("maioria", 20);
+    const n1 = conteudo("minoria", 5);
+    const [post] = planejarPublicacao([m1, n1]);
+    expect(post.legenda.endsWith(`→ códigos ${m1.id}, ${n1.id}`)).toBe(true);
+    const [sozinho] = planejarPublicacao([conteudo("maioria", 3)]);
+    expect(sozinho.legenda).toMatch(/→ código \d+$/);
+  });
+
   it("tira os asteriscos de negrito da legenda", () => {
     const m1 = conteudo("maioria", 20, { texto: "**Título** e o resto" });
     const [post] = planejarPublicacao([m1]);
