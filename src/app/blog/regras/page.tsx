@@ -334,11 +334,114 @@ export default function Regras() {
           <li>O registro de cada conteúdo passou a ser publicado automaticamente neste blog, no fechamento da votação.</li>
         </ul>
 
-        <h3>0.1 e 0.2</h3>
-        <p>
-          Anteriores ao app. A versão 0.1 está{" "}
-          <a href="https://devirsocial.blogspot.com/2026/10/devir-social-regras-do-piloto-versao-01.html">no blog antigo</a>.
-        </p>
+        <h3>0.2</h3>
+        <p>Anterior ao app. O texto desta versão não está reproduzido aqui.</p>
+
+        <h3>0.1</h3>
+        <p>Primeira versão, anterior ao app: envio e votação pelo Telegram. Texto original abaixo.</p>
+        <details>
+          <summary className="cursor-pointer">Ver o texto da versão 0.1 (histórico, não está em vigor)</summary>
+          <div className="mt-3 border-l border-border pl-4">
+            <h4 className="font-semibold">Devir Social: regras do piloto (versão 0.1)</h4>
+
+            <h4 className="font-semibold">A. Regras que não mudam</h4>
+            <p>Qualquer instância que mantiver estas três regras pode usar o nome Devir:</p>
+            <ol>
+              <li>
+                Processo determinístico e verificável: regras e entradas são públicas, e qualquer pessoa pode recalcular o
+                resultado. Toda decisão humana é registrada como uma etapa ainda não automatizada.
+              </li>
+              <li>Peso igual: nenhum voto vale mais que outro.</li>
+              <li>
+                Todo conteúdo é publicado, com visibilidade proporcional ao apoio. Cada autor responde pelo que diz.
+                Exceções só por obrigação legal, sempre registradas.
+              </li>
+            </ol>
+
+            <h4 className="font-semibold">B. Funcionamento do piloto</h4>
+            <p>
+              <strong>1. Envio.</strong> Um conteúdo é uma imagem ou um vídeo, mais um texto. Cada conteúdo recebe um
+              número (#).
+            </p>
+            <p>
+              <strong>2. Votação.</strong> Secreta, aberta por 7 dias. Opções: a favor ou contra.
+            </p>
+            <p>
+              <strong>3. Classificação.</strong>
+            </p>
+            <ul>
+              <li>Maioria: mais de 50% a favor.</li>
+              <li>Minoria: de 20% a 50% a favor.</li>
+              <li>Tribuna livre: menos de 20% a favor.</li>
+            </ul>
+            <p>
+              <strong>4. Ordem dentro de cada faixa.</strong> Primeiro quem tem mais votos a favor. Em caso de empate,
+              quem tem menos votos contra. Persistindo o empate, o conteúdo mais antigo.
+            </p>
+            <p>
+              <strong>5. Publicação.</strong> Duas vezes por semana (quarta e domingo), saem todos os conteúdos cuja
+              votação terminou. Quando falta uma faixa, a faixa de baixo sobe para o lugar dela:
+            </p>
+            <ul>
+              <li>
+                Há maioria e minoria: cada maioria vira um post. As minorias entram como imagens seguintes, em rodízio. A
+                tribuna livre aparece só como texto na legenda, em rodízio.
+              </li>
+              <li>
+                Há maioria, sem minoria: cada maioria vira um post. A tribuna livre entra como imagens seguintes, em
+                rodízio.
+              </li>
+              <li>
+                Sem maioria, há minoria: um único post com todas as minorias. A tribuna livre aparece só como texto na
+                legenda.
+              </li>
+              <li>Sem maioria e sem minoria: um único post com a tribuna livre.</li>
+            </ul>
+            <p>
+              Rodízio: o 1º da fila vai para o post da maioria mais votada, o 2º para o segundo post, e assim por diante.
+              Quando os posts acabam, volta ao primeiro.
+            </p>
+            <p>
+              <strong>6. Legenda.</strong>
+            </p>
+            <ul>
+              <li>Cada post traz na legenda os textos de todos os seus conteúdos.</li>
+              <li>Cada texto aparece com sua classificação, seu número e os votos a favor, contra e total.</li>
+              <li>
+                O espaço é dividido por peso: maioria 4, minoria 2, tribuna livre 1. O peso segue a classificação, não a
+                posição no post.
+              </li>
+              <li>Cada texto é cortado no tamanho que lhe cabe.</li>
+            </ul>
+            <p>
+              <strong>7. Blog.</strong> Cada publicação tem uma página neste blog, com o texto completo e a contagem de
+              votos de todos os conteúdos. O link fica na bio do Instagram.
+            </p>
+            <p>
+              <strong>8. Exceção legal.</strong> Conteúdo ilegal ou que viole as regras da plataforma não é publicado.
+              Cada remoção é registrada neste blog, com o motivo.
+            </p>
+
+            <h4 className="font-semibold">C. Etapas ainda não automatizadas</h4>
+            <p>Cada item sai desta lista quando for automatizado:</p>
+            <ol>
+              <li>Numerar os conteúdos e criar as enquetes.</li>
+              <li>Encerrar as votações e anotar as contagens.</li>
+              <li>Montar os posts (cascata, rodízio, corte dos textos).</li>
+              <li>Avaliar conteúdo ilegal.</li>
+              <li>Verificar identidade (hoje, por convite).</li>
+              <li>Votação: secreta para o grupo, mas não verificável. O Telegram tem acesso aos votos.</li>
+              <li>Definir as regras (hoje, o idealizador).</li>
+            </ol>
+
+            <h4 className="font-semibold">D. Ferramentas do piloto</h4>
+            <ul>
+              <li>Telegram: envio e votação.</li>
+              <li>Instagram: publicação.</li>
+              <li>Blog: registro completo.</li>
+            </ul>
+          </div>
+        </details>
       </article>
     </div>
   );
