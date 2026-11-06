@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { semanaAtual } from "@/lib/datas";
 
-const ROTAS_PUBLICAS = ["/login", "/auth", "/painel", "/blog"];
+// /api/cron confere o próprio segredo (agendamento da Vercel), sem sessão de usuário.
+const ROTAS_PUBLICAS = ["/login", "/auth", "/painel", "/blog", "/api/cron"];
 const COOKIE_ATIVIDADE = "devir_atividade";
 
 export async function proxy(request: NextRequest) {

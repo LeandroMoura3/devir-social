@@ -16,8 +16,8 @@ export default function PlanoPublicacao({ searchParams }: PageProps<"/admin/publ
       <h1 className="text-2xl font-semibold">Plano de publicação</h1>
       <p className="text-sm text-muted">
         Calculado automaticamente pelas regras do piloto com todos os conteúdos fechados e ainda não publicados no
-        Instagram. Confira cada post e publique pelo botão. Se preferir publicar à mão, baixe as imagens na ordem
-        mostrada, copie a legenda e depois registre aqui.
+        Instagram. Aos domingos, às 18h, o app publica estes posts sozinho. Use esta página para conferir antes, ou
+        para publicar pelo botão se a publicação automática falhar.
       </p>
       <Suspense fallback={null}>
         <Conexao searchParams={searchParams} />

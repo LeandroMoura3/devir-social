@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.8)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.9)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -170,7 +170,7 @@ export default function Regras() {
 
         <h3>8. Publicação no Instagram</h3>
         <p>
-          Uma vez por semana, no domingo, saem todos os conteúdos já classificados. Quando falta uma faixa, a
+          Uma vez por semana, no domingo, às 18h (horário de Brasília), o app publica sozinho todos os conteúdos já classificados. Quando falta uma faixa, a
           faixa de baixo sobe para o lugar dela:
         </p>
         <ul>
@@ -259,7 +259,6 @@ export default function Regras() {
 
         <h2>C. Etapas ainda não automatizadas</h2>
         <ol>
-          <li>Publicar no Instagram (o app monta os posts; a publicação ainda é manual).</li>
           <li>Avaliar conteúdo ilegal.</li>
           <li>Verificar identidade (hoje, por convite).</li>
           <li>Definir as regras (hoje, o idealizador).</li>
@@ -277,6 +276,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.9 (06/11/2026)</h3>
+        <ul>
+          <li>
+            A publicação no Instagram passou a ser automática: aos domingos, às 18h, o app monta e publica os posts
+            pelas regras (item 8). Saiu da lista de etapas ainda não automatizadas.
+          </li>
+        </ul>
 
         <h3>0.8 (06/11/2026)</h3>
         <ul>

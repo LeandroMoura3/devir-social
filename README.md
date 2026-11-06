@@ -80,11 +80,9 @@ where id = (select id from auth.users where email = 'seu-email@exemplo.com');
 
 ## Rotina da coordenação
 
-Aos domingos, abra **Plano de publicação** na página inicial:
+Aos domingos, às 18h (Brasília), o agendamento da Vercel (`vercel.json`) chama `/api/cron/publicar`, que monta os posts pelas regras, publica no Instagram, marca os conteúdos como publicados e apaga as imagens. O robô usa o `CRON_SECRET` (só o hash fica no banco, migração 0014), não a chave mestra do Supabase.
 
-1. Para cada post: baixe as imagens na ordem mostrada, publique no Instagram como carrossel e cole a legenda.
-2. Clique em **Marcar como publicado**. As imagens desse post são apagadas do app; textos e votos ficam guardados.
-3. O registro aparece sozinho em `/blog`.
+O **Plano de publicação** continua disponível para conferir os posts antes de domingo e publicar pelo botão, se o robô falhar. Teste sem marcar nada: `curl -H "Authorization: Bearer $CRON_SECRET" "https://devir-social.vercel.app/api/cron/publicar?teste=1"`.
 
 ## Comandos
 
