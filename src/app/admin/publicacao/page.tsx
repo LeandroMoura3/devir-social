@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { exigirAdmin, urlsAssinadas } from "@/lib/dados";
-import { instanteDaRequisicao } from "@/lib/datas";
+import { formatarData, instanteDaRequisicao } from "@/lib/datas";
 import { chaveDoPost, montarPlano } from "@/lib/plano";
 import { NOME_FAIXA } from "@/lib/regras";
 import { BotaoInstagram, BotaoPublicado, TextoCopiavel } from "./componentes";
@@ -10,7 +10,7 @@ export const metadata = { title: "Plano de publicação · Devir Social" };
 // Publicar um carrossel no Instagram leva alguns segundos por imagem.
 export const maxDuration = 60;
 
-export default function PlanoPublicacao() {
+export default function PlanoPublicacao({ searchParams }: PageProps<"/admin/publicacao">) {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Plano de publicação</h1>
@@ -19,10 +19,45 @@ export default function PlanoPublicacao() {
         Instagram. Confira cada post e publique pelo botão. Se preferir publicar à mão, baixe as imagens na ordem
         mostrada, copie a legenda e depois registre aqui.
       </p>
+      <Suspense fallback={null}>
+        <Conexao searchParams={searchParams} />
+      </Suspense>
       <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
         <Plano />
       </Suspense>
     </div>
+  );
+}
+
+const MENSAGENS: Record<string, string> = {
+  conectado: "Instagram conectado",
+  erro: "Não foi possível conectar o Instagram",
+  sem_configuracao: "Faltam as chaves do app da Meta no servidor (META_APP_ID, META_CONFIG_ID e META_APP_SECRET)",
+};
+
+// Estado da conexão com o Instagram (login unificado da Meta) e o botão para conectar ou reconectar.
+async function Conexao({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const [{ supabase }, parametros] = await Promise.all([exigirAdmin(), searchParams]);
+  const { data: conexao } = await supabase.from("instagram_conexao").select("renovado_em").maybeSingle<{ renovado_em: string }>();
+  const resultado = typeof parametros.instagram === "string" ? parametros.instagram : undefined;
+  const detalhe = typeof parametros.detalhe === "string" ? parametros.detalhe : undefined;
+  return (
+    <section className="cartao flex flex-col gap-2 text-sm">
+      {resultado && MENSAGENS[resultado] && (
+        <p className={resultado === "conectado" ? "text-accent" : "erro"}>
+          {MENSAGENS[resultado]}
+          {detalhe ? `: ${detalhe}` : "."}
+        </p>
+      )}
+      <p>
+        {conexao
+          ? `Instagram conectado desde ${formatarData(conexao.renovado_em)}. Os posts podem ser publicados pelo botão.`
+          : "O Instagram ainda não está conectado. Publique à mão e registre com o botão de cada post, ou conecte abaixo."}
+      </p>
+      <a href="/admin/instagram/conectar" className="botao-secundario self-start">
+        {conexao ? "Reconectar Instagram" : "Conectar Instagram"}
+      </a>
+    </section>
   );
 }
 
@@ -45,11 +80,6 @@ async function Plano() {
 
   return (
     <div className="flex flex-col gap-8">
-      {!conexao && (
-        <p className="cartao text-sm">
-          O Instagram ainda não está conectado ao app. Por enquanto, publique à mão e registre com o botão de cada post.
-        </p>
-      )}
       {posts.map((post, i) => (
         <section key={chaveDoPost(post)} className="cartao flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Post {i + 1}</h2>

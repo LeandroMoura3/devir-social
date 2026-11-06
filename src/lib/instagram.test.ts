@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { publicarPost } from "./instagram";
+import { contasAtribuidas, publicarPost, trocarCodigo, urlDeLogin } from "./instagram";
 
 type Chamada = { url: string; corpo: Record<string, string> };
 
@@ -79,5 +79,34 @@ describe("publicarPost", () => {
     await expect(
       publicarPost({ usuarioId: "u1", token: "t", imagens: ["x"], legenda: "L" }, buscar, semEspera),
     ).rejects.toThrow("Instagram: Only photo or video can be accepted");
+  });
+});
+
+describe("login unificado", () => {
+  it("monta a URL do diálogo com a configuração e o estado", () => {
+    const url = new URL(urlDeLogin({ appId: "10", configId: "20", redirectUri: "https://x.app/retorno", estado: "abc" }));
+    expect(url.origin + url.pathname).toBe("https://www.facebook.com/dialog/oauth");
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      client_id: "10",
+      config_id: "20",
+      redirect_uri: "https://x.app/retorno",
+      response_type: "code",
+      state: "abc",
+    });
+  });
+
+  it("troca o código pelo token em graph.facebook.com", async () => {
+    const { buscar, chamadas } = apiFalsa({ "/oauth/access_token": () => ({ access_token: "tok" }) });
+    const token = await trocarCodigo({ appId: "10", appSecret: "s", redirectUri: "https://x.app/retorno", codigo: "c" }, buscar);
+    expect(token).toBe("tok");
+    expect(chamadas[0].url).toBe("https://graph.facebook.com/oauth/access_token");
+    expect(chamadas[0].corpo).toMatchObject({ client_id: "10", client_secret: "s", code: "c" });
+  });
+
+  it("lista as contas do Instagram atribuídas ao token", async () => {
+    const { buscar } = apiFalsa({
+      "/me/assigned_instagram_accounts": () => ({ data: [{ id: "99", username: "devir_social" }] }),
+    });
+    expect(await contasAtribuidas("tok", buscar)).toEqual([{ id: "99", username: "devir_social" }]);
   });
 });

@@ -1,7 +1,8 @@
 // Publicação no Instagram pela API oficial.
 // Dois caminhos da Meta, com os mesmos endpoints de publicação:
 //   "instagram": login do Instagram (graph.instagram.com), token de usuário que vence em 60 dias;
-//   "facebook": login do Facebook com Página vinculada (graph.facebook.com), token de página que não vence.
+//   "facebook": graph.facebook.com — usado pelo login unificado (token de usuário do sistema do portfólio,
+//   com validade definida na configuração do app) e pelo antigo login do Facebook com Página.
 // Fluxo: um "container" por imagem → container do carrossel com a legenda → aguarda processar → publica.
 // Com uma imagem só, o post é simples (o carrossel exige pelo menos duas).
 
@@ -116,4 +117,53 @@ export async function renovarToken(token: string, buscar: Fetch = fetch): Promis
     "GET",
   );
   return access_token;
+}
+
+// Login unificado (https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-unified-login/get-started):
+// o botão leva ao diálogo da Meta, que volta com um código; o servidor troca o código pelo token e
+// descobre a conta do Instagram atribuída a ele.
+export function urlDeLogin({ appId, configId, redirectUri, estado }: {
+  appId: string;
+  configId: string;
+  redirectUri: string;
+  estado: string;
+}): string {
+  const parametros = new URLSearchParams({
+    client_id: appId,
+    config_id: configId,
+    redirect_uri: redirectUri,
+    response_type: "code",
+    state: estado,
+  });
+  return `https://www.facebook.com/dialog/oauth?${parametros}`;
+}
+
+export async function trocarCodigo(
+  { appId, appSecret, redirectUri, codigo }: { appId: string; appSecret: string; redirectUri: string; codigo: string },
+  buscar: Fetch = fetch,
+): Promise<string> {
+  const parametros = new URLSearchParams({
+    client_id: appId,
+    client_secret: appSecret,
+    redirect_uri: redirectUri,
+    code: codigo,
+  });
+  const resposta = await buscar(`${BASES.facebook}/oauth/access_token?${parametros}`);
+  const dados = (await resposta.json()) as { access_token?: string; error?: { message?: string } };
+  if (!resposta.ok || !dados.access_token) {
+    throw new Error(`Instagram: ${dados.error?.message ?? "não foi possível obter o token"}`);
+  }
+  return dados.access_token;
+}
+
+export async function contasAtribuidas(token: string, buscar: Fetch = fetch): Promise<{ id: string; username: string }[]> {
+  const { data } = await chamar<{ data: { id: string; username: string }[] }>(
+    buscar,
+    BASES.facebook,
+    "/me/assigned_instagram_accounts",
+    token,
+    { fields: "id,username" },
+    "GET",
+  );
+  return data;
 }
