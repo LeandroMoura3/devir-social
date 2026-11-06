@@ -19,7 +19,10 @@ export default function ComoFunciona() {
 
         <h2>Como funciona</h2>
         <ol>
-          <li>Você envia um conteúdo: uma imagem com um texto.</li>
+          <li>
+            Você envia um conteúdo: uma imagem com um texto. Cada membro tem uma cota de envios por semana, igual para
+            todos, que se ajusta sozinha para que sempre haja uma quantidade boa de conteúdos para votar.
+          </li>
           <li>
             O grupo debate nos comentários e vota durante o prazo do conteúdo, escolhendo um sentimento de{" "}
             <strong>apoio</strong> (me representa, utilidade pública, expõe injustiça, merece ser ouvido), de{" "}

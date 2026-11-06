@@ -10,6 +10,8 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 - **Envio de conteúdo** (imagem de até 5 MB + texto).
 - **Debate** com comentários e respostas em thread, e **votação por sentimento** durante o prazo do conteúdo: 4 opções de apoio (me representa, utilidade pública, expõe injustiça, merece ser ouvido), indiferente e 4 de protesto (não me representa, falso ou enganoso, ofende ou ataca, só gera briga). O voto pode ser mudado até o fechamento. Durante o debate, o voto atual de quem comenta aparece ao lado do nome; as contagens e os votos de quem não comentou ficam escondidos até o fechamento. Indiferente conta para o quórum, mas não para a porcentagem de apoio.
 - **Ciclos de participação**: quem votou em pelo menos X% dos conteúdos do ciclo anterior é participante; os demais são espectadores (votam, mas não contam). Quem entrou agora é participante garantido no ciclo seguinte.
+- **Cota de envios por ciclo**, igual para todos: cai 1 se o volume do ciclo anterior passou do alvo (parâmetro, 20), sobe 1 se ficou abaixo da metade; sempre entre 1 e 5.
+- **Contato opcional** (WhatsApp e e-mail) na página Membros, só para membros e só de quem permitir; editável em Perfil.
 - **Cancelamento pelo autor** enquanto o conteúdo está aberto (motivo opcional): sai da classificação e do Instagram, e o blog registra o texto completo e os votos até o cancelamento.
 - **Classificação automática** (maioria, minoria, tribuna livre, sem quórum), com quórum sobre os participantes do ciclo em que o conteúdo fecha (apoio, protesto e indiferente contam para o quórum).
 - **Parâmetros versionados** (prazo do conteúdo, duração do ciclo, participação mínima, quórum): mudanças só valem a partir do próximo ciclo, e o histórico não muda.

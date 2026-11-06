@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { VERSAO_CONSENTIMENTO } from "@/lib/config";
+import { contatoDoFormulario } from "@/lib/contato";
 import { criarClienteServidor } from "@/lib/supabase/server";
 
 export type EstadoCadastro = { erro?: string };
@@ -24,5 +25,7 @@ export async function concluirCadastro(_anterior: EstadoCadastro, formData: Form
     p_versao: VERSAO_CONSENTIMENTO,
   });
   if (error) return { erro: "Não foi possível concluir o cadastro. Tente de novo." };
+  const contato = await supabase.rpc("salvar_contato", contatoDoFormulario(formData));
+  if (contato.error) return { erro: contato.error.message };
   redirect("/");
 }

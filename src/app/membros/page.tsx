@@ -1,8 +1,10 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { exigirParticipante } from "@/lib/dados";
 import { ultimoDiaDoCiclo, votosNecessarios, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
 import { formatarData } from "@/lib/datas";
+import { formatarWhatsapp, linkWhatsapp } from "@/lib/cota";
 
 export const metadata = { title: "Membros · Devir Social" };
 
@@ -24,6 +26,9 @@ type Membro = {
   novo: boolean;
   votados: number;
   total: number;
+  envios_disponiveis: number;
+  whatsapp: string | null;
+  email: string | null;
 };
 
 async function Lista() {
@@ -52,6 +57,10 @@ async function Lista() {
         &quot;Próximo ciclo&quot; mostra a situação de cada um com os votos dados até agora nos conteúdos que fecham até{" "}
         {ate} (qualquer opção conta, inclusive indiferente).
       </p>
+      <p className="text-sm text-muted">
+        &quot;Envios&quot; é quantos conteúdos cada um ainda pode enviar até {ate}. O contato só aparece para quem
+        permitiu, em <Link href="/perfil">Perfil</Link>.
+      </p>
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-left text-sm">
           <thead className="bg-card text-xs text-muted">
@@ -60,6 +69,8 @@ async function Lista() {
               <th className="px-3 py-2 font-medium">Neste ciclo</th>
               <th className="px-3 py-2 text-right font-medium">Votos até {ate}</th>
               <th className="px-3 py-2 font-medium">Próximo ciclo</th>
+              <th className="px-3 py-2 text-right font-medium">Envios</th>
+              <th className="px-3 py-2 font-medium">Contato</th>
             </tr>
           </thead>
           <tbody>
@@ -74,6 +85,22 @@ async function Lista() {
                   {m.votados} de {m.total}
                 </td>
                 <td className="px-3 py-2">{proximo(m)}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{m.envios_disponiveis}</td>
+                <td className="px-3 py-2">
+                  <div className="flex flex-col">
+                    {m.whatsapp && (
+                      <a href={linkWhatsapp(m.whatsapp)} target="_blank" rel="noreferrer" className="text-accent">
+                        {formatarWhatsapp(m.whatsapp)}
+                      </a>
+                    )}
+                    {m.email && (
+                      <a href={`mailto:${m.email}`} className="text-accent">
+                        {m.email}
+                      </a>
+                    )}
+                    {!m.whatsapp && !m.email && <span className="text-muted">—</span>}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

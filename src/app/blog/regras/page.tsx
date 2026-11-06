@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { formatarData, instanteDaRequisicao } from "@/lib/datas";
+import { ultimoDiaDoCiclo } from "@/lib/participacao";
+import { lista } from "@/lib/supabase/lista";
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { MenuBlog } from "../menu";
 
@@ -11,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.6)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.7)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -46,9 +48,32 @@ export default function Regras() {
           Cada pessoa tem um nome, que fica só com a coordenação, e um nome público, escolhido por ela, que aparece no
           app e neste blog. A participação no piloto é por convite.
         </p>
+        <p>
+          Cada membro pode, se quiser, informar WhatsApp e e-mail de contato e permitir que apareçam para os outros
+          membros, na página Membros do app, para que possam se articular. O contato nunca aparece neste blog nem no
+          Instagram.
+        </p>
 
         <h3>2. Envio</h3>
         <p>Um conteúdo é uma imagem mais um texto. Cada conteúdo recebe um número (#).</p>
+        <p>
+          <strong>Cota de envios:</strong> cada membro pode enviar até um número de conteúdos por ciclo, igual para
+          todos. A cota se ajusta sozinha pelo volume do ciclo anterior (todos os conteúdos enviados, inclusive
+          cancelados e removidos), para que haja sempre uma quantidade boa de conteúdos para votar:
+        </p>
+        <ul>
+          <li>volume acima do alvo: a cota cai 1;</li>
+          <li>volume abaixo da metade do alvo: a cota sobe 1;</li>
+          <li>entre os dois: a cota se mantém.</li>
+        </ul>
+        <p>
+          A cota fica sempre entre 1 e 5 e começou em 3 no primeiro ciclo do piloto. O alvo é um parâmetro público (item
+          13). Quem já usou a cota pode pedir a outro membro que envie por ela; quem envia aparece como autor e responde
+          pelo conteúdo.
+        </p>
+        <Suspense fallback={<p className="text-sm text-muted">Carregando cotas…</p>}>
+          <Cotas />
+        </Suspense>
 
         <h3>3. Debate e votação</h3>
         <ul>
@@ -217,7 +242,8 @@ export default function Regras() {
 
         <h3>13. Parâmetros</h3>
         <p>
-          Prazo do conteúdo, duração do ciclo, participação mínima e quórum são parâmetros públicos. Uma mudança só
+          Prazo do conteúdo, duração do ciclo, participação mínima, quórum e alvo de conteúdos por ciclo são
+          parâmetros públicos. Uma mudança só
           vale a partir do início do ciclo seguinte, e as versões anteriores continuam registradas, para que os
           resultados antigos nunca mudem.
         </p>
@@ -250,6 +276,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.7 (06/11/2026)</h3>
+        <ul>
+          <li>
+            Cota de envios por ciclo, igual para todos e ajustada pelo volume do ciclo anterior (item 2), com alvo de 20
+            conteúdos por ciclo. Vale desde o ciclo atual: com o volume do ciclo anterior, a cota deste ciclo é 4.
+          </li>
+          <li>Contato opcional (WhatsApp e e-mail) visível só para membros, e só para quem permitir (item 1).</li>
+        </ul>
 
         <h3>0.6 (05/11/2026)</h3>
         <ul>
@@ -300,13 +335,20 @@ export default function Regras() {
   );
 }
 
-type Versao = { inicio: string; dias_conteudo: number; dias_ciclo: number; participacao_minima: number; quorum: number };
+type Versao = {
+  inicio: string;
+  dias_conteudo: number;
+  dias_ciclo: number;
+  participacao_minima: number;
+  quorum: number;
+  alvo_conteudos: number;
+};
 
 async function Parametros() {
   const supabase = await criarClientePublico();
   const { data } = await supabase
     .from("parametros")
-    .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum")
+    .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum, alvo_conteudos")
     .order("inicio", { ascending: false })
     .overrideTypes<Versao[], { merge: false }>();
   const agora = instanteDaRequisicao();
@@ -318,7 +360,30 @@ async function Parametros() {
             {Date.parse(v.inicio) > agora ? "Agendado a partir de" : "A partir de"} {formatarData(v.inicio)}:
           </strong>{" "}
           conteúdo aberto por {v.dias_conteudo} dias; ciclos de {v.dias_ciclo} dias; participação mínima de{" "}
-          {v.participacao_minima}%; quórum de {v.quorum}% dos participantes do ciclo.
+          {v.participacao_minima}%; quórum de {v.quorum}% dos participantes do ciclo; alvo de {v.alvo_conteudos}{" "}
+          conteúdos por ciclo.
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+type Cota = { ciclo_inicio: string; ciclo_fim: string; cota: number; volume: number; alvo: number };
+
+// Histórico público da cota: qualquer pessoa recalcula a partir do volume de cada ciclo.
+async function Cotas() {
+  const supabase = await criarClientePublico();
+  const { data } = await lista<Cota>(supabase.rpc("cotas_por_ciclo"));
+  const ciclos = [...(data ?? [])].reverse();
+  return (
+    <ul>
+      {ciclos.map((c, i) => (
+        <li key={c.ciclo_inicio}>
+          <strong>
+            {formatarData(c.ciclo_inicio)} a {ultimoDiaDoCiclo(c.ciclo_fim)}:
+          </strong>{" "}
+          cota de {c.cota} por membro; {c.volume} {c.volume === 1 ? "conteúdo enviado" : "conteúdos enviados"}
+          {i === 0 ? " até agora" : ""} (alvo {c.alvo}).
         </li>
       ))}
     </ul>

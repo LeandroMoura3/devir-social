@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CamposContato } from "../campos-contato";
 import { concluirCadastro, type EstadoCadastro } from "./acoes";
 
 const CAIXAS = [
@@ -27,7 +28,7 @@ const CAIXAS = [
   { nome: "responsabilidade", texto: <>Entendo que respondo legalmente pelo que envio e comento.</> },
 ];
 
-export function FormularioCadastro() {
+export function FormularioCadastro({ emailCadastro }: { emailCadastro?: string }) {
   const [estado, acao, enviando] = useActionState<EstadoCadastro, FormData>(concluirCadastro, {});
 
   return (
@@ -41,6 +42,7 @@ export function FormularioCadastro() {
         <input name="nome_publico" required minLength={2} maxLength={40} className="campo" />
         <span className="text-xs text-muted">Pode ser seu nome real, um apelido ou suas iniciais.</span>
       </label>
+      <CamposContato emailCadastro={emailCadastro} />
       <fieldset className="flex flex-col gap-2 text-sm">
         {CAIXAS.map((caixa) => (
           <label key={caixa.nome} className="flex items-start gap-2">

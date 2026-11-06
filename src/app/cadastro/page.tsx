@@ -20,7 +20,7 @@ async function ExigirLogin() {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims?.sub) redirect("/login");
-  return <FormularioCadastro />;
+  return <FormularioCadastro emailCadastro={data.claims.email} />;
 }
 
 function TextoConsentimento() {
@@ -77,6 +77,11 @@ function TextoConsentimento() {
           </li>
           <li>
             Seus comentários <strong>não</strong> são publicados fora do app.
+          </li>
+          <li>
+            Seu <strong>WhatsApp e e-mail de contato</strong> são opcionais. Só aparecem para os outros membros, na
+            página Membros, se você marcar essa opção, e nunca no blog nem no Instagram. Dá para mudar ou apagar a
+            qualquer momento em Perfil.
           </li>
         </ul>
       </section>
