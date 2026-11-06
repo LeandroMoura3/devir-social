@@ -59,7 +59,7 @@ export function resumoDoLado(lado: "apoio" | "protesto", total: number, detalhe:
 
 export const LIMITE_LEGENDA = 2200;
 export const MAX_ITENS_POST = 10;
-export const RODAPE_LEGENDA = "Texto completo e votos: link na bio";
+export const RODAPE_LEGENDA = "Texto completo, links e votos: link na bio → Verificar postagem → código (#)";
 
 const PESOS = { maioria: 4, minoria: 2, tribuna: 1 } as const;
 

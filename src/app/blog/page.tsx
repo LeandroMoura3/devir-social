@@ -79,7 +79,7 @@ async function Publicacoes() {
           {cancelados.map((c) => {
             const t = totaisDoDetalhe(c.detalhe);
             return (
-              <article key={c.id} className="cartao flex flex-col gap-2">
+              <article key={c.id} id={`cancelado-${c.id}`} className="cartao flex flex-col gap-2">
                 <p className="text-xs text-muted">
                   #{c.id} · {c.autor} · enviado em {formatarData(c.criadoEm)} · cancelado em {formatarData(c.canceladoEm)}
                 </p>

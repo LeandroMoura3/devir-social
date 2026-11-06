@@ -5,6 +5,7 @@ const ITENS = [
   { href: "/blog/por-que", texto: "Por que" },
   { href: "/blog/como-funciona", texto: "Como funciona" },
   { href: "/blog/regras", texto: "Regras" },
+  { href: "/blog/verificar", texto: "Verificar postagem" },
   { href: "/painel", texto: "Painel" },
 ];
 
