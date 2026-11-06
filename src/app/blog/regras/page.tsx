@@ -335,7 +335,11 @@ export default function Regras() {
         </ul>
 
         <h3>0.2</h3>
-        <p>Anterior ao app. O texto desta versão não está reproduzido aqui.</p>
+        <p>
+          Preparada em 27/10/2026 para substituir a 0.1 (voto nominal, só imagens, quórum, app próprio no lugar do
+          Telegram), mas não chegou a ser publicada nem entrou em vigor: o app estreou já com a 0.3, que incorporou essas
+          mudanças.
+        </p>
 
         <h3>0.1</h3>
         <p>Primeira versão, anterior ao app: envio e votação pelo Telegram. Texto original abaixo.</p>
