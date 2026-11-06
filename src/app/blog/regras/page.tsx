@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.7)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.8)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -170,7 +170,7 @@ export default function Regras() {
 
         <h3>8. Publicação no Instagram</h3>
         <p>
-          Duas vezes por semana (quarta e domingo), saem todos os conteúdos já classificados. Quando falta uma faixa, a
+          Uma vez por semana, no domingo, saem todos os conteúdos já classificados. Quando falta uma faixa, a
           faixa de baixo sobe para o lugar dela:
         </p>
         <ul>
@@ -235,8 +235,9 @@ export default function Regras() {
             comentários continuam visíveis no app.
           </li>
           <li>
-            Este blog registra o cancelamento, com o texto completo, o nome público do autor, as datas, o motivo (se
-            houver) e a contagem por sentimento de todos os votos dados até o cancelamento.
+            Este blog registra o cancelamento numa página própria, no mesmo formato dos publicados: texto completo, nome
+            público do autor, datas, motivo (se houver) e os votos nominais dados até o cancelamento. Como o conteúdo
+            não chega a fechar, participantes e espectadores são os do ciclo em que o cancelamento aconteceu.
           </li>
         </ul>
 
@@ -276,6 +277,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.8 (06/11/2026)</h3>
+        <ul>
+          <li>Publicação no Instagram passa a ser uma vez por semana, no domingo (item 8).</li>
+          <li>
+            Cancelados ganham página própria no blog, com os votos nominais, no mesmo formato dos publicados (item 12).
+          </li>
+        </ul>
 
         <h3>0.7 (06/11/2026)</h3>
         <ul>

@@ -8,7 +8,8 @@ type Props = {
   indiferente: number;
   detalhe: Detalhe;
   base: number;
-  quorumNecessario: number;
+  // Ausente quando o conteúdo foi cancelado: não houve fechamento, quórum nem classificação.
+  quorumNecessario?: number;
   cicloInicio: string;
   votacao: VotacaoNominal;
 };
@@ -57,8 +58,9 @@ export function ResultadoVotos(p: Props) {
         Indiferente (conta para o quórum, não para a porcentagem): {p.indiferente} · {nomes(p.votacao.porVoto.indiferente ?? [])}
       </p>
       <p className="text-muted">
-        Quórum: {p.base} participantes no ciclo iniciado em {formatarData(p.cicloInicio)}; mínimo de{" "}
-        {p.quorumNecessario} votos (apoio, protesto e indiferente).
+        {p.quorumNecessario === undefined
+          ? `Cancelado antes de fechar, sem quórum nem classificação. Base: ${p.base} participantes no ciclo iniciado em ${formatarData(p.cicloInicio)}, o do cancelamento.`
+          : `Quórum: ${p.base} participantes no ciclo iniciado em ${formatarData(p.cicloInicio)}; mínimo de ${p.quorumNecessario} votos (apoio, protesto e indiferente).`}
       </p>
       <p className="text-muted">Participantes do ciclo: {nomes(p.votacao.participantesCiclo)}</p>
       <p className="text-muted">

@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { carregarCancelados, carregarPublicados, carregarRemocoes } from "@/lib/blog";
 import { MenuBlog } from "../menu";
@@ -51,19 +50,7 @@ async function Resultado({ searchParams }: { searchParams: Promise<Record<string
     carregarRemocoes(),
   ]);
   if (publicados.some((p) => p.id === id)) redirect(`/blog/conteudo/${id}`);
-
-  const cancelado = cancelados.find((c) => c.id === id);
-  if (cancelado) {
-    return (
-      <p className="cartao text-sm">
-        O #{id} foi cancelado pelo autor durante o debate.{" "}
-        <Link href={`/blog#cancelado-${id}`} className="text-accent">
-          Ver o registro do cancelamento
-        </Link>
-        .
-      </p>
-    );
-  }
+  if (cancelados.some((c) => c.id === id)) redirect(`/blog/cancelado/${id}`);
   const remocao = remocoes.find((r) => r.id === id);
   if (remocao) {
     return <p className="cartao text-sm">O #{id} foi removido por exceção legal. Motivo: {remocao.motivo}</p>;

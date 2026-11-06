@@ -80,6 +80,7 @@ export type Cancelado = {
   criadoEm: string;
   canceladoEm: string;
   motivo: string | null;
+  cicloInicio: string;
   detalhe: Detalhe;
 };
 
@@ -93,6 +94,7 @@ export async function carregarCancelados(): Promise<Cancelado[]> {
       criado_em: string;
       cancelado_em: string;
       motivo: string | null;
+      ciclo_inicio: string;
       detalhe: Detalhe | null;
     }>(supabase.rpc("blog_cancelados")),
     "cancelados",
@@ -104,6 +106,7 @@ export async function carregarCancelados(): Promise<Cancelado[]> {
     criadoEm: l.criado_em,
     canceladoEm: l.cancelado_em,
     motivo: l.motivo,
+    cicloInicio: l.ciclo_inicio,
     detalhe: l.detalhe ?? {},
   }));
 }

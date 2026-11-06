@@ -80,7 +80,7 @@ where id = (select id from auth.users where email = 'seu-email@exemplo.com');
 
 ## Rotina da coordenação
 
-Nas quartas e domingos, abra **Plano de publicação** na página inicial:
+Aos domingos, abra **Plano de publicação** na página inicial:
 
 1. Para cada post: baixe as imagens na ordem mostrada, publique no Instagram como carrossel e cole a legenda.
 2. Clique em **Marcar como publicado**. As imagens desse post são apagadas do app; textos e votos ficam guardados.
