@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { carregarCancelados, carregarPublicados, carregarRemocoes, type Publicado } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
-import { NOME_FAIXA, totaisDoDetalhe } from "@/lib/regras";
+import { NOME_FAIXA } from "@/lib/regras";
 import { TextoFormatado } from "../texto-formatado";
 import { MenuBlog } from "./menu";
 
@@ -70,32 +70,11 @@ async function Publicacoes() {
       ))}
 
       {cancelados.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Cancelados pelo autor</h2>
-          <p className="text-sm text-muted">
-            O autor cancelou o conteúdo durante o debate. Ele não foi classificado nem vai para o Instagram; o registro
-            fica aqui, com os votos dados até o cancelamento.
-          </p>
-          {cancelados.map((c) => {
-            const t = totaisDoDetalhe(c.detalhe);
-            return (
-              <Link
-                key={c.id}
-                id={`cancelado-${c.id}`}
-                href={`/blog/cancelado/${c.id}`}
-                className="cartao flex flex-col gap-1 hover:border-accent"
-              >
-                <p className="text-xs text-muted">
-                  #{c.id} · {c.autor} · cancelado em {formatarData(c.canceladoEm)}
-                </p>
-                <TextoFormatado texto={c.texto} className="line-clamp-3 text-sm" />
-                <p className="text-xs font-medium text-accent">
-                  Cancelado pelo autor · apoio {t.apoio} · protesto {t.protesto}
-                </p>
-              </Link>
-            );
-          })}
-        </section>
+        <p className="text-sm">
+          <Link href="/blog/cancelados" className="text-accent">
+            Cancelados pelo autor ({cancelados.length}) →
+          </Link>
+        </p>
       )}
 
       {remocoes.length > 0 && (
