@@ -43,7 +43,13 @@ export function FormularioNovo({ usuarioId }: { usuarioId: string }) {
     <form action={enviar} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1 text-sm">
         Imagem (JPG, PNG ou WebP). Fotos muito altas ou muito largas são cortadas pelo centro para caber no Instagram.
-        <input name="imagem" type="file" accept={TIPOS.join(",")} required className="text-sm" />
+        <input
+          name="imagem"
+          type="file"
+          accept={TIPOS.join(",")}
+          required
+          className="campo cursor-pointer text-sm text-muted file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-medium file:text-accent-foreground hover:file:opacity-90"
+        />
       </label>
       <label className="flex flex-col gap-1 text-sm">
         Texto
