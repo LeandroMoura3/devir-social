@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ConteudoVisao } from "@/lib/conteudos";
 import { tempoRestante } from "@/lib/datas";
 import { NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { TextoFormatado } from "./texto-formatado";
 
 type Props = {
   conteudo: ConteudoVisao;
@@ -38,7 +39,7 @@ export function CartaoConteudo({ conteudo: c, imagemUrl, agora, meuVoto, souAuto
         <p className="text-xs text-muted">
           #{c.id} · {c.autor} · {c.comentarios} {c.comentarios === 1 ? "comentário" : "comentários"}
         </p>
-        <p className="line-clamp-2 text-sm">{c.texto}</p>
+        <TextoFormatado texto={c.texto} className="line-clamp-2 text-sm" quebras={false} />
         <p className="text-xs font-medium text-accent">{situacao}</p>
       </div>
     </Link>
