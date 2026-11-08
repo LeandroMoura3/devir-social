@@ -89,7 +89,7 @@ function TextoConsentimento() {
       <section>
         <h2 className="font-semibold">O que guardamos e por quanto tempo</h2>
         <ul className="list-disc pl-5">
-          <li>Imagens: até serem publicadas no Instagram, depois são apagadas do app.</li>
+          <li>Imagens: para sempre, no blog, junto com o texto e os votos (menos as de conteúdos cancelados ou removidos).</li>
           <li>
             Textos, comentários, votos e contagens: para sempre, para que qualquer pessoa possa conferir os resultados.
           </li>

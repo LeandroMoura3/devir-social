@@ -74,7 +74,7 @@ type PublicacaoPendente = {
   publicado_em: string;
 };
 
-// Posts já publicados que a coordenação ainda não conferiu. As imagens só saem do app depois do "Conferido".
+// Posts já publicados que a coordenação ainda não conferiu.
 async function Conferencia() {
   const { supabase } = await exigirAdmin();
   const { data: publicacoes } = await supabase
@@ -97,9 +97,8 @@ async function Conferencia() {
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Aguardando conferência</h2>
       <p className="text-sm text-muted">
-        Confira cada post no Instagram. Se estiver certo, clique em &quot;Conferido&quot;: as imagens desse post são
-        apagadas do app. Se saiu errado, apague o post no Instagram e clique em &quot;Publicar novamente&quot;, que
-        repete exatamente o mesmo post.
+        Confira cada post no Instagram. Se estiver certo, clique em &quot;Conferido&quot;. Se saiu errado, apague o
+        post no Instagram e clique em &quot;Publicar novamente&quot;, que repete exatamente o mesmo post.
       </p>
       {publicacoes.map((p) => (
         <article key={p.id} className="cartao flex flex-col gap-3">

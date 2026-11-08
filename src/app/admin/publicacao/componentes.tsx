@@ -63,7 +63,7 @@ export function BotaoPublicado({ chave, liberado }: { chave: number; liberado: b
   );
 }
 
-// Depois de publicado: "Conferido" encerra (apaga as imagens); "Publicar novamente" repete o mesmo post.
+// Depois de publicado: "Conferido" registra que está tudo certo; "Publicar novamente" repete o mesmo post.
 export function BotoesConferencia({ publicacao }: { publicacao: number }) {
   const [estadoConferir, conferir, conferindo] = useActionState<EstadoPublicacao, FormData>(conferirPublicacao, {});
   const [estadoRepublicar, republicar, republicando] = useActionState<EstadoPublicacao, FormData>(publicarNovamente, {});

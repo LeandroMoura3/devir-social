@@ -18,6 +18,7 @@ export type Publicado = {
   quorumNecessario: number;
   detalhe: Detalhe;
   faixa: Faixa;
+  imagemPath: string | null;
 };
 
 type LinhaPublicado = {
@@ -34,6 +35,7 @@ type LinhaPublicado = {
   base: number;
   quorum_necessario: number;
   detalhe: Detalhe;
+  imagem_path: string | null;
 };
 
 function verificar<T>(resposta: { data: T[] | null; error: unknown }, oQue: string): T[] {
@@ -59,7 +61,16 @@ export async function carregarPublicados(): Promise<Publicado[]> {
     quorumNecessario: l.quorum_necessario,
     detalhe: l.detalhe ?? {},
     faixa: classificar({ favor: l.favor, contra: l.contra, indiferente: l.indiferente, quorumNecessario: l.quorum_necessario }),
+    imagemPath: l.imagem_path,
   }));
+}
+
+// Links temporários das imagens de conteúdos fechados (a política do armazenamento libera só essas).
+export async function linksDasImagens(caminhos: string[]): Promise<Map<string, string>> {
+  if (caminhos.length === 0) return new Map();
+  const supabase = await criarClientePublico();
+  const { data } = await supabase.storage.from("imagens").createSignedUrls(caminhos, 60 * 60);
+  return new Map((data ?? []).flatMap((d) => (d.path && d.signedUrl ? [[d.path, d.signedUrl] as const] : [])));
 }
 
 export type Remocao = { id: number; motivo: string; removidoEm: string };

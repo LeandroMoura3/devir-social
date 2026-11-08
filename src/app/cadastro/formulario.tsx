@@ -20,8 +20,9 @@ const CAIXAS = [
     nome: "publicacao",
     texto: (
       <>
-        Autorizo a publicação dos meus conteúdos no Instagram e no blog, conforme as regras, e que{" "}
-        <strong>meu nome público apareça no blog</strong> como autor.
+        Autorizo a publicação dos meus conteúdos no Instagram e no blog, conforme as regras, com as{" "}
+        <strong>imagens guardadas no blog para sempre</strong>, e que <strong>meu nome público apareça no blog</strong>{" "}
+        como autor.
       </>
     ),
   },

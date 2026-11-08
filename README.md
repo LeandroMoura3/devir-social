@@ -15,7 +15,7 @@ As regras de classificação e montagem dos posts estão em [`src/lib/regras.ts`
 - **Cancelamento pelo autor** enquanto o conteúdo está aberto (motivo opcional): sai da classificação e do Instagram, e o blog registra o texto completo e os votos até o cancelamento.
 - **Classificação automática** (maioria, minoria, tribuna livre, sem quórum), com quórum sobre os participantes do ciclo em que o conteúdo fecha (apoio, protesto e indiferente contam para o quórum).
 - **Parâmetros versionados** (prazo do conteúdo, duração do ciclo, participação mínima, quórum): mudanças só valem a partir do próximo ciclo, e o histórico não muda.
-- **Plano de publicação** (só coordenação): monta os posts do Instagram (cascata, rodízio, até 10 imagens, legenda com pesos 4:2:1), gera o registro em HTML para o blog e apaga as imagens depois de publicadas.
+- **Plano de publicação** (só coordenação): monta os posts do Instagram (cascata, rodízio, até 10 imagens, legenda com pesos 4:2:1), mostra os posts aguardando conferência (Conferido / Publicar novamente) e serve de reserva se a publicação automática falhar.
 - **Painel semanal público** em `/painel`, sem login.
 - **Blog público** em `/blog`, sem login: textos do projeto (por que, como funciona, regras com parâmetros ao vivo) e o registro de cada conteúdo, publicado automaticamente no fechamento da votação, com votos nominais e base do quórum.
 - **Remoção por exceção legal** (só coordenação), com o motivo registrado.
@@ -80,7 +80,7 @@ where id = (select id from auth.users where email = 'seu-email@exemplo.com');
 
 ## Rotina da coordenação
 
-Aos domingos, às 18h (Brasília), o agendamento da Vercel (`vercel.json`) chama `/api/cron/publicar`, que monta os posts pelas regras, publica no Instagram, marca os conteúdos como publicados e apaga as imagens. O robô usa o `CRON_SECRET` (só o hash fica no banco, migração 0014), não a chave mestra do Supabase.
+Aos domingos, às 18h (Brasília), o agendamento da Vercel (`vercel.json`) chama `/api/cron/publicar`, que monta os posts pelas regras, publica no Instagram e marca os conteúdos como publicados. As imagens nunca são apagadas: aparecem no blog (regras v0.10). O robô usa o `CRON_SECRET` (só o hash fica no banco, migração 0014), não a chave mestra do Supabase.
 
 O **Plano de publicação** continua disponível para conferir os posts antes de domingo e publicar pelo botão, se o robô falhar. Teste sem marcar nada: `curl -H "Authorization: Bearer $CRON_SECRET" "https://devir-social.vercel.app/api/cron/publicar?teste=1"`.
 

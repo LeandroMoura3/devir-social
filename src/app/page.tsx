@@ -6,6 +6,8 @@ import { instanteDaRequisicao } from "@/lib/datas";
 import { ultimoDiaDoCiclo, votosNecessarios, type StatusCiclo } from "@/lib/participacao";
 import { lista } from "@/lib/supabase/lista";
 import type { Voto } from "@/lib/regras";
+import { VERSAO_CONSENTIMENTO } from "@/lib/config";
+import { AvisoAtualizacao } from "./aviso-atualizacao";
 import { CartaoConteudo } from "./cartao-conteudo";
 
 export default function Inicio() {
@@ -18,7 +20,7 @@ export default function Inicio() {
 
 async function ListaConteudos() {
   const { supabase, usuarioId, perfil } = await exigirParticipante();
-  const [conteudos, { data: votos }, { data: status }] = await Promise.all([
+  const [conteudos, { data: votos }, { data: status }, { data: privado }] = await Promise.all([
     carregarConteudos(supabase),
     supabase
       .from("votos")
@@ -26,6 +28,11 @@ async function ListaConteudos() {
       .eq("eleitor_id", usuarioId)
       .overrideTypes<{ conteudo_id: number; voto: Voto }[], { merge: false }>(),
     lista<StatusCiclo>(supabase.rpc("meu_status")),
+    supabase
+      .from("perfis_privados")
+      .select("consentimento_versao")
+      .eq("id", usuarioId)
+      .maybeSingle<{ consentimento_versao: string }>(),
   ]);
   const meusVotos = new Map((votos ?? []).map((v) => [v.conteudo_id, v.voto]));
   const imagens = await urlsAssinadas(
@@ -74,6 +81,7 @@ async function ListaConteudos() {
           </Link>
         </div>
       </div>
+      {privado && privado.consentimento_versao !== VERSAO_CONSENTIMENTO && <AvisoAtualizacao />}
       {status?.[0] && <AvisoStatus status={status[0]} />}
       {secao("Em debate e votação", abertos, "Nenhum conteúdo aberto agora.")}
       {secao("Fechados, aguardando publicação", aguardando, "Nada aguardando publicação.")}

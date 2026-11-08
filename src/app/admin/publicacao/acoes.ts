@@ -6,14 +6,13 @@ import { instanteDaRequisicao } from "@/lib/datas";
 import { publicarPost, renovarToken, RENOVAR_APOS_DIAS, type Via } from "@/lib/instagram";
 import { janelaManualAberta } from "@/lib/robo";
 import type { Post } from "@/lib/regras";
-import { lista } from "@/lib/supabase/lista";
 import { chaveDoPost, montarPlano, type ItemPlano } from "@/lib/plano";
 
 export type EstadoPublicacao = { erro?: string; aviso?: string };
 
 type Sessao = Awaited<ReturnType<typeof exigirAdmin>>;
 
-// Registra o post (conteúdos marcados como publicados). As imagens ficam até a conferência.
+// Registra o post (conteúdos marcados como publicados). As imagens ficam guardadas.
 async function registrarPublicacao(
   supabase: Sessao["supabase"],
   post: Post<ItemPlano>,
@@ -135,21 +134,10 @@ export async function publicarNovamente(_anterior: EstadoPublicacao, formData: F
   }
 }
 
-// Conferido: o post está certo no Instagram; as imagens desse post são apagadas do app.
+// Conferido: o post está certo no Instagram. Só registra; as imagens ficam no app e no blog.
 export async function conferirPublicacao(_anterior: EstadoPublicacao, formData: FormData): Promise<EstadoPublicacao> {
   const { supabase } = await exigirAdmin();
-  const { data: imagens, error } = await lista<{ imagem_path: string }>(
-    supabase.rpc("conferir_publicacao", { p_publicacao: Number(formData.get("publicacao")) }),
-  );
-  if (error) return { erro: (error as { message?: string }).message ?? "Não foi possível conferir." };
-  const caminhos = (imagens ?? []).map((i) => i.imagem_path);
-  if (caminhos.length > 0) {
-    const { error: erroImagens } = await supabase.storage.from("imagens").remove(caminhos);
-    if (erroImagens) {
-      refresh();
-      return { aviso: `Conferido, mas as imagens não foram apagadas: ${erroImagens.message}` };
-    }
-  }
+  const { error } = await supabase.rpc("conferir_publicacao", { p_publicacao: Number(formData.get("publicacao")) });
   refresh();
-  return {};
+  return error ? { erro: error.message } : {};
 }

@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.9)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.10)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -211,10 +211,11 @@ export default function Regras() {
 
         <h3>10. Blog e registro</h3>
         <p>
-          Assim que a votação fecha, cada conteúdo ganha automaticamente uma página neste blog com o texto completo, o
-          nome público do autor, as contagens, os votos nominais, a base do quórum, os indiferentes e os votos de
-          espectadores. Depois de publicadas no Instagram, as imagens são apagadas do app; textos e votos ficam
-          guardados para sempre.
+          Assim que a votação fecha, cada conteúdo ganha automaticamente uma página neste blog com a imagem, o texto
+          completo, o nome público do autor, as contagens, os votos nominais, a base do quórum, os indiferentes e os
+          votos de espectadores. A página principal do blog agrupa os conteúdos por postagem de domingo: maioria e
+          minoria aparecem direto, e a tribuna livre a um clique. Imagens, textos e votos ficam guardados para sempre.
+          Conteúdos cancelados ou removidos não têm imagem pública.
         </p>
 
         <h3>11. Exceção legal</h3>
@@ -276,6 +277,16 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.10 (07/11/2026)</h3>
+        <ul>
+          <li>
+            As imagens passaram a ficar guardadas para sempre e a aparecer neste blog, inclusive as da tribuna livre,
+            que antes não chegavam a ser vistas fora do app (item 10).
+          </li>
+          <li>O blog passou a agrupar os conteúdos por postagem de domingo, com a tribuna livre a um clique.</li>
+          <li>Mudança feita antes de qualquer imagem ter sido apagada; os membros atuais confirmam a leitura no app.</li>
+        </ul>
 
         <h3>0.9 (06/11/2026)</h3>
         <ul>

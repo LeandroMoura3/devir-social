@@ -7,7 +7,7 @@ import { lista } from "@/lib/supabase/lista";
 // Agendado na Vercel (vercel.json) para domingo, 18h de Brasília. A Vercel manda o CRON_SECRET no
 // cabeçalho Authorization; o mesmo segredo autoriza o robô no banco (migração 0014).
 // ?teste=1 publica um post de teste com a primeira imagem pendente, sem marcar nada como publicado.
-// Não apaga imagens: isso acontece quando a coordenação confere a publicação.
+// Não apaga imagens: elas ficam guardadas e aparecem no blog.
 export const maxDuration = 300;
 
 const ORCAMENTO_MS = 240_000;
@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
     try {
       const caminhos = post.imagens.map((c) => c.imagemPath).filter((c): c is string => !!c);
       const mediaId = await publicarPost({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagens: await links(caminhos), legenda: post.legenda });
-      // As imagens ficam até a coordenação conferir (permite publicar de novo se algo sair errado).
       const { error } = await supabase.rpc("robo_registrar_publicacao", {
         p_segredo: segredo,
         p_conteudo_ids: ids,
