@@ -36,7 +36,8 @@ async function ListaConteudos() {
 
   const abertos = conteudos.filter((c) => !c.removidoEm && Date.parse(c.fechaEm) > agora);
   const aguardando = conteudos.filter((c) => !c.removidoEm && !c.publicadoEm && Date.parse(c.fechaEm) <= agora);
-  const publicados = conteudos.filter((c) => c.publicadoEm || c.removidoEm);
+  const publicados = conteudos.filter((c) => c.publicadoEm && !c.removidoEm);
+  const encerrados = conteudos.filter((c) => c.removidoEm);
 
   const secao = (titulo: string, lista: ConteudoVisao[], vazio: string) => (
     <section className="flex flex-col gap-3">
@@ -76,6 +77,7 @@ async function ListaConteudos() {
       {secao("Em debate e votação", abertos, "Nenhum conteúdo aberto agora.")}
       {secao("Fechados, aguardando publicação", aguardando, "Nada aguardando publicação.")}
       {secao("Publicados", publicados, "Nada publicado ainda.")}
+      {encerrados.length > 0 && secao("Cancelados e removidos", encerrados, "")}
     </div>
   );
 }
