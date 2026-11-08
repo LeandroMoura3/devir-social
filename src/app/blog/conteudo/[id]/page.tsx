@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { carregarPublicados, carregarRegistro, linksDasImagens } from "@/lib/blog";
+import { carregarDebate, carregarPublicados, carregarRegistro, linksDasImagens } from "@/lib/blog";
+import { DebatePublico } from "../../../debate-publico";
 import { formatarData } from "@/lib/datas";
 import { NOME_FAIXA } from "@/lib/regras";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
@@ -25,9 +26,10 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
   const publicados = await carregarPublicados();
   const conteudo = publicados.find((p) => p.id === id);
   if (!conteudo) notFound();
-  const [registro, imagens] = await Promise.all([
+  const [registro, imagens, debate] = await Promise.all([
     carregarRegistro(id),
     linksDasImagens(conteudo.imagemPath ? [conteudo.imagemPath] : []),
+    carregarDebate(id),
   ]);
   const imagemUrl = conteudo.imagemPath ? imagens.get(conteudo.imagemPath) : undefined;
 
@@ -51,6 +53,11 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
       <section className="cartao">
         <ResultadoVotos {...conteudo} votacao={registro} />
       </section>
+      <DebatePublico
+        comentarios={debate}
+        marco={{ instante: Date.parse(conteudo.fechaEm), rotulo: "após o fechamento" }}
+        linkApp={`/conteudo/${id}`}
+      />
       <NavegacaoConteudos
         {...vizinhos(
           publicados.map((p) => p.id),

@@ -84,6 +84,7 @@ export function FormularioComentario({ conteudoId, paiId }: { conteudoId: number
         placeholder={paiId ? "Sua resposta" : "Seu comentário"}
         className="campo"
       />
+      {!paiId && <p className="text-xs text-muted">Os comentários ficam públicos no blog depois que a votação fecha.</p>}
       {estado.erro && <p className="erro">{estado.erro}</p>}
       <div className="flex gap-2">
         <button className="botao" disabled={enviando}>

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { carregarCancelados, carregarRegistro, linksDasImagens } from "@/lib/blog";
+import { carregarCancelados, carregarDebate, carregarRegistro, linksDasImagens } from "@/lib/blog";
+import { DebatePublico } from "../../../debate-publico";
 import { formatarData } from "@/lib/datas";
 import { totaisDoDetalhe } from "@/lib/regras";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
@@ -25,9 +26,10 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
   const cancelados = await carregarCancelados();
   const conteudo = cancelados.find((c) => c.id === id);
   if (!conteudo) notFound();
-  const [registro, imagens] = await Promise.all([
+  const [registro, imagens, debate] = await Promise.all([
     carregarRegistro(id),
     linksDasImagens(conteudo.imagemPath ? [conteudo.imagemPath] : []),
+    carregarDebate(id),
   ]);
   const imagemUrl = conteudo.imagemPath ? imagens.get(conteudo.imagemPath) : undefined;
   const totais = totaisDoDetalhe(conteudo.detalhe);
@@ -63,6 +65,11 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
           votacao={registro}
         />
       </section>
+      <DebatePublico
+        comentarios={debate}
+        marco={{ instante: Date.parse(conteudo.canceladoEm), rotulo: "após o cancelamento" }}
+        linkApp={`/conteudo/${id}`}
+      />
       <NavegacaoConteudos
         {...vizinhos(
           cancelados.map((c) => c.id),

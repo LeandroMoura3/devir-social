@@ -76,7 +76,7 @@ function TextoConsentimento() {
             responda pelo que faz.
           </li>
           <li>
-            Seus comentários <strong>não</strong> são publicados fora do app.
+            Seus <strong>comentários</strong> aparecem no blog, na página do conteúdo, depois que a votação fecha.
           </li>
           <li>
             Seu <strong>WhatsApp e e-mail de contato</strong> são opcionais. Só aparecem para os outros membros, na

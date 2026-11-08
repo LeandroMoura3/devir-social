@@ -2,6 +2,7 @@ import { votacaoVazia, type VotacaoNominal } from "@/lib/conteudos";
 import { classificar, type Detalhe, type Faixa, type Voto } from "@/lib/regras";
 import { lista } from "@/lib/supabase/lista";
 import { criarClientePublico } from "@/lib/supabase/publico";
+import type { ComentarioPublico } from "@/app/debate-publico";
 
 export type Publicado = {
   id: number;
@@ -123,6 +124,11 @@ export async function carregarCancelados(): Promise<Cancelado[]> {
     detalhe: l.detalhe ?? {},
     imagemPath: l.imagem_path,
   }));
+}
+
+export async function carregarDebate(id: number): Promise<ComentarioPublico[]> {
+  const supabase = await criarClientePublico();
+  return verificar(await lista<ComentarioPublico>(supabase.rpc("blog_debate", { p_conteudo: id })), "debate");
 }
 
 export type Registro = VotacaoNominal;

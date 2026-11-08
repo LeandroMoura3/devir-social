@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.11)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.12)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -80,7 +80,8 @@ export default function Regras() {
           <li>
             Cada conteúdo fica aberto para votação pelo prazo definido nos parâmetros. O debate (comentários com
             respostas em thread) começa junto e não fecha: continua depois do fechamento da votação, e os comentários
-            feitos depois aparecem marcados como &quot;após o fechamento&quot;. Os comentários ficam só no app.
+            feitos depois aparecem marcados como &quot;após o fechamento&quot;. Depois que a votação fecha, o debate
+            aparece neste blog, na página do conteúdo; comentar continua sendo só para membros, no app.
           </li>
           <li>
             Cada pessoa escolhe <strong>um</strong> sentimento, em pares espelhados:
@@ -214,7 +215,7 @@ export default function Regras() {
         <p>
           Assim que a votação fecha, cada conteúdo ganha automaticamente uma página neste blog com a imagem, o texto
           completo, o nome público do autor, as contagens, os votos nominais, a base do quórum, os indiferentes e os
-          votos de espectadores. A página principal do blog agrupa os conteúdos por postagem de domingo: maioria e
+          votos de espectadores e o debate. A página principal do blog agrupa os conteúdos por postagem de domingo: maioria e
           minoria aparecem direto, e a tribuna livre a um clique. Imagens, textos e votos ficam guardados para sempre.
           Conteúdos removidos por exceção legal não têm imagem pública.
         </p>
@@ -238,7 +239,8 @@ export default function Regras() {
           </li>
           <li>
             Este blog registra o cancelamento numa página própria, no mesmo formato dos publicados: imagem, texto
-            completo, nome público do autor, datas, motivo (se houver) e os votos nominais dados até o cancelamento. Como o conteúdo
+            completo, nome público do autor, datas, motivo (se houver), os votos nominais dados até o cancelamento e o
+            debate. Como o conteúdo
             não chega a fechar, participantes e espectadores são os do ciclo em que o cancelamento aconteceu.
           </li>
         </ul>
@@ -278,6 +280,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.12 (08/11/2026)</h3>
+        <ul>
+          <li>
+            O debate passou a ser público: depois que a votação fecha (ou no cancelamento), os comentários aparecem
+            neste blog, na página do conteúdo (itens 3, 10 e 12). Antes, ficavam só no app.
+          </li>
+        </ul>
 
         <h3>0.11 (08/11/2026)</h3>
         <ul>
