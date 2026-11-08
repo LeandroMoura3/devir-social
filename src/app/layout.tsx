@@ -28,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="mr-auto font-semibold">
               Devir Social
             </Link>
+            <Link href="/">Início</Link>
             <Link href="/novo">Enviar</Link>
             <Link href="/membros">Membros</Link>
             <Link href="/blog">Blog</Link>
