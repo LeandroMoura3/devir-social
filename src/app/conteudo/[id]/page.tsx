@@ -59,6 +59,12 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
 
   const agora = instanteDaRequisicao();
   const aberto = !conteudo.removidoEm && Date.parse(conteudo.fechaEm) > agora;
+  // A votação fecha; o debate continua (menos em removidos por exceção legal). Comentários depois do
+  // fechamento ou do cancelamento ganham uma marcação.
+  const debateAberto = !conteudo.removidoEm || conteudo.cancelado;
+  const marco = conteudo.cancelado
+    ? { instante: Date.parse(conteudo.removidoEm!), rotulo: "após o cancelamento" }
+    : { instante: Date.parse(conteudo.fechaEm), rotulo: "após o fechamento" };
   const [imagens, { data: abertos }] = await Promise.all([
     urlsAssinadas(supabase, conteudo.imagemPath ? [conteudo.imagemPath] : []),
     supabase
@@ -95,7 +101,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
           {imagemUrl ? (
             <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />
           ) : (
-            <p className="text-sm text-muted">A imagem já foi publicada e removida do app.</p>
+            <p className="text-sm text-muted">Sem imagem.</p>
           )}
           <TextoFormatado texto={conteudo.texto} />
         </>
@@ -118,21 +124,28 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Debate</h2>
-        {aberto ? (
-          <FormularioComentario conteudoId={conteudo.id} />
+        {debateAberto ? (
+          <>
+            {!aberto && (
+              <p className="text-sm text-muted">
+                {conteudo.cancelado ? "O conteúdo foi cancelado" : "A votação fechou"}, mas o debate continua. Os
+                comentários novos aparecem marcados como &quot;{marco.rotulo}&quot;.
+              </p>
+            )}
+            <FormularioComentario conteudoId={conteudo.id} />
+          </>
         ) : (
-          <p className="text-sm text-muted">
-            {conteudo.cancelado ? "O debate fechou com o cancelamento." : "O debate fechou junto com a votação."}
-          </p>
+          <p className="text-sm text-muted">Debate fechado: conteúdo removido por exceção legal.</p>
         )}
         <ArvoreComentarios
           comentarios={comentarios ?? []}
           paiId={null}
           conteudoId={conteudo.id}
-          aberto={aberto}
+          aberto={debateAberto}
           espectadores={espectadores}
           votos={votos}
           autorConteudo={conteudo.autorId}
+          marco={marco}
         />
       </section>
 
@@ -199,6 +212,7 @@ function ArvoreComentarios({
   espectadores,
   votos,
   autorConteudo,
+  marco,
 }: {
   comentarios: Comentario[];
   paiId: number | null;
@@ -207,6 +221,7 @@ function ArvoreComentarios({
   espectadores: Set<string>;
   votos: Map<string, Voto>;
   autorConteudo: string;
+  marco: { instante: number; rotulo: string };
 }) {
   const filhos = comentarios.filter((c) => c.pai_id === paiId);
   if (filhos.length === 0) return null;
@@ -219,6 +234,9 @@ function ArvoreComentarios({
             {espectadores.has(c.autor_id) && <span className="ml-1 rounded border border-border px-1">espectador</span>} ·{" "}
             <SeloVoto autorId={c.autor_id} votos={votos} autorConteudo={autorConteudo} /> ·{" "}
             {formatarDataHora(c.criado_em)}
+            {Date.parse(c.criado_em) >= marco.instante && (
+              <span className="ml-1 rounded border border-border px-1">{marco.rotulo}</span>
+            )}
           </p>
           <p className="whitespace-pre-wrap text-sm">
             {c.removido_motivo ? `Comentário removido: ${c.removido_motivo}` : c.texto}
@@ -232,6 +250,7 @@ function ArvoreComentarios({
             espectadores={espectadores}
             votos={votos}
             autorConteudo={autorConteudo}
+            marco={marco}
           />
         </li>
       ))}

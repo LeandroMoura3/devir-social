@@ -130,8 +130,9 @@ export function FormularioCancelamento({ conteudoId }: { conteudoId: number }) {
     <form action={acao} className="flex flex-col gap-2">
       <input type="hidden" name="conteudo_id" value={conteudoId} />
       <p className="text-sm">
-        O conteúdo não vai para o Instagram nem é classificado, e a votação e o debate fecham agora. O blog registra o
-        cancelamento com o texto completo e os votos dados até aqui. Não dá para desfazer.
+        O conteúdo não vai para o Instagram nem é classificado, e a votação fecha agora; o debate continua. O texto, a
+        imagem e os votos dados até aqui continuam públicos no blog. Não dá para desfazer. Se o problema for algo que
+        não pode ficar público (uma foto pessoal, por exemplo), fale com a coordenação em vez de cancelar.
       </p>
       <label className="flex flex-col gap-1 text-sm">
         Motivo (opcional, aparece no blog)

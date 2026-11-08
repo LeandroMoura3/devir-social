@@ -93,6 +93,7 @@ export type Cancelado = {
   motivo: string | null;
   cicloInicio: string;
   detalhe: Detalhe;
+  imagemPath: string | null;
 };
 
 export async function carregarCancelados(): Promise<Cancelado[]> {
@@ -107,6 +108,7 @@ export async function carregarCancelados(): Promise<Cancelado[]> {
       motivo: string | null;
       ciclo_inicio: string;
       detalhe: Detalhe | null;
+      imagem_path: string | null;
     }>(supabase.rpc("blog_cancelados")),
     "cancelados",
   );
@@ -119,6 +121,7 @@ export async function carregarCancelados(): Promise<Cancelado[]> {
     motivo: l.motivo,
     cicloInicio: l.ciclo_inicio,
     detalhe: l.detalhe ?? {},
+    imagemPath: l.imagem_path,
   }));
 }
 

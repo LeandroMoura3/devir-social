@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { carregarCancelados } from "@/lib/blog";
+import { carregarCancelados, linksDasImagens } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
 import { totaisDoDetalhe } from "@/lib/regras";
 import { TextoFormatado } from "../../texto-formatado";
@@ -22,6 +22,7 @@ export default function Cancelados() {
 async function Lista() {
   const cancelados = await carregarCancelados();
   if (cancelados.length === 0) return <p className="text-sm text-muted">Nenhum conteúdo cancelado.</p>;
+  const imagens = await linksDasImagens(cancelados.flatMap((c) => (c.imagemPath ? [c.imagemPath] : [])));
   return (
     <section className="flex flex-col gap-3">
       <h1 className="text-2xl font-semibold">Cancelados pelo autor</h1>
@@ -36,15 +37,22 @@ async function Lista() {
             key={c.id}
             id={`cancelado-${c.id}`}
             href={`/blog/cancelado/${c.id}`}
-            className="cartao flex flex-col gap-1 hover:border-accent"
+            className="cartao flex gap-3 hover:border-accent"
           >
-            <p className="text-xs text-muted">
-              #{c.id} · {c.autor} · cancelado em {formatarData(c.canceladoEm)}
-            </p>
-            <TextoFormatado texto={c.texto} className="line-clamp-3 text-sm" />
-            <p className="text-xs font-medium text-accent">
-              Cancelado pelo autor · apoio {t.apoio} · protesto {t.protesto}
-            </p>
+            {c.imagemPath && imagens.get(c.imagemPath) ? (
+              <img src={imagens.get(c.imagemPath)} alt="" className="h-20 w-20 shrink-0 rounded object-cover" />
+            ) : (
+              <div className="h-20 w-20 shrink-0 rounded bg-border" />
+            )}
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-xs text-muted">
+                #{c.id} · {c.autor} · cancelado em {formatarData(c.canceladoEm)}
+              </p>
+              <TextoFormatado texto={c.texto} className="line-clamp-2 text-sm" quebras={false} />
+              <p className="text-xs font-medium text-accent">
+                Cancelado pelo autor · apoio {t.apoio} · protesto {t.protesto}
+              </p>
+            </div>
           </Link>
         );
       })}

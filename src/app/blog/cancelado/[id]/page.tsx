@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { carregarCancelados, carregarRegistro } from "@/lib/blog";
+import { carregarCancelados, carregarRegistro, linksDasImagens } from "@/lib/blog";
 import { formatarData } from "@/lib/datas";
 import { totaisDoDetalhe } from "@/lib/regras";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
@@ -25,7 +25,11 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
   const cancelados = await carregarCancelados();
   const conteudo = cancelados.find((c) => c.id === id);
   if (!conteudo) notFound();
-  const registro = await carregarRegistro(id);
+  const [registro, imagens] = await Promise.all([
+    carregarRegistro(id),
+    linksDasImagens(conteudo.imagemPath ? [conteudo.imagemPath] : []),
+  ]);
+  const imagemUrl = conteudo.imagemPath ? imagens.get(conteudo.imagemPath) : undefined;
   const totais = totaisDoDetalhe(conteudo.detalhe);
 
   return (
@@ -41,6 +45,7 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
         </p>
       </header>
 
+      {imagemUrl && <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />}
       <TextoFormatado texto={conteudo.texto} />
 
       <p className="text-sm text-muted">
