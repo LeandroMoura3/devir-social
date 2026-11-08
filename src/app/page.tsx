@@ -37,7 +37,8 @@ async function ListaConteudos() {
   const abertos = conteudos.filter((c) => !c.removidoEm && Date.parse(c.fechaEm) > agora);
   const aguardando = conteudos.filter((c) => !c.removidoEm && !c.publicadoEm && Date.parse(c.fechaEm) <= agora);
   const publicados = conteudos.filter((c) => c.publicadoEm && !c.removidoEm);
-  const encerrados = conteudos.filter((c) => c.removidoEm);
+  const cancelados = conteudos.filter((c) => c.cancelado);
+  const removidos = conteudos.filter((c) => c.removidoEm && !c.cancelado);
 
   const secao = (titulo: string, lista: ConteudoVisao[], vazio: string) => (
     <section className="flex flex-col gap-3">
@@ -76,8 +77,22 @@ async function ListaConteudos() {
       {status?.[0] && <AvisoStatus status={status[0]} />}
       {secao("Em debate e votação", abertos, "Nenhum conteúdo aberto agora.")}
       {secao("Fechados, aguardando publicação", aguardando, "Nada aguardando publicação.")}
-      {secao("Publicados", publicados, "Nada publicado ainda.")}
-      {encerrados.length > 0 && secao("Cancelados e removidos", encerrados, "")}
+      {/* O registro completo de publicados, cancelados e removidos fica no blog, a um clique. */}
+      <nav className="flex flex-col gap-2 text-sm">
+        <Link href="/blog" className="text-accent">
+          Publicados ({publicados.length}) →
+        </Link>
+        {cancelados.length > 0 && (
+          <Link href="/blog/cancelados" className="text-accent">
+            Cancelados ({cancelados.length}) →
+          </Link>
+        )}
+        {removidos.length > 0 && (
+          <Link href="/blog" className="text-accent">
+            Removidos por exceção legal ({removidos.length}) →
+          </Link>
+        )}
+      </nav>
     </div>
   );
 }
