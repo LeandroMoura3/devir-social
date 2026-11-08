@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/">Início</Link>
             <Link href="/novo">Enviar</Link>
             <Link href="/membros">Membros</Link>
-            <Link href="/blog">Blog</Link>
+            <Link href="/blog">Publicações</Link>
             <Link href="/painel">Painel</Link>
             <Link href="/perfil">Perfil</Link>
             <form action={sair}>

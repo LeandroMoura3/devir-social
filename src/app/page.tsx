@@ -82,8 +82,9 @@ async function ListaConteudos() {
         </div>
       </div>
       {privado && privado.consentimento_versao !== VERSAO_CONSENTIMENTO && <AvisoAtualizacao />}
-      {status?.[0] && <AvisoStatus status={status[0]} />}
+      {abertos.length > 0 && <p className="-mb-5 text-sm">Abra um conteúdo para ler, debater e votar.</p>}
       {secao("Em debate e votação", abertos, "Nenhum conteúdo aberto agora.")}
+      {status?.[0] && <AvisoStatus status={status[0]} />}
       {secao("Fechados, aguardando publicação", aguardando, "Nada aguardando publicação.")}
       {/* O registro completo de publicados, cancelados e removidos fica no blog, a um clique. */}
       <nav className="flex flex-col gap-2 text-sm">
@@ -117,20 +118,25 @@ function AvisoStatus({ status: s }: { status: StatusCiclo }) {
   else
     proximo = `Para ser participante no próximo ciclo, vote em pelo menos ${necessarios} dos ${s.total} conteúdos que fecham até ${ate} (faltam ${faltam}). Qualquer opção conta, inclusive indiferente.`;
 
+  // Uma linha visível; os detalhes ficam a um clique, para não empurrar os conteúdos para baixo.
   return (
-    <section className="cartao flex flex-col gap-1 text-sm">
-      <p>
-        Neste ciclo você é <strong>{s.participante ? "participante" : "espectador"}</strong>. Isso vale para os
-        conteúdos que fecham até {ate}
-        {s.participante ? ": nesses, seus votos contam." : ": nesses, seus votos não entram no resultado."} Em cada
-        conteúdo, o app mostra se o seu voto vai contar.
-      </p>
-      <p className="text-muted">{proximo}</p>
-      <p>
-        <Link href="/membros" className="text-accent underline">
-          Ver quem é participante neste ciclo
-        </Link>
-      </p>
-    </section>
+    <details className="cartao text-sm">
+      <summary className="cursor-pointer">
+        Neste ciclo você é <strong>{s.participante ? "participante" : "espectador"}</strong>
+        {s.participante ? ": seus votos contam" : ": seus votos ainda não entram no resultado"}.{" "}
+        <span className="text-accent">Saiba mais</span>
+      </summary>
+      <div className="mt-2 flex flex-col gap-1">
+        <p>
+          Isso vale para os conteúdos que fecham até {ate}. Em cada conteúdo, o app mostra se o seu voto vai contar.
+        </p>
+        <p className="text-muted">{proximo}</p>
+        <p>
+          <Link href="/membros" className="text-accent underline">
+            Ver quem é participante neste ciclo
+          </Link>
+        </p>
+      </div>
+    </details>
   );
 }
