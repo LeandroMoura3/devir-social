@@ -1,4 +1,4 @@
-import type { VotacaoNominal } from "@/lib/conteudos";
+import { votacaoVazia, type VotacaoNominal } from "@/lib/conteudos";
 import { formatarData } from "@/lib/datas";
 import { NOME_VOTO, VOTOS_APOIO, VOTOS_PROTESTO, type Detalhe, type Voto } from "@/lib/regras";
 
@@ -64,6 +64,36 @@ function Lado({ titulo, total, opcoes, detalhe, votacao }: {
   );
 }
 
+// Votos de espectadores (não contam), no mesmo formato dos participantes, a um clique.
+function Espectadores({ votacao }: { votacao: VotacaoNominal }) {
+  if (votacao.espectadores.length === 0) {
+    return <p className="text-muted">Votos de espectadores (não contam): nenhum</p>;
+  }
+  const deles = votacaoVazia();
+  const detalhe: Detalhe = {};
+  for (const e of votacao.espectadores) {
+    deles.porVoto[e.voto].push(e.nome);
+    detalhe[e.voto] = (detalhe[e.voto] ?? 0) + 1;
+  }
+  const total = (opcoes: readonly Voto[]) => opcoes.reduce((soma, v) => soma + (detalhe[v] ?? 0), 0);
+  return (
+    <details className="text-muted">
+      <summary className="cursor-pointer">Votos de espectadores (não contam): {votacao.espectadores.length}</summary>
+      <div className="mt-2 flex flex-col gap-3">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Lado titulo="Apoio" total={total(VOTOS_APOIO)} opcoes={VOTOS_APOIO} detalhe={detalhe} votacao={deles} />
+          <Lado titulo="Protesto" total={total(VOTOS_PROTESTO)} opcoes={VOTOS_PROTESTO} detalhe={detalhe} votacao={deles} />
+        </div>
+        {(detalhe.indiferente ?? 0) > 0 && (
+          <div>
+            Indiferente: {detalhe.indiferente} · <Nomes itens={deles.porVoto.indiferente} />
+          </div>
+        )}
+      </div>
+    </details>
+  );
+}
+
 // Votos de participantes por sentimento, com nomes; indiferentes e espectadores à parte.
 export function ResultadoVotos(p: Props) {
   const minimo = p.quorumNecessario === 1 ? "1 voto" : `${p.quorumNecessario} votos`;
@@ -91,10 +121,7 @@ export function ResultadoVotos(p: Props) {
         <summary className="cursor-pointer">Participantes do ciclo: {p.votacao.participantesCiclo.length} (ver nomes)</summary>
         <p className="mt-1">{p.votacao.participantesCiclo.join(", ") || "ninguém"}</p>
       </details>
-      <div className="text-muted">
-        Votos de espectadores (não contam):{" "}
-        <Nomes itens={p.votacao.espectadores.map((e) => `${e.nome} (${NOME_VOTO[e.voto]})`)} />
-      </div>
+      <Espectadores votacao={p.votacao} />
     </div>
   );
 }
