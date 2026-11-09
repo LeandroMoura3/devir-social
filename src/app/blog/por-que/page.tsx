@@ -73,8 +73,9 @@ export default function PorQue() {
 
         <h2>Participe</h2>
         <p>
-          A participação no piloto é por convite. Para entender como funciona, leia{" "}
-          <Link href="/blog/como-funciona">como funciona</Link> e as <Link href="/blog/regras">regras completas</Link>.
+          A participação no piloto é por convite: <Link href="/convite">peça o seu aqui</Link>. Para entender como
+          funciona, leia <Link href="/blog/como-funciona">como funciona</Link> e as{" "}
+          <Link href="/blog/regras">regras completas</Link>.
         </p>
       </article>
     </div>

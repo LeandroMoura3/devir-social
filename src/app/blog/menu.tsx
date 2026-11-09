@@ -7,6 +7,7 @@ const ITENS = [
   { href: "/blog/regras", texto: "Regras" },
   { href: "/blog/verificar", texto: "Verificar postagem" },
   { href: "/painel", texto: "Painel" },
+  { href: "/convite", texto: "Participar" },
 ];
 
 export function MenuBlog() {

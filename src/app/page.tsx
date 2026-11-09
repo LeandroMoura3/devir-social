@@ -70,11 +70,16 @@ async function ListaConteudos() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">Olá, {perfil.nome_publico}.</p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {perfil.is_admin && (
-            <Link href="/admin/publicacao" className="botao-secundario">
-              Plano de publicação
-            </Link>
+            <>
+              <Link href="/admin/convites" className="botao-secundario">
+                Pedidos de convite
+              </Link>
+              <Link href="/admin/publicacao" className="botao-secundario">
+                Plano de publicação
+              </Link>
+            </>
           )}
           <Link href="/novo" className="botao">
             Enviar conteúdo

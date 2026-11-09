@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FormularioLogin } from "./formulario";
 import { SessaoDoLink } from "./sessao-do-link";
 
@@ -10,6 +11,13 @@ export default function Login() {
       </p>
       <SessaoDoLink />
       <FormularioLogin />
+      <p className="text-sm text-muted">
+        Ainda não tem convite?{" "}
+        <Link href="/convite" className="text-accent">
+          Peça aqui
+        </Link>
+        .
+      </p>
     </div>
   );
 }

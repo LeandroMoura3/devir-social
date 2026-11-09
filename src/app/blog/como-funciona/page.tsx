@@ -52,7 +52,9 @@ export default function ComoFunciona() {
             torne autônomo.
           </li>
           <li>
-            Ainda não temos como garantir que cada pessoa tenha só uma conta. Por isso, a participação é por convite.
+            Ainda não temos como garantir automaticamente que cada pessoa tenha só uma conta. Por isso, a participação é
+            por convite, com uma videochamada curta de verificação. Quer entrar?{" "}
+            <Link href="/convite">Peça o seu convite</Link>.
           </li>
           <li>O algoritmo é público. Qualquer pessoa pode criar a sua própria versão.</li>
         </ul>

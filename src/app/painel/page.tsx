@@ -13,6 +13,9 @@ export default function Painel() {
       <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
         <Ciclos />
       </Suspense>
+      <Suspense fallback={null}>
+        <Entradas />
+      </Suspense>
       <h2 className="text-lg font-semibold">Semanas</h2>
       <p className="text-sm text-muted">
         Totais por semana (domingo a sábado, horário de Brasília). Ativo: abriu o app na semana. Votante: votou pelo
@@ -206,5 +209,59 @@ async function Tabela() {
         </tbody>
       </table>
     </div>
+  );
+}
+
+type Vagas = { limite: number; usadas: number; pendentes: number; ciclo_fim: string };
+type NumerosConvite = {
+  recebidos: number;
+  pendentes: number;
+  aprovados_videochamada: number;
+  aprovados_conhecido: number;
+  recusados_nao_compareceu: number;
+  recusados_identidade: number;
+  recusados_ja_tem_conta: number;
+  recusados_invalido: number;
+  expirados: number;
+};
+
+// Pedidos de convite (regras v0.13): só contagens, nenhum dado pessoal.
+async function Entradas() {
+  const supabase = await criarClientePublico();
+  const [{ data: vagas }, { data: numeros }] = await Promise.all([
+    lista<Vagas>(supabase.rpc("vagas_de_entrada")),
+    lista<NumerosConvite>(supabase.rpc("painel_convites")),
+  ]);
+  const v = vagas?.[0];
+  const n = numeros?.[0];
+  if (!v || !n) return null;
+  const recusados = [
+    ["não compareceu", n.recusados_nao_compareceu],
+    ["identidade não confere", n.recusados_identidade],
+    ["já tinha conta", n.recusados_ja_tem_conta],
+    ["pedido inválido", n.recusados_invalido],
+    ["expirados sem decisão", n.expirados],
+  ] as const;
+  return (
+    <section className="flex flex-col gap-2 text-sm">
+      <h2 className="text-lg font-semibold">Entradas</h2>
+      <p className="text-muted">
+        Limite de entradas por ciclo, por ordem de chegada. Contam todos os convites enviados no ciclo, inclusive os
+        diretos da coordenação, e os pedidos aprovados ainda sem convite.
+      </p>
+      <p>
+        Ciclo atual (até {ultimoDia(v.ciclo_fim)}):{" "}
+        <strong>
+          {v.usadas} de {v.limite} vagas usadas
+        </strong>
+        ; {v.pendentes} {v.pendentes === 1 ? "pedido" : "pedidos"} na fila.
+      </p>
+      <p>
+        Pedidos pela página <a href="/convite" className="underline">Participar</a>: {n.recebidos} recebidos;
+        aprovados após videochamada: {n.aprovados_videochamada}; aprovados sem chamada (pessoa conhecida da
+        coordenação): {n.aprovados_conhecido}; recusados:{" "}
+        {recusados.map(([texto, total]) => `${texto} ${total}`).join(", ")}.
+      </p>
+    </section>
   );
 }

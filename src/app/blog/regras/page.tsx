@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.12)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.13)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -48,6 +48,29 @@ export default function Regras() {
           Cada pessoa tem um nome, que fica só com a coordenação, e um nome público, escolhido por ela, que aparece no
           app e neste blog. A participação no piloto é por convite.
         </p>
+        <p>
+          <strong>Entrada:</strong> quem não conhece ninguém do projeto pede o convite na página{" "}
+          <Link href="/convite">Participar</Link>. A coordenação faz uma videochamada de até 5 minutos, só para
+          confirmar que é uma pessoa real e que ainda não tem conta, e explicar como o Devir funciona. Na chamada não se
+          pergunta opinião de ninguém. A chamada é dispensada quando a coordenação já conhece a pessoa pessoalmente, e
+          o pedido fica marcado assim.
+        </p>
+        <ul>
+          <li>
+            Os pedidos são atendidos por ordem de chegada, até o limite de entradas do ciclo (parâmetro público, item
+            13). Contam todos os convites enviados no ciclo, inclusive os diretos da coordenação. Um pedido só pode ser
+            aprovado se sobrar vaga depois de reservar uma para cada pedido mais antigo ainda na fila.
+          </li>
+          <li>
+            Recusa só por motivo objetivo: não compareceu à videochamada após duas tentativas, identidade não confere,
+            já tem conta ou pedido inválido (robô, teste ou dados falsos). Pedido sem decisão em 30 dias expira.
+          </li>
+          <li>
+            O <Link href="/painel">painel</Link> mostra as vagas do ciclo e quantos pedidos foram aprovados (com e sem
+            videochamada) e recusados, por motivo. Os dados pessoais do pedido ficam só com a coordenação e são apagados
+            30 dias depois da decisão.
+          </li>
+        </ul>
         <p>
           Cada membro pode, se quiser, informar WhatsApp e e-mail de contato e permitir que apareçam para os outros
           membros, na página Membros do app, para que possam se articular. O contato nunca aparece neste blog nem no
@@ -247,8 +270,8 @@ export default function Regras() {
 
         <h3>13. Parâmetros</h3>
         <p>
-          Prazo do conteúdo, duração do ciclo, participação mínima, quórum e alvo de conteúdos por ciclo são
-          parâmetros públicos. Uma mudança só
+          Prazo do conteúdo, duração do ciclo, participação mínima, quórum, alvo de conteúdos por ciclo e limite de
+          entradas por ciclo são parâmetros públicos. Uma mudança só
           vale a partir do início do ciclo seguinte, e as versões anteriores continuam registradas, para que os
           resultados antigos nunca mudem.
         </p>
@@ -264,7 +287,7 @@ export default function Regras() {
         <h2>C. Etapas ainda não automatizadas</h2>
         <ol>
           <li>Avaliar conteúdo ilegal.</li>
-          <li>Verificar identidade (hoje, por convite).</li>
+          <li>Verificar identidade (hoje, por videochamada com a coordenação, ou dispensa para quem ela conhece pessoalmente).</li>
           <li>Definir as regras (hoje, o idealizador).</li>
         </ol>
 
@@ -280,6 +303,16 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.13 (09/11/2026)</h3>
+        <ul>
+          <li>
+            Página <Link href="/convite">Participar</Link> para pedir convite, com videochamada de verificação,
+            dispensa registrada para pessoas conhecidas da coordenação, ordem de chegada e motivos de recusa objetivos
+            (item 1).
+          </li>
+          <li>Novo parâmetro público: limite de entradas por ciclo, começando em 5 (item 13).</li>
+        </ul>
 
         <h3>0.12 (08/11/2026)</h3>
         <ul>
@@ -472,7 +505,7 @@ export default function Regras() {
               <li>Encerrar as votações e anotar as contagens.</li>
               <li>Montar os posts (cascata, rodízio, corte dos textos).</li>
               <li>Avaliar conteúdo ilegal.</li>
-              <li>Verificar identidade (hoje, por convite).</li>
+              <li>Verificar identidade (hoje, por videochamada com a coordenação, ou dispensa para quem ela conhece pessoalmente).</li>
               <li>Votação: secreta para o grupo, mas não verificável. O Telegram tem acesso aos votos.</li>
               <li>Definir as regras (hoje, o idealizador).</li>
             </ol>
@@ -497,13 +530,14 @@ type Versao = {
   participacao_minima: number;
   quorum: number;
   alvo_conteudos: number;
+  entradas_por_ciclo: number;
 };
 
 async function Parametros() {
   const supabase = await criarClientePublico();
   const { data } = await supabase
     .from("parametros")
-    .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum, alvo_conteudos")
+    .select("inicio, dias_conteudo, dias_ciclo, participacao_minima, quorum, alvo_conteudos, entradas_por_ciclo")
     .order("inicio", { ascending: false })
     .overrideTypes<Versao[], { merge: false }>();
   const agora = instanteDaRequisicao();
@@ -516,7 +550,7 @@ async function Parametros() {
           </strong>{" "}
           conteúdo aberto por {v.dias_conteudo} dias; ciclos de {v.dias_ciclo} dias; participação mínima de{" "}
           {v.participacao_minima}%; quórum de {v.quorum}% dos participantes do ciclo; alvo de {v.alvo_conteudos}{" "}
-          conteúdos por ciclo.
+          conteúdos por ciclo; até {v.entradas_por_ciclo} entradas por ciclo.
         </li>
       ))}
     </ul>
