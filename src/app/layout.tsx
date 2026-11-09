@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-import { sair } from "./acoes";
+import { MenuTopo } from "./menu-topo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,17 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <header className="border-b border-border">
           <nav className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm">
-            <Link href="/" className="mr-auto font-semibold">
-              Devir Social
-            </Link>
-            <Link href="/">Início</Link>
-            <Link href="/membros">Membros</Link>
-            <Link href="/blog">Blog</Link>
-            <Link href="/painel">Painel</Link>
-            <Link href="/perfil">Perfil</Link>
-            <form action={sair}>
-              <button className="text-muted">Sair</button>
-            </form>
+            <Suspense fallback={<span className="mr-auto font-semibold">Devir Social</span>}>
+              <MenuTopo />
+            </Suspense>
           </nav>
         </header>
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">{children}</main>
