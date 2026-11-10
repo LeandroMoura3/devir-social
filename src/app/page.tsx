@@ -74,7 +74,7 @@ async function ListaConteudos() {
           {perfil.is_admin && (
             <>
               <Link href="/admin/convites" className="botao-secundario">
-                Pedidos de convite
+                Convites
               </Link>
               <Link href="/admin/publicacao" className="botao-secundario">
                 Plano de publicação

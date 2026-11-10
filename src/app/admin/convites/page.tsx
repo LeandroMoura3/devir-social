@@ -72,6 +72,19 @@ async function Fila() {
         aprovados ainda sem convite.
       </p>
 
+      {/* Convite direto (quem a coordenação conhece) ou reenvio: o envio é pelo Supabase, porque o app não tem a
+          chave secreta necessária para convidar. */}
+      <section className="cartao flex flex-col gap-2 text-sm">
+        <h2 className="font-semibold">Enviar ou reenviar convite</h2>
+        <p className="text-muted">
+          No Supabase: <strong>Add user → Send invitation</strong> e digite o e-mail. Para reenviar a quem não conseguiu
+          entrar, apague o usuário pendente na mesma tela e convide de novo.
+        </p>
+        <a href={URL_USUARIOS_SUPABASE} target="_blank" rel="noreferrer" className="botao self-start">
+          Abrir usuários no Supabase ↗
+        </a>
+      </section>
+
       {aprovadosSemConvite.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">Aprovados: falta mandar o convite</h2>
