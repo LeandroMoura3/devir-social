@@ -33,15 +33,19 @@ async function processar(formData: FormData): Promise<EstadoPedido> {
   const cabecalhos = await headers();
   const ip = cabecalhos.get("x-real-ip") ?? cabecalhos.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
   const origemHash = createHmac("sha256", segredo).update(ip).digest("hex");
+  // Impressão digital do WhatsApp: o banco guarda os confirmados assim, sem o número (migração 0021).
+  const whatsapp = normalizarWhatsapp(String(formData.get("whatsapp") ?? ""));
+  const whatsappHash = createHmac("sha256", segredo).update(`whatsapp:${whatsapp}`).digest("hex");
 
   const supabase = await criarClientePublico();
   const { error } = await supabase.rpc("pedir_convite", {
     p_segredo: segredo,
     p_nome: String(formData.get("nome") ?? ""),
     p_email: String(formData.get("email") ?? ""),
-    p_whatsapp: normalizarWhatsapp(String(formData.get("whatsapp") ?? "")),
+    p_whatsapp: whatsapp,
     p_como_conheceu: String(formData.get("como_conheceu") ?? ""),
     p_origem_hash: origemHash,
+    p_whatsapp_hash: whatsappHash,
   });
   if (error) {
     // Mensagens de validação do banco são escritas para o público; o resto vira mensagem genérica.

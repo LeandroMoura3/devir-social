@@ -49,11 +49,23 @@ export default function Regras() {
           app e neste blog. A participação no piloto é por convite.
         </p>
         <p>
-          <strong>Entrada:</strong> quem não conhece ninguém do projeto pede o convite na página{" "}
-          <Link href="/convite">Participar</Link>. A coordenação manda uma mensagem pelo WhatsApp informado, e a pessoa
-          responde, o que confirma que o número é real. Não se pergunta opinião de ninguém. Cada pessoa tem uma só conta:
-          um e-mail ou WhatsApp que já é de um membro ou de outro pedido não gera pedido novo. A confirmação é
-          dispensada quando a coordenação já conhece a pessoa pessoalmente, e o pedido fica marcado assim.
+          <strong>Entrada:</strong> há dois caminhos.
+        </p>
+        <ul>
+          <li>
+            <strong>Convite direto</strong> da coordenação, para quem ela conhece pessoalmente. Não exige WhatsApp.
+          </li>
+          <li>
+            <strong>Página <Link href="/convite">Participar</Link></strong>, para quem não conhece ninguém da
+            coordenação. O WhatsApp é obrigatório: a coordenação manda uma mensagem, sempre do número publicado na
+            página, e a pessoa responde, o que confirma que o número é dela. Não se pergunta opinião de ninguém. Se a
+            coordenação já conhece a pessoa, pode aprovar o pedido sem a confirmação, e o pedido fica marcado assim.
+          </li>
+        </ul>
+        <p>
+          <strong>Uma conta por pessoa:</strong> um WhatsApp confirmado não pode ser usado em outro pedido, e um e-mail
+          que já é de um membro também não. Pedidos ainda não confirmados com o mesmo WhatsApp ou e-mail entram todos
+          na fila, para que ninguém consiga bloquear outra pessoa usando os dados dela; aprova-se quem responder.
         </p>
         <ul>
           <li>
@@ -307,9 +319,11 @@ export default function Regras() {
         <h3>0.14 (10/11/2026)</h3>
         <ul>
           <li>
-            A videochamada de verificação saiu: a entrada passa a ser confirmada pelo WhatsApp (a pessoa responde a uma
-            mensagem da coordenação). E-mail ou WhatsApp já usado por um membro ou outro pedido não gera pedido novo.
-            Nenhum pedido chegou a passar pela videochamada (item 1).
+            A videochamada de verificação saiu: pela página Participar, a entrada passa a ser confirmada pelo WhatsApp
+            (a pessoa responde a uma mensagem da coordenação, sempre do número publicado). O convite direto, para quem
+            a coordenação conhece, continua sem WhatsApp. Só um WhatsApp confirmado (ou o e-mail de um membro) impede
+            pedido novo, para que ninguém bloqueie outra pessoa usando os dados dela. Nenhum pedido chegou a passar
+            pela videochamada (item 1).
           </li>
         </ul>
 

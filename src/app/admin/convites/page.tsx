@@ -43,6 +43,8 @@ type Pedido = {
   motivo: Motivo | null;
   decidido_em: string | null;
   convidado: boolean;
+  mesmo_whatsapp: number;
+  mesmo_email: number;
 };
 
 type Vagas = { limite: number; usadas: number; pendentes: number; ciclo_fim: string };
@@ -111,6 +113,13 @@ async function Fila() {
                 </a>
               </div>
               {p.como_conheceu && <p className="text-muted">Como conheceu: {p.como_conheceu}</p>}
+              {(p.mesmo_whatsapp > 0 || p.mesmo_email > 0) && (
+                <p className="erro">
+                  Atenção: há outro pedido na fila com o mesmo {p.mesmo_whatsapp > 0 ? "WhatsApp" : "e-mail"}
+                  {p.mesmo_whatsapp > 0 && p.mesmo_email > 0 ? " e e-mail" : ""}. Só aprove pelo WhatsApp quem
+                  responder; o outro provavelmente usou dados de terceiros.
+                </p>
+              )}
               <BotoesDecisao pedidoId={p.id} temVaga={podeAprovar(vagas, posicao)} />
             </li>
           ))}

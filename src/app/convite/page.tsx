@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { EMAIL_CONTATO } from "@/lib/config";
+import { EMAIL_CONTATO, WHATSAPP_COORDENACAO } from "@/lib/config";
+import { formatarWhatsapp } from "@/lib/cota";
 import { formatarData } from "@/lib/datas";
 import { lista } from "@/lib/supabase/lista";
 import { criarClientePublico } from "@/lib/supabase/publico";
@@ -32,13 +33,19 @@ export default function Convite() {
           <ol className="list-decimal pl-5">
             <li>Você preenche o pedido abaixo.</li>
             <li>
-              A coordenação te manda uma mensagem no WhatsApp. <strong>É só responder</strong>: isso confirma que o
-              número é seu. <strong>Ninguém pergunta suas opiniões.</strong>
+              A coordenação te manda uma mensagem no WhatsApp, sempre do número{" "}
+              <strong>+55 {formatarWhatsapp(WHATSAPP_COORDENACAO)}</strong>. <strong>É só responder</strong>: isso
+              confirma que o número é seu. <strong>Ninguém pergunta suas opiniões.</strong> Mensagem de outro número
+              dizendo ser do Devir não é nossa.
             </li>
             <li>Aprovado o pedido, o convite chega no seu e-mail.</li>
           </ol>
           <p className="mt-2">
-            Os pedidos são atendidos por ordem de chegada, até o limite de entradas do ciclo.
+            Os pedidos são atendidos por ordem de chegada, até o limite de entradas do ciclo. Cada pessoa tem uma só
+            conta: um WhatsApp já confirmado não pode ser usado de novo.
+          </p>
+          <p className="mt-2">
+            <strong>Conhece alguém da coordenação?</strong> Peça o convite direto a ela, sem precisar deste formulário.
           </p>
         </section>
         <Suspense fallback={null}>
