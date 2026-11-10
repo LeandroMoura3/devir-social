@@ -37,8 +37,15 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   if (!Number.isInteger(conteudoId)) notFound();
 
   const { supabase, usuarioId, perfil } = await exigirParticipante();
-  const [[conteudo], { data: meuVoto }, { data: comentarios }, { data: status }, { data: membros }, { data: votosDoDebate }] =
-    await Promise.all([
+  const [
+    [conteudo],
+    { data: meuVoto },
+    { data: comentarios },
+    { data: status },
+    { data: membros },
+    { data: votosDoDebate },
+    { data: debateFechado },
+  ] = await Promise.all([
     carregarConteudos(supabase, [conteudoId]),
     supabase
       .from("votos")
@@ -55,13 +62,25 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
     lista<StatusCiclo>(supabase.rpc("meu_status")),
     lista<{ perfil_id: string; participante: boolean }>(supabase.rpc("membros_ciclo_atual")),
     lista<{ perfil_id: string; voto: Voto }>(supabase.rpc("votos_de_comentaristas", { p_conteudo: conteudoId })),
+    // Depois do fechamento (ou cancelamento), quem era espectador no ciclo do conteúdo, igual ao blog.
+    lista<{ id: number; espectador: boolean }>(supabase.rpc("blog_debate", { p_conteudo: conteudoId })),
   ]);
-  const espectadores = new Set((membros ?? []).filter((m) => !m.participante).map((m) => m.perfil_id));
   const votos = new Map((votosDoDebate ?? []).map((v) => [v.perfil_id, v.voto]));
   if (!conteudo) notFound();
 
   const agora = instanteDaRequisicao();
   const aberto = !conteudo.removidoEm && Date.parse(conteudo.fechaEm) > agora;
+  // Selo "espectador" = o voto desta pessoa não conta NESTE conteúdo.
+  //   fechado/cancelado: participantes do ciclo em que ele fechou (fixo, como no blog);
+  //   aberto e fecha neste ciclo: situação atual, que é a que vai valer;
+  //   aberto e fecha num ciclo futuro: sem selo (ainda não dá para saber).
+  const fimDoCiclo = status?.[0] ? Date.parse(status[0].ciclo_fim) : 0;
+  const espectadoresAgora = new Set((membros ?? []).filter((m) => !m.participante).map((m) => m.perfil_id));
+  const espectadoresNoFechamento = new Set((debateFechado ?? []).filter((d) => d.espectador).map((d) => d.id));
+  const ehEspectador = (c: Comentario) =>
+    aberto
+      ? Date.parse(conteudo.fechaEm) < fimDoCiclo && c.autor_id !== conteudo.autorId && espectadoresAgora.has(c.autor_id)
+      : espectadoresNoFechamento.has(c.id);
   // A votação fecha; o debate continua (menos em removidos por exceção legal). Comentários depois do
   // fechamento ou do cancelamento ganham uma marcação.
   const debateAberto = !conteudo.removidoEm || conteudo.cancelado;
@@ -142,7 +161,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
           paiId={null}
           conteudoId={conteudo.id}
           aberto={debateAberto}
-          espectadores={espectadores}
+          ehEspectador={ehEspectador}
           votos={votos}
           autorConteudo={conteudo.autorId}
           marco={marco}
@@ -185,7 +204,7 @@ function ArvoreComentarios({
   paiId,
   conteudoId,
   aberto,
-  espectadores,
+  ehEspectador,
   votos,
   autorConteudo,
   marco,
@@ -194,7 +213,7 @@ function ArvoreComentarios({
   paiId: number | null;
   conteudoId: number;
   aberto: boolean;
-  espectadores: Set<string>;
+  ehEspectador: (c: Comentario) => boolean;
   votos: Map<string, Voto>;
   autorConteudo: string;
   marco: { instante: number; rotulo: string };
@@ -210,7 +229,7 @@ function ArvoreComentarios({
             <span className="text-sm font-semibold">{c.perfis?.nome_publico ?? "participante"}</span>
             {/* Voto atual de quem comenta (muda junto com o voto até o fechamento). */}
             <SeloVoto voto={votos.get(c.autor_id)} ehAutor={c.autor_id === autorConteudo} semVoto="ainda não votou" />
-            {espectadores.has(c.autor_id) && <span className={SELO_NEUTRO}>espectador</span>}
+            {ehEspectador(c) && <span className={SELO_NEUTRO}>espectador</span>}
             {Date.parse(c.criado_em) >= marco.instante && <span className={SELO_NEUTRO}>{marco.rotulo}</span>}
             <span className="ml-auto text-xs text-muted">{formatarDataHora(c.criado_em)}</span>
           </div>
@@ -223,7 +242,7 @@ function ArvoreComentarios({
             paiId={c.id}
             conteudoId={conteudoId}
             aberto={aberto}
-            espectadores={espectadores}
+            ehEspectador={ehEspectador}
             votos={votos}
             autorConteudo={autorConteudo}
             marco={marco}
