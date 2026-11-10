@@ -1,29 +1,36 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 
-// Anterior = mais antigo; próxima = mais recente.
+// Anterior = mais antigo; próxima = mais recente. "meio" fica entre os dois (ex.: cancelar o próprio conteúdo).
+// No celular, os botões mostram só o número, para os três caberem numa linha.
 export function NavegacaoConteudos({
   anterior,
   proxima,
   href,
+  meio,
 }: {
   anterior?: number;
   proxima?: number;
   href: (id: number) => string;
+  meio?: ReactNode;
 }) {
-  if (anterior === undefined && proxima === undefined) return null;
+  if (anterior === undefined && proxima === undefined && !meio) return null;
   return (
-    <nav className="flex justify-between gap-2 text-sm">
+    <nav className="flex flex-wrap items-center justify-between gap-2 text-sm">
       {anterior !== undefined ? (
         <Link href={href(anterior)} className="botao-secundario">
-          ← Anterior (#{anterior})
+          ← <span className="hidden sm:inline">&nbsp;Anterior&nbsp;</span>(#{anterior})
         </Link>
       ) : (
         <span />
       )}
-      {proxima !== undefined && (
+      {meio}
+      {proxima !== undefined ? (
         <Link href={href(proxima)} className="botao-secundario">
-          Próxima (#{proxima}) →
+          <span className="hidden sm:inline">Próxima&nbsp;</span>(#{proxima}) →
         </Link>
+      ) : (
+        <span />
       )}
     </nav>
   );

@@ -122,13 +122,14 @@ export function FormularioCancelamento({ conteudoId }: { conteudoId: number }) {
   const [estado, acao, enviando] = useActionState<EstadoAcao, FormData>(cancelarConteudo, {});
   if (!aberto) {
     return (
-      <button type="button" onClick={() => setAberto(true)} className="botao-secundario self-start">
+      <button type="button" onClick={() => setAberto(true)} className="botao-secundario">
         Cancelar meu conteúdo
       </button>
     );
   }
+  // Aberto, ocupa a linha inteira abaixo da navegação (basis-full + order-last dentro do flex-wrap).
   return (
-    <form action={acao} className="flex flex-col gap-2">
+    <form action={acao} className="order-last flex basis-full flex-col gap-2">
       <input type="hidden" name="conteudo_id" value={conteudoId} />
       <p className="text-sm">
         O conteúdo não vai para o Instagram nem é classificado, e a votação fecha agora; o debate continua. O texto, a

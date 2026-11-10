@@ -82,6 +82,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       <header className="flex flex-col gap-1">
         <p className="text-xs text-muted">
           #{conteudo.id} · {conteudo.autor} · enviado em {formatarDataHora(conteudo.criadoEm)}
+          {aberto && conteudo.autorId === usuarioId && " (você não vota no próprio conteúdo)"}
         </p>
         <p className="text-sm font-medium text-accent">
           {conteudo.removidoEm
@@ -114,12 +115,6 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
           situacao={status?.[0] ? situacaoDoVoto(status[0], conteudo.fechaEm) : undefined}
         />
       )}
-      {aberto && conteudo.autorId === usuarioId && (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-muted">Você não vota no próprio conteúdo.</p>
-          <FormularioCancelamento conteudoId={conteudo.id} />
-        </div>
-      )}
       {!aberto && conteudo.resultado && <BlocoResultado conteudo={conteudo} supabase={supabase} />}
 
       <section className="flex flex-col gap-3">
@@ -149,7 +144,11 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         />
       </section>
 
-      <NavegacaoConteudos {...navegacao} href={(id) => `/conteudo/${id}`} />
+      <NavegacaoConteudos
+        {...navegacao}
+        href={(id) => `/conteudo/${id}`}
+        meio={aberto && conteudo.autorId === usuarioId ? <FormularioCancelamento conteudoId={conteudo.id} /> : undefined}
+      />
 
       {perfil.is_admin && !conteudo.removidoEm && !conteudo.publicadoEm && (
         <section className="cartao flex flex-col gap-2">
