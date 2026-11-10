@@ -7,6 +7,7 @@ import { totaisDoDetalhe } from "@/lib/regras";
 import { MotivoCancelamento } from "../../../motivo-cancelamento";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
 import { ResultadoVotos } from "../../../resultado-votos";
+import { MolduraInstagram } from "../../../moldura-instagram";
 import { TextoFormatado } from "../../../texto-formatado";
 import { MenuBlog } from "../../menu";
 
@@ -46,8 +47,11 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
       </header>
       <MotivoCancelamento motivo={conteudo.motivo} />
 
-      {imagemUrl && <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />}
-      <TextoFormatado texto={conteudo.texto} />
+      {imagemUrl ? (
+        <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} rotulo="cancelado" />
+      ) : (
+        <TextoFormatado texto={conteudo.texto} />
+      )}
 
       <p className="text-sm text-muted">
         Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.canceladoEm)}, quando o autor cancelou. Não

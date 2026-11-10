@@ -5,6 +5,7 @@ import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
 import { NOME_FAIXA, type Voto } from "@/lib/regras";
 import { MotivoCancelamento } from "../../motivo-cancelamento";
+import { MolduraInstagram } from "../../moldura-instagram";
 import { SELO_NEUTRO, SeloVoto } from "../../selos";
 import { NavegacaoConteudos, vizinhos } from "../../navegacao";
 import { ResultadoVotos } from "../../resultado-votos";
@@ -98,8 +99,9 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       </header>
       {conteudo.cancelado && <MotivoCancelamento motivo={conteudo.removidoMotivo} />}
 
-      {aberto && imagemUrl ? (
-        <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} />
+      {/* Aberto: prévia de como sai no Instagram. Cancelado: o mesmo quadro, marcado como cancelado. */}
+      {(aberto || conteudo.cancelado) && imagemUrl ? (
+        <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} rotulo={aberto ? "prévia" : "cancelado"} />
       ) : (
         <>
           {imagemUrl ? (
@@ -160,23 +162,6 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         </section>
       )}
     </article>
-  );
-}
-
-// Prévia enquanto o conteúdo está aberto: a imagem já sai do app no recorte do Instagram.
-function MolduraInstagram({ imagemUrl, texto }: { imagemUrl: string; texto: string }) {
-  return (
-    <figure className="mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-border bg-card">
-      <figcaption className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
-        <img src="/logo.png" alt="" className="size-7 rounded-full border border-border" />
-        devir_social
-        <span className="ml-auto text-xs font-normal text-muted">prévia</span>
-      </figcaption>
-      <img src={imagemUrl} alt="" className="w-full" />
-      <div className="px-3 py-3 text-sm">
-        <TextoFormatado texto={texto} />
-      </div>
-    </figure>
   );
 }
 
