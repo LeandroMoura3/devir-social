@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { EMAIL_CONTATO, WHATSAPP_COORDENACAO } from "@/lib/config";
-import { formatarWhatsapp } from "@/lib/cota";
+import { EMAIL_CONTATO } from "@/lib/config";
 import { formatarData } from "@/lib/datas";
 import { lista } from "@/lib/supabase/lista";
 import { criarClientePublico } from "@/lib/supabase/publico";
@@ -33,10 +32,9 @@ export default function Convite() {
           <ol className="list-decimal pl-5">
             <li>Você preenche o pedido abaixo.</li>
             <li>
-              A coordenação te manda uma mensagem no WhatsApp, sempre do número{" "}
-              <strong>+55 {formatarWhatsapp(WHATSAPP_COORDENACAO)}</strong>. <strong>É só responder</strong>: isso
-              confirma que o número é seu. <strong>Ninguém pergunta suas opiniões.</strong> Mensagem de outro número
-              dizendo ser do Devir não é nossa.
+              A coordenação te manda uma mensagem no WhatsApp citando o <strong>nome e o e-mail</strong> que você
+              informou aqui (assim você sabe que é do Devir). <strong>É só responder</strong>: isso confirma que o
+              número é seu. <strong>Ninguém pergunta suas opiniões.</strong>
             </li>
             <li>Aprovado o pedido, o convite chega no seu e-mail.</li>
           </ol>

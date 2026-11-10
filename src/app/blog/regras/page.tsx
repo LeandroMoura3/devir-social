@@ -57,8 +57,8 @@ export default function Regras() {
           </li>
           <li>
             <strong>Página <Link href="/convite">Participar</Link></strong>, para quem não conhece ninguém da
-            coordenação. O WhatsApp é obrigatório: a coordenação manda uma mensagem, sempre do número publicado na
-            página, e a pessoa responde, o que confirma que o número é dela. Não se pergunta opinião de ninguém. Se a
+            coordenação. O WhatsApp é obrigatório: a coordenação manda uma mensagem citando o nome e o e-mail do pedido,
+            e a pessoa responde, o que confirma que o número é dela. Não se pergunta opinião de ninguém. Se a
             coordenação já conhece a pessoa, pode aprovar o pedido sem a confirmação, e o pedido fica marcado assim.
           </li>
         </ul>
@@ -320,7 +320,7 @@ export default function Regras() {
         <ul>
           <li>
             A videochamada de verificação saiu: pela página Participar, a entrada passa a ser confirmada pelo WhatsApp
-            (a pessoa responde a uma mensagem da coordenação, sempre do número publicado). O convite direto, para quem
+            (a pessoa responde a uma mensagem da coordenação que cita o nome e o e-mail do pedido). O convite direto, para quem
             a coordenação conhece, continua sem WhatsApp. Só um WhatsApp confirmado (ou o e-mail de um membro) impede
             pedido novo, para que ninguém bloqueie outra pessoa usando os dados dela. Nenhum pedido chegou a passar
             pela videochamada (item 1).

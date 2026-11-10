@@ -16,8 +16,8 @@ export default function PedidosConvite() {
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Pedidos de convite</h1>
       <p className="text-sm text-muted">
-        Regras v0.14: mande uma mensagem pelo WhatsApp da pessoa; se ela responder, o número é real e o pedido pode
-        ser aprovado. Nada de perguntar opinião. Quem você conhece pessoalmente pode ser aprovado direto (fica marcado).
+        Regras v0.14: mande uma mensagem pelo WhatsApp da pessoa citando o nome e o e-mail do pedido (é como ela sabe
+        que é do Devir); se ela responder, o número é real e o pedido pode ser aprovado. Nada de perguntar opinião. Quem você conhece pessoalmente pode ser aprovado direto (fica marcado).
         Por ordem de chegada, até o limite do ciclo. Os números aparecem no{" "}
         <Link href="/painel" className="underline">
           painel público
