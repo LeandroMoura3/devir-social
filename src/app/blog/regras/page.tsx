@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.13)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.14)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -50,10 +50,10 @@ export default function Regras() {
         </p>
         <p>
           <strong>Entrada:</strong> quem não conhece ninguém do projeto pede o convite na página{" "}
-          <Link href="/convite">Participar</Link>. A coordenação faz uma videochamada de até 5 minutos, só para
-          confirmar que é uma pessoa real e que ainda não tem conta, e explicar como o Devir funciona. Na chamada não se
-          pergunta opinião de ninguém. A chamada é dispensada quando a coordenação já conhece a pessoa pessoalmente, e
-          o pedido fica marcado assim.
+          <Link href="/convite">Participar</Link>. A coordenação manda uma mensagem pelo WhatsApp informado, e a pessoa
+          responde, o que confirma que o número é real. Não se pergunta opinião de ninguém. Cada pessoa tem uma só conta:
+          um e-mail ou WhatsApp que já é de um membro ou de outro pedido não gera pedido novo. A confirmação é
+          dispensada quando a coordenação já conhece a pessoa pessoalmente, e o pedido fica marcado assim.
         </p>
         <ul>
           <li>
@@ -62,12 +62,12 @@ export default function Regras() {
             aprovado se sobrar vaga depois de reservar uma para cada pedido mais antigo ainda na fila.
           </li>
           <li>
-            Recusa só por motivo objetivo: não compareceu à videochamada após duas tentativas, identidade não confere,
+            Recusa só por motivo objetivo: não respondeu no WhatsApp após duas tentativas, identidade não confere,
             já tem conta ou pedido inválido (robô, teste ou dados falsos). Pedido sem decisão em 30 dias expira.
           </li>
           <li>
-            O <Link href="/painel">painel</Link> mostra as vagas do ciclo e quantos pedidos foram aprovados (com e sem
-            videochamada) e recusados, por motivo. Os dados pessoais do pedido ficam só com a coordenação e são apagados
+            O <Link href="/painel">painel</Link> mostra as vagas do ciclo e quantos pedidos foram aprovados (com
+            confirmação pelo WhatsApp ou direto, por conhecimento pessoal) e recusados, por motivo. Os dados pessoais do pedido ficam só com a coordenação e são apagados
             30 dias depois da decisão.
           </li>
         </ul>
@@ -287,7 +287,7 @@ export default function Regras() {
         <h2>C. Etapas ainda não automatizadas</h2>
         <ol>
           <li>Avaliar conteúdo ilegal.</li>
-          <li>Verificar identidade (hoje, por videochamada com a coordenação, ou dispensa para quem ela conhece pessoalmente).</li>
+          <li>Verificar identidade (hoje, confirmação pelo WhatsApp, ou dispensa para quem a coordenação conhece pessoalmente).</li>
           <li>Definir as regras (hoje, o idealizador).</li>
         </ol>
 
@@ -303,6 +303,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.14 (10/11/2026)</h3>
+        <ul>
+          <li>
+            A videochamada de verificação saiu: a entrada passa a ser confirmada pelo WhatsApp (a pessoa responde a uma
+            mensagem da coordenação). E-mail ou WhatsApp já usado por um membro ou outro pedido não gera pedido novo.
+            Nenhum pedido chegou a passar pela videochamada (item 1).
+          </li>
+        </ul>
 
         <h3>0.13 (09/11/2026)</h3>
         <ul>
@@ -505,7 +514,7 @@ export default function Regras() {
               <li>Encerrar as votações e anotar as contagens.</li>
               <li>Montar os posts (cascata, rodízio, corte dos textos).</li>
               <li>Avaliar conteúdo ilegal.</li>
-              <li>Verificar identidade (hoje, por videochamada com a coordenação, ou dispensa para quem ela conhece pessoalmente).</li>
+              <li>Verificar identidade (hoje, confirmação pelo WhatsApp, ou dispensa para quem a coordenação conhece pessoalmente).</li>
               <li>Votação: secreta para o grupo, mas não verificável. O Telegram tem acesso aos votos.</li>
               <li>Definir as regras (hoje, o idealizador).</li>
             </ol>

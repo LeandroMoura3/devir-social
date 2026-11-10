@@ -32,9 +32,8 @@ export default function Convite() {
           <ol className="list-decimal pl-5">
             <li>Você preenche o pedido abaixo.</li>
             <li>
-              A coordenação te chama no WhatsApp para uma <strong>videochamada de até 5 minutos</strong>. Ela só
-              confirma que você é uma pessoa real e que ainda não tem conta, e explica como o Devir funciona.{" "}
-              <strong>Ninguém pergunta suas opiniões.</strong>
+              A coordenação te manda uma mensagem no WhatsApp. <strong>É só responder</strong>: isso confirma que o
+              número é seu. <strong>Ninguém pergunta suas opiniões.</strong>
             </li>
             <li>Aprovado o pedido, o convite chega no seu e-mail.</li>
           </ol>

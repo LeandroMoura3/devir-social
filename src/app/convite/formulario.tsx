@@ -19,7 +19,7 @@ export function FormularioConvite() {
   if (estado.enviado) {
     return (
       <p className="cartao text-sm">
-        Pedido recebido. A coordenação vai te chamar no WhatsApp para marcar a videochamada. Se o pedido for
+        Pedido recebido. A coordenação vai te mandar uma mensagem no WhatsApp: é só responder. Se o pedido for
         aprovado, o convite chega no seu e-mail (confira também a caixa de spam).
       </p>
     );
@@ -43,7 +43,7 @@ export function FormularioConvite() {
         <input name="email" defaultValue={v.email} type="email" required maxLength={200} autoComplete="email" className="campo" />
       </label>
       <label className="flex flex-col gap-1 text-sm">
-        WhatsApp com DDD (para marcar a videochamada)
+        WhatsApp com DDD (a coordenação manda uma mensagem para confirmar)
         <input
           name="whatsapp"
           defaultValue={v.whatsapp}

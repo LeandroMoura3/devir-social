@@ -1,10 +1,15 @@
-// Pedido de convite (regras v0.13). Espelho das regras em supabase/migrations/0019_pedidos_de_convite.sql.
+// Pedido de convite (regras v0.14). Espelho das regras em supabase/migrations/0019 e 0020.
 
-export const FORMAS = { videochamada: "videochamada", conhecido: "conhecido pessoalmente" } as const;
+export const FORMAS = {
+  whatsapp: "confirmou pelo WhatsApp",
+  videochamada: "videochamada (regras v0.13)",
+  conhecido: "conhecido pessoalmente",
+} as const;
 export type Forma = keyof typeof FORMAS;
 
 export const MOTIVOS = {
-  nao_compareceu: "não compareceu à videochamada após duas tentativas",
+  nao_respondeu: "não respondeu no WhatsApp após duas tentativas",
+  nao_compareceu: "não compareceu à videochamada (regras v0.13)",
   identidade_nao_confere: "identidade não confere",
   ja_tem_conta: "já tem conta",
   pedido_invalido: "pedido inválido (robô, teste ou dados falsos)",

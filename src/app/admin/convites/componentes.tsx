@@ -4,7 +4,10 @@ import { useActionState, useState } from "react";
 import { MOTIVOS, type Motivo } from "@/lib/convite";
 import { decidirPedido, type EstadoDecisao } from "./acoes";
 
-const MOTIVOS_MANUAIS = Object.entries(MOTIVOS).filter(([chave]) => chave !== "expirado") as [Motivo, string][];
+// Motivos que a coordenação pode escolher hoje (os demais são automáticos ou de versões anteriores).
+const MOTIVOS_MANUAIS = (["nao_respondeu", "identidade_nao_confere", "ja_tem_conta", "pedido_invalido"] as Motivo[]).map(
+  (chave) => [chave, MOTIVOS[chave]] as const,
+);
 
 export function BotoesDecisao({ pedidoId, temVaga }: { pedidoId: number; temVaga: boolean }) {
   const [estado, acao, enviando] = useActionState<EstadoDecisao, FormData>(decidirPedido, {});
@@ -14,8 +17,8 @@ export function BotoesDecisao({ pedidoId, temVaga }: { pedidoId: number; temVaga
       <input type="hidden" name="pedido_id" value={pedidoId} />
       {!recusando ? (
         <div className="flex flex-wrap gap-2">
-          <button name="decisao" value="aprovado:videochamada" className="botao" disabled={enviando || !temVaga}>
-            Aprovar após videochamada
+          <button name="decisao" value="aprovado:whatsapp" className="botao" disabled={enviando || !temVaga}>
+            Aprovar: respondeu no WhatsApp
           </button>
           <button name="decisao" value="aprovado:conhecido" className="botao-secundario" disabled={enviando || !temVaga}>
             Aprovar: conheço pessoalmente

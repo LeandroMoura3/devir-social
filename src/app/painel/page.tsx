@@ -216,8 +216,10 @@ type Vagas = { limite: number; usadas: number; pendentes: number; ciclo_fim: str
 type NumerosConvite = {
   recebidos: number;
   pendentes: number;
+  aprovados_whatsapp: number;
   aprovados_videochamada: number;
   aprovados_conhecido: number;
+  recusados_nao_respondeu: number;
   recusados_nao_compareceu: number;
   recusados_identidade: number;
   recusados_ja_tem_conta: number;
@@ -236,7 +238,8 @@ async function Entradas() {
   const n = numeros?.[0];
   if (!v || !n) return null;
   const recusados = [
-    ["não compareceu", n.recusados_nao_compareceu],
+    ["não respondeu", n.recusados_nao_respondeu],
+    ["não compareceu à videochamada (v0.13)", n.recusados_nao_compareceu],
     ["identidade não confere", n.recusados_identidade],
     ["já tinha conta", n.recusados_ja_tem_conta],
     ["pedido inválido", n.recusados_invalido],
@@ -258,8 +261,9 @@ async function Entradas() {
       </p>
       <p>
         Pedidos pela página <a href="/convite" className="underline">Participar</a>: {n.recebidos} recebidos;
-        aprovados após videochamada: {n.aprovados_videochamada}; aprovados sem chamada (pessoa conhecida da
-        coordenação): {n.aprovados_conhecido}; recusados:{" "}
+        aprovados após confirmação pelo WhatsApp: {n.aprovados_whatsapp}
+        {n.aprovados_videochamada > 0 && `; após videochamada (v0.13): ${n.aprovados_videochamada}`}; aprovados direto
+        (pessoa conhecida da coordenação): {n.aprovados_conhecido}; recusados:{" "}
         {recusados.map(([texto, total]) => `${texto} ${total}`).join(", ")}.
       </p>
     </section>
