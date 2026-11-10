@@ -48,7 +48,10 @@ async function Lista() {
               <p className="text-xs text-muted">
                 #{c.id} · {c.autor} · cancelado em {formatarData(c.canceladoEm)}
               </p>
-              <TextoFormatado texto={c.texto} className="line-clamp-2 text-sm" quebras={false} />
+              <p className="text-sm font-medium">
+                {c.motivo ? `Motivo: “${c.motivo}”` : <span className="font-normal text-muted">Motivo não informado</span>}
+              </p>
+              <TextoFormatado texto={c.texto} className="line-clamp-2 text-sm text-muted" quebras={false} />
               <p className="text-xs font-medium text-accent">
                 Cancelado pelo autor · apoio {t.apoio} · protesto {t.protesto}
               </p>

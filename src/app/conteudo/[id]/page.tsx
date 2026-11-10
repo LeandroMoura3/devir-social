@@ -4,6 +4,7 @@ import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/co
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
 import { ladoDoVoto, NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { MotivoCancelamento } from "../../motivo-cancelamento";
 import { NavegacaoConteudos, vizinhos } from "../../navegacao";
 import { ResultadoVotos } from "../../resultado-votos";
 import { TextoFormatado } from "../../texto-formatado";
@@ -87,13 +88,14 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         <p className="text-sm font-medium text-accent">
           {conteudo.removidoEm
             ? conteudo.cancelado
-              ? `Cancelado pelo autor em ${formatarDataHora(conteudo.removidoEm)}${conteudo.removidoMotivo ? `: ${conteudo.removidoMotivo}` : ""}`
+              ? `Cancelado pelo autor em ${formatarDataHora(conteudo.removidoEm)}`
               : `Removido: ${conteudo.removidoMotivo}`
             : aberto
               ? `Em debate e votação · ${tempoRestante(conteudo.fechaEm, agora)}`
               : `Fechado em ${formatarDataHora(conteudo.fechaEm)}`}
         </p>
       </header>
+      {conteudo.cancelado && <MotivoCancelamento motivo={conteudo.removidoMotivo} />}
 
       {aberto && imagemUrl ? (
         <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} />
@@ -190,17 +192,21 @@ async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao;
   );
 }
 
+const SELO = "rounded-full px-2 py-0.5 text-[11px] font-medium leading-4";
+
 // Voto atual de quem comenta (muda junto com o voto até o fechamento).
 function SeloVoto({ autorId, votos, autorConteudo }: { autorId: string; votos: Map<string, Voto>; autorConteudo: string }) {
-  if (autorId === autorConteudo) return <span>autor</span>;
+  if (autorId === autorConteudo) return <span className={`${SELO} bg-accent text-accent-foreground`}>autor</span>;
   const voto = votos.get(autorId);
-  if (!voto) return <span>ainda não votou</span>;
+  if (!voto) return <span className={`${SELO} border border-border text-muted`}>ainda não votou</span>;
   const lado = ladoDoVoto(voto);
-  return (
-    <span className={lado === "apoio" ? "text-accent" : lado === "protesto" ? "text-danger" : undefined}>
-      <em>{NOME_VOTO[voto]}</em>
-    </span>
-  );
+  const cor =
+    lado === "apoio"
+      ? "bg-[#e5f3ea] text-[#1d6b3b]"
+      : lado === "protesto"
+        ? "bg-[#fde8ea] text-[#a3242f]"
+        : "bg-border text-foreground";
+  return <span className={`${SELO} ${cor}`}>{NOME_VOTO[voto]}</span>;
 }
 
 function ArvoreComentarios({
@@ -224,21 +230,22 @@ function ArvoreComentarios({
 }) {
   const filhos = comentarios.filter((c) => c.pai_id === paiId);
   if (filhos.length === 0) return null;
+  // Cada conversa (comentário + respostas) num cartão; respostas recuadas com uma linha à esquerda.
   return (
-    <ul className={paiId ? "ml-4 flex flex-col gap-3 border-l border-border pl-3" : "flex flex-col gap-3"}>
+    <ul className={paiId ? "mt-3 flex flex-col gap-4 border-l-2 border-border pl-4" : "flex flex-col gap-4"}>
       {filhos.map((c) => (
-        <li key={c.id} className="flex flex-col gap-1">
-          <p className="text-xs text-muted">
-            {c.perfis?.nome_publico ?? "participante"}
-            {espectadores.has(c.autor_id) && <span className="ml-1 rounded border border-border px-1">espectador</span>} ·{" "}
-            <SeloVoto autorId={c.autor_id} votos={votos} autorConteudo={autorConteudo} /> ·{" "}
-            {formatarDataHora(c.criado_em)}
+        <li key={c.id} className={paiId ? "flex flex-col gap-1.5" : "cartao flex flex-col gap-1.5"}>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="text-sm font-semibold">{c.perfis?.nome_publico ?? "participante"}</span>
+            <SeloVoto autorId={c.autor_id} votos={votos} autorConteudo={autorConteudo} />
+            {espectadores.has(c.autor_id) && <span className={`${SELO} border border-border text-muted`}>espectador</span>}
             {Date.parse(c.criado_em) >= marco.instante && (
-              <span className="ml-1 rounded border border-border px-1">{marco.rotulo}</span>
+              <span className={`${SELO} border border-border text-muted`}>{marco.rotulo}</span>
             )}
-          </p>
-          <p className="whitespace-pre-wrap text-sm">
-            {c.removido_motivo ? `Comentário removido: ${c.removido_motivo}` : c.texto}
+            <span className="ml-auto text-xs text-muted">{formatarDataHora(c.criado_em)}</span>
+          </div>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+            {c.removido_motivo ? <span className="text-muted">Comentário removido: {c.removido_motivo}</span> : c.texto}
           </p>
           {aberto && <FormularioComentario conteudoId={conteudoId} paiId={c.id} />}
           <ArvoreComentarios

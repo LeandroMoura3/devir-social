@@ -66,7 +66,7 @@ export function FormularioComentario({ conteudoId, paiId }: { conteudoId: number
 
   if (!aberto) {
     return (
-      <button type="button" onClick={() => setAberto(true)} className="self-start text-xs text-accent">
+      <button type="button" onClick={() => setAberto(true)} className="mt-1 self-start text-xs font-medium text-accent">
         Responder
       </button>
     );
@@ -84,10 +84,12 @@ export function FormularioComentario({ conteudoId, paiId }: { conteudoId: number
         placeholder={paiId ? "Sua resposta" : "Seu comentário"}
         className="campo"
       />
-      {!paiId && <p className="text-xs text-muted">Os comentários ficam públicos no blog depois que a votação fecha.</p>}
       {estado.erro && <p className="erro">{estado.erro}</p>}
-      <div className="flex gap-2">
-        <button className="botao" disabled={enviando}>
+      <div className="flex items-center gap-2">
+        {!paiId && (
+          <p className="mr-auto text-xs text-muted">Os comentários ficam públicos no blog depois que a votação fecha.</p>
+        )}
+        <button className="botao shrink-0" disabled={enviando}>
           {enviando ? "Enviando…" : paiId ? "Responder" : "Comentar"}
         </button>
         {paiId && (

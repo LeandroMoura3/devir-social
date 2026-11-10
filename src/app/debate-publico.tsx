@@ -40,16 +40,24 @@ function Arvore({
   const filhos = comentarios.filter((c) => c.pai_id === paiId);
   if (filhos.length === 0) return null;
   return (
-    <ul className={paiId ? "ml-4 flex flex-col gap-3 border-l border-border pl-3" : "flex flex-col gap-3"}>
+    // list-none/pl explícitos: o blog usa a classe "prosa", que põe marcador e recuo em toda lista.
+    <ul
+      className={
+        paiId ? "mt-3 flex list-none! flex-col gap-4 border-l-2 border-border pl-4!" : "flex list-none! flex-col gap-4 pl-0!"
+      }
+    >
       {filhos.map((c) => (
-        <li key={c.id} className="flex flex-col gap-1">
-          <p className="text-xs text-muted">
-            {c.autor} · {formatarDataHora(c.criado_em)}
+        <li key={c.id} className={paiId ? "flex flex-col gap-1.5" : "cartao flex flex-col gap-1.5"}>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="text-sm font-semibold">{c.autor}</span>
             {Date.parse(c.criado_em) >= marco.instante && (
-              <span className="ml-1 rounded border border-border px-1">{marco.rotulo}</span>
+              <span className="rounded-full border border-border px-2 py-0.5 text-[11px] leading-4 text-muted">
+                {marco.rotulo}
+              </span>
             )}
-          </p>
-          <p className="whitespace-pre-wrap text-sm">{c.texto}</p>
+            <span className="ml-auto text-xs text-muted">{formatarDataHora(c.criado_em)}</span>
+          </div>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">{c.texto}</p>
           <Arvore comentarios={comentarios} paiId={c.id} marco={marco} />
         </li>
       ))}

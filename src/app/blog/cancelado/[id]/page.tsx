@@ -4,6 +4,7 @@ import { carregarCancelados, carregarDebate, carregarRegistro, linksDasImagens }
 import { DebatePublico } from "../../../debate-publico";
 import { formatarData } from "@/lib/datas";
 import { totaisDoDetalhe } from "@/lib/regras";
+import { MotivoCancelamento } from "../../../motivo-cancelamento";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
 import { ResultadoVotos } from "../../../resultado-votos";
 import { TextoFormatado } from "../../../texto-formatado";
@@ -42,10 +43,8 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
         </p>
         <h1 className="text-2xl font-semibold">Cancelado pelo autor</h1>
         <p className="text-sm text-muted">Autor: {conteudo.autor}</p>
-        <p className="text-sm">
-          <strong>Motivo:</strong> {conteudo.motivo ?? "não informado"}
-        </p>
       </header>
+      <MotivoCancelamento motivo={conteudo.motivo} />
 
       {imagemUrl && <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />}
       <TextoFormatado texto={conteudo.texto} />
