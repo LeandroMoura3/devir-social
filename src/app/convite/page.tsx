@@ -46,6 +46,26 @@ export default function Convite() {
             <strong>Conhece alguém da coordenação?</strong> Peça o convite direto a ela, sem precisar deste formulário.
           </p>
         </section>
+        <section>
+          <h2 className="font-semibold">Depois de entrar: quando o seu voto conta</h2>
+          <ul className="list-disc pl-5">
+            <li>
+              Na <strong>primeira semana</strong> você é <strong>espectador</strong>: pode enviar, comentar e votar, mas
+              o voto ainda não entra no resultado.
+            </li>
+            <li>
+              A partir da <strong>semana seguinte</strong>, você é <strong>participante</strong> e o seu voto conta.
+            </li>
+            <li>
+              Para continuar participante, vote em pelo menos <strong>metade dos conteúdos</strong> de cada semana (com
+              qualquer opção, inclusive indiferente). Quem vota menos volta a ser espectador na semana seguinte, até
+              voltar a votar.
+            </li>
+          </ul>
+          <p className="mt-2 text-muted">
+            Assim, o resultado é decidido por quem acompanha o debate, e não por quem aparece só para votar uma vez.
+          </p>
+        </section>
         <Suspense fallback={null}>
           <Vagas />
         </Suspense>
