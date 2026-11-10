@@ -17,5 +17,6 @@ export async function GET(request: NextRequest) {
     ({ error } = await supabase.auth.exchangeCodeForSession(codigo));
   }
 
-  return NextResponse.redirect(new URL(error ? "/login" : "/", origin));
+  // Link expirado, já usado ou aberto em outro navegador (link antigo): volta ao login com aviso.
+  return NextResponse.redirect(new URL(error ? "/login?erro=link" : "/", origin));
 }

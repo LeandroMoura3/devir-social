@@ -1,9 +1,10 @@
 "use server";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/server";
 
-export type EstadoLogin = { enviado: boolean; erro?: string };
+export type EstadoLogin = { enviado: boolean; email?: string; erro?: string };
 
 export async function enviarLink(_anterior: EstadoLogin, formData: FormData): Promise<EstadoLogin> {
   const email = String(formData.get("email") ?? "").trim();
@@ -22,5 +23,18 @@ export async function enviarLink(_anterior: EstadoLogin, formData: FormData): Pr
   if (error) {
     return { enviado: false, erro: "Não foi possível enviar o link. Confira se este e-mail foi convidado." };
   }
-  return { enviado: true };
+  return { enviado: true, email };
+}
+
+// Código de 8 dígitos do e-mail: funciona em qualquer aparelho ou navegador (o link depende do modelo do e-mail).
+export async function entrarComCodigo(anterior: EstadoLogin, formData: FormData): Promise<EstadoLogin> {
+  const email = String(formData.get("email") ?? "").trim();
+  const codigo = String(formData.get("codigo") ?? "").replace(/\D/g, "");
+  if (codigo.length < 6) return { ...anterior, erro: "Digite o código que chegou no e-mail." };
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.auth.verifyOtp({ email, token: codigo, type: "email" });
+  if (error) {
+    return { ...anterior, erro: "Código inválido ou expirado. Confira o e-mail mais recente ou peça um novo." };
+  }
+  redirect("/");
 }

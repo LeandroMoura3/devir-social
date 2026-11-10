@@ -13,6 +13,12 @@ export function SessaoDoLink() {
     const accessToken = fragmento.get("access_token");
     const refreshToken = fragmento.get("refresh_token");
     const erro = fragmento.get("error_description");
+    if (new URLSearchParams(window.location.search).get("erro") === "link") {
+      Promise.resolve().then(() =>
+        setMensagem("O link não funcionou (expirado, já usado ou aberto em outro navegador). Peça um código abaixo."),
+      );
+      return;
+    }
 
     if (erro) {
       Promise.resolve().then(() => setMensagem(`O link não funcionou: ${erro}. Peça um novo link abaixo.`));
