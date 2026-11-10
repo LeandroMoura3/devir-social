@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
 import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
-import { ladoDoVoto, NOME_FAIXA, NOME_VOTO, type Voto } from "@/lib/regras";
+import { NOME_FAIXA, type Voto } from "@/lib/regras";
 import { MotivoCancelamento } from "../../motivo-cancelamento";
+import { SELO_NEUTRO, SeloVoto } from "../../selos";
 import { NavegacaoConteudos, vizinhos } from "../../navegacao";
 import { ResultadoVotos } from "../../resultado-votos";
 import { TextoFormatado } from "../../texto-formatado";
@@ -192,22 +193,7 @@ async function BlocoResultado({ conteudo, supabase }: { conteudo: ConteudoVisao;
   );
 }
 
-const SELO = "rounded-full px-2 py-0.5 text-[11px] font-medium leading-4";
 
-// Voto atual de quem comenta (muda junto com o voto até o fechamento).
-function SeloVoto({ autorId, votos, autorConteudo }: { autorId: string; votos: Map<string, Voto>; autorConteudo: string }) {
-  if (autorId === autorConteudo) return <span className={`${SELO} bg-accent text-accent-foreground`}>autor</span>;
-  const voto = votos.get(autorId);
-  if (!voto) return <span className={`${SELO} border border-border text-muted`}>ainda não votou</span>;
-  const lado = ladoDoVoto(voto);
-  const cor =
-    lado === "apoio"
-      ? "bg-[#e5f3ea] text-[#1d6b3b]"
-      : lado === "protesto"
-        ? "bg-[#fde8ea] text-[#a3242f]"
-        : "bg-border text-foreground";
-  return <span className={`${SELO} ${cor}`}>{NOME_VOTO[voto]}</span>;
-}
 
 function ArvoreComentarios({
   comentarios,
@@ -237,11 +223,10 @@ function ArvoreComentarios({
         <li key={c.id} className={paiId ? "flex flex-col gap-1.5" : "cartao flex flex-col gap-1.5"}>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="text-sm font-semibold">{c.perfis?.nome_publico ?? "participante"}</span>
-            <SeloVoto autorId={c.autor_id} votos={votos} autorConteudo={autorConteudo} />
-            {espectadores.has(c.autor_id) && <span className={`${SELO} border border-border text-muted`}>espectador</span>}
-            {Date.parse(c.criado_em) >= marco.instante && (
-              <span className={`${SELO} border border-border text-muted`}>{marco.rotulo}</span>
-            )}
+            {/* Voto atual de quem comenta (muda junto com o voto até o fechamento). */}
+            <SeloVoto voto={votos.get(c.autor_id)} ehAutor={c.autor_id === autorConteudo} semVoto="ainda não votou" />
+            {espectadores.has(c.autor_id) && <span className={SELO_NEUTRO}>espectador</span>}
+            {Date.parse(c.criado_em) >= marco.instante && <span className={SELO_NEUTRO}>{marco.rotulo}</span>}
             <span className="ml-auto text-xs text-muted">{formatarDataHora(c.criado_em)}</span>
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed">

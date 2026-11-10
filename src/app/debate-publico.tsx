@@ -1,6 +1,17 @@
 import { formatarDataHora } from "@/lib/datas";
+import type { Voto } from "@/lib/regras";
+import { SELO_NEUTRO, SeloVoto } from "./selos";
 
-export type ComentarioPublico = { id: number; pai_id: number | null; autor: string; texto: string; criado_em: string };
+export type ComentarioPublico = {
+  id: number;
+  pai_id: number | null;
+  autor: string;
+  texto: string;
+  criado_em: string;
+  voto: Voto | null;
+  espectador: boolean;
+  eh_autor: boolean;
+};
 
 // Debate no blog (regras v0.12): só leitura; comentários depois do marco ganham a marcação.
 export function DebatePublico({
@@ -50,11 +61,10 @@ function Arvore({
         <li key={c.id} className={paiId ? "flex flex-col gap-1.5" : "cartao flex flex-col gap-1.5"}>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="text-sm font-semibold">{c.autor}</span>
-            {Date.parse(c.criado_em) >= marco.instante && (
-              <span className="rounded-full border border-border px-2 py-0.5 text-[11px] leading-4 text-muted">
-                {marco.rotulo}
-              </span>
-            )}
+            {/* Voto final de quem comentou (já público no bloco de votos). */}
+            <SeloVoto voto={c.voto} ehAutor={c.eh_autor} semVoto="não votou" />
+            {c.espectador && <span className={SELO_NEUTRO}>espectador</span>}
+            {Date.parse(c.criado_em) >= marco.instante && <span className={SELO_NEUTRO}>{marco.rotulo}</span>}
             <span className="ml-auto text-xs text-muted">{formatarDataHora(c.criado_em)}</span>
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed">{c.texto}</p>
