@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.14)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.15)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -104,7 +104,8 @@ export default function Regras() {
         <p>
           A cota fica sempre entre 1 e 5 e começou em 3 no primeiro ciclo do piloto. O alvo é um parâmetro público (item
           13). Quem já usou a cota pode pedir a outro membro que envie por ela; quem envia aparece como autor e responde
-          pelo conteúdo.
+          pelo conteúdo. Um conteúdo cancelado pelo autor em até 15 minutos depois do envio, sem nenhum voto nem
+          comentário, não conta na cota (item 12).
         </p>
         <Suspense fallback={<p className="text-sm text-muted">Carregando cotas…</p>}>
           <Cotas />
@@ -266,7 +267,9 @@ export default function Regras() {
         <ul>
           <li>
             Enquanto o conteúdo está aberto, o autor pode cancelá-lo, por exemplo se mudou de ideia durante o debate.
-            O motivo é opcional. Não dá para desfazer.
+            O motivo é opcional. Não dá para desfazer. Se o cancelamento acontecer em até 15 minutos depois do envio,
+            sem nenhum voto nem comentário, o conteúdo não conta na cota de envios do autor (item 2); ele continua
+            registrado neste blog como qualquer cancelamento.
           </li>
           <li>
             O conteúdo cancelado não é classificado e não vai para o Instagram. A votação fecha na hora; o debate
@@ -315,6 +318,16 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.15 (11/11/2026, vale a partir de 15/11/2026)</h3>
+        <ul>
+          <li>
+            Cancelamento rápido não conta na cota: conteúdo cancelado pelo autor em até 15 minutos, sem votos nem
+            comentários, deixa de contar na cota de envios (itens 2 e 12). Vale para envios a partir do ciclo que começa
+            em 15/11/2026, sem efeito retroativo. O caso que motivou a regra foi do idealizador (#12, cancelado em
+            11/11), que por isso não se beneficia dela.
+          </li>
+        </ul>
 
         <h3>0.14 (10/11/2026)</h3>
         <ul>

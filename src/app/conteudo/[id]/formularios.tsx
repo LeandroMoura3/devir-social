@@ -136,7 +136,9 @@ export function FormularioCancelamento({ conteudoId }: { conteudoId: number }) {
       <p className="text-sm">
         O conteúdo não vai para o Instagram nem é classificado, e a votação fecha agora; o debate continua. O texto, a
         imagem e os votos dados até aqui continuam públicos no blog. Não dá para desfazer. Se o problema for algo que
-        não pode ficar público (uma foto pessoal, por exemplo), fale com a coordenação em vez de cancelar.
+        não pode ficar público (uma foto pessoal, por exemplo), fale com a coordenação em vez de cancelar. Cancelando
+        em até 15 minutos depois do envio, sem votos nem comentários, o envio não conta na sua cota (a partir de
+        15/11).
       </p>
       <label className="flex flex-col gap-1 text-sm">
         Motivo (opcional, aparece no blog)
