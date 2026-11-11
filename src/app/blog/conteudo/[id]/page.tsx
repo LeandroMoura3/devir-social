@@ -4,6 +4,7 @@ import { carregarDebate, carregarPublicados, carregarRegistro, linksDasImagens }
 import { DebatePublico } from "../../../debate-publico";
 import { formatarData } from "@/lib/datas";
 import { NOME_FAIXA } from "@/lib/regras";
+import { MolduraInstagram } from "../../../moldura-instagram";
 import { NavegacaoConteudos, vizinhos } from "../../../navegacao";
 import { ResultadoVotos } from "../../../resultado-votos";
 import { TextoFormatado } from "../../../texto-formatado";
@@ -44,8 +45,16 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
         <p className="text-sm text-muted">Autor: {conteudo.autor}</p>
       </header>
 
-      {imagemUrl && <img src={imagemUrl} alt="" className="w-full rounded-lg border border-border" />}
-      <TextoFormatado texto={conteudo.texto} />
+      {/* No quadro do Instagram, com o texto completo (a legenda do Instagram pode ter sido cortada). */}
+      {imagemUrl ? (
+        <MolduraInstagram
+          imagemUrl={imagemUrl}
+          texto={conteudo.texto}
+          rotulo={conteudo.instagramEm ? `no Instagram em ${formatarData(conteudo.instagramEm)}` : "aguardando publicação"}
+        />
+      ) : (
+        <TextoFormatado texto={conteudo.texto} />
+      )}
 
       <p className="text-sm text-muted">
         Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.fechaEm)}.

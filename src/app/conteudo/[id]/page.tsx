@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { carregarConteudos, carregarVotacao, type ConteudoVisao } from "@/lib/conteudos";
 import { exigirParticipante, urlsAssinadas } from "@/lib/dados";
-import { formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
+import { formatarData, formatarDataHora, instanteDaRequisicao, tempoRestante } from "@/lib/datas";
 import { NOME_FAIXA, type Voto } from "@/lib/regras";
 import { MotivoCancelamento } from "../../motivo-cancelamento";
 import { MolduraInstagram } from "../../moldura-instagram";
@@ -118,9 +118,21 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       </header>
       {conteudo.cancelado && <MotivoCancelamento motivo={conteudo.removidoMotivo} />}
 
-      {/* Aberto: prévia de como sai no Instagram. Cancelado: o mesmo quadro, marcado como cancelado. */}
-      {(aberto || conteudo.cancelado) && imagemUrl ? (
-        <MolduraInstagram imagemUrl={imagemUrl} texto={conteudo.texto} rotulo={aberto ? "prévia" : "cancelado"} />
+      {/* Quadro do Instagram em tudo, menos nos removidos por exceção legal; o rótulo diz a situação. */}
+      {!(conteudo.removidoEm && !conteudo.cancelado) && imagemUrl ? (
+        <MolduraInstagram
+          imagemUrl={imagemUrl}
+          texto={conteudo.texto}
+          rotulo={
+            aberto
+              ? "prévia"
+              : conteudo.cancelado
+                ? "cancelado"
+                : conteudo.publicadoEm
+                  ? `no Instagram em ${formatarData(conteudo.publicadoEm)}`
+                  : "aguardando publicação"
+          }
+        />
       ) : (
         <>
           {imagemUrl ? (
