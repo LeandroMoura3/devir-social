@@ -42,7 +42,7 @@ async function Lista() {
 
   const ate = ultimoDiaDoCiclo(ciclo.ciclo_fim);
   const proximo = (m: Membro) => {
-    if (m.novo) return "participante garantido";
+    if (m.novo) return "participante garantido com 1 voto";
     if (m.total === 0) return "participante (nenhum conteúdo fecha neste ciclo)";
     const faltam = Math.max(0, votosNecessarios(m.total, ciclo.participacao_minima) - m.votados);
     return faltam === 0 ? "participante" : `faltam ${faltam} ${faltam === 1 ? "voto" : "votos"}`;

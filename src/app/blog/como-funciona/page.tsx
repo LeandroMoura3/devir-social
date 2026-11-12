@@ -32,7 +32,8 @@ export default function ComoFunciona() {
           <li>
             Para o voto contar, é preciso participar com regularidade. Quem votou em pelo menos uma parte mínima dos
             conteúdos do ciclo anterior é <strong>participante</strong>; os demais são <strong>espectadores</strong>{" "}
-            e votam sem que o voto conte. Quem acabou de entrar é participante garantido no ciclo seguinte.
+            e votam sem que o voto conte. Quem acabou de entrar e vota pelo menos uma vez é participante garantido no ciclo
+            seguinte.
           </li>
           <li>
             O resultado define o destaque: a maioria vira post próprio no Instagram, a minoria entra junto, e a tribuna

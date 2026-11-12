@@ -41,7 +41,7 @@ function TextoConsentimento() {
           Para o seu voto contar, é preciso participar com regularidade: o tempo é dividido em ciclos, e quem votou em
           pelo menos uma parte mínima dos conteúdos do ciclo anterior é <strong>participante</strong>. Quem votou menos
           é <strong>espectador</strong>: pode votar, mas o voto não conta no resultado. Quem acabou de entrar é
-          espectador até o fim do ciclo atual e participante garantido no seguinte. Os prazos e porcentagens estão no
+          espectador até o fim do ciclo atual e, se votar pelo menos uma vez nele, participante garantido no seguinte. Os prazos e porcentagens estão no
           painel público.
         </p>
       </section>

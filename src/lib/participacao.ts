@@ -48,7 +48,10 @@ export function situacaoDoVoto(s: StatusCiclo, fechaEm: string): SituacaoVoto {
     };
   }
   if (s.novo) {
-    return { conta: "sim", mensagem: `Seu voto vai contar: você é participante garantido no ciclo que começa em ${proximo}.` };
+    return {
+      conta: "sim",
+      mensagem: `Seu voto vai contar: você entrou neste ciclo e, votando, é participante garantido no ciclo que começa em ${proximo}.`,
+    };
   }
   if (s.total === 0) {
     return {

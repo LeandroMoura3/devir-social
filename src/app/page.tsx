@@ -116,7 +116,7 @@ function AvisoStatus({ status: s }: { status: StatusCiclo }) {
   const necessarios = votosNecessarios(s.total, s.participacao_minima);
   const faltam = Math.max(0, necessarios - s.votados);
   let proximo: string;
-  if (s.novo) proximo = "Você entrou neste ciclo, então no próximo é participante garantido.";
+  if (s.novo) proximo = `Você entrou neste ciclo: votando em pelo menos um conteúdo até ${ate}, é participante garantido no próximo.`;
   else if (s.total === 0) proximo = `Nenhum conteúdo fecha até ${ate}; se continuar assim, todos serão participantes no próximo ciclo.`;
   else if (faltam === 0)
     proximo = `Você já votou em ${s.votados} dos ${s.total} conteúdos que fecham até ${ate}: mantém a vaga de participante no próximo ciclo.`;

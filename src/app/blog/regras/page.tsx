@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.15)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.16)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -159,7 +159,8 @@ export default function Regras() {
             mas não conta no resultado de nenhum conteúdo.
           </li>
           <li>
-            Quem entrou no ciclo atual é espectador até o fim dele e participante garantido no ciclo seguinte. Se nenhum
+            Quem entrou no ciclo atual é espectador até o fim dele. Se votar pelo menos uma vez nesse ciclo (em qualquer
+            conteúdo, com qualquer opção), é participante garantido no ciclo seguinte. Se nenhum
             conteúdo fechou no ciclo anterior, todos são participantes.
           </li>
           <li>Num conteúdo, contam os votos de quem é participante no ciclo em que ele fecha.</li>
@@ -318,6 +319,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.16 (12/11/2026, vale para quem entrar a partir de 15/11/2026)</h3>
+        <ul>
+          <li>
+            A participação garantida de quem acabou de entrar passa a exigir pelo menos um voto no ciclo em que a pessoa
+            entrou (item 4). Antes, quem entrava e não fazia nada era participante no ciclo seguinte e aumentava a base
+            do quórum sem votar. Quem entrou antes de 15/11/2026 mantém a regra anterior.
+          </li>
+        </ul>
 
         <h3>0.15 (11/11/2026, vale a partir de 15/11/2026)</h3>
         <ul>

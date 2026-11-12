@@ -54,7 +54,8 @@ export default function Convite() {
               o voto ainda não entra no resultado.
             </li>
             <li>
-              A partir da <strong>semana seguinte</strong>, você é <strong>participante</strong> e o seu voto conta.
+              Se votar pelo menos uma vez nessa primeira semana, a partir da <strong>semana seguinte</strong> você é
+              <strong>participante</strong> e o seu voto conta.
             </li>
             <li>
               Para continuar participante, vote em pelo menos <strong>metade dos conteúdos</strong> de cada semana (com
