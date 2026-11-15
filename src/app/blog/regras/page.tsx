@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.20)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.21)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -244,7 +244,9 @@ export default function Regras() {
         </p>
         <ul>
           <li>
-            <strong>Domingo:</strong> logo depois do feed, um aviso de &quot;post novo&quot; para cada post publicado.
+            <strong>Domingo:</strong> logo depois do feed, um aviso de &quot;post novo&quot; para cada post publicado e,
+            no fim, o &quot;Resultado da semana&quot;: quantos posts saíram em cada faixa, a data da próxima publicação
+            e o convite para participar.
           </li>
           <li>
             <strong>Quarta, às 18h:</strong> um grupo dos Destaques, em rodízio (O que é, Como votar, Resultado,
@@ -344,6 +346,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.21 (15/11/2026)</h3>
+        <ul>
+          <li>
+            Story &quot;Resultado da semana&quot; no domingo, depois dos avisos de post novo: só as faixas do que saiu
+            no feed, a próxima publicação e o convite para participar (item 8).
+          </li>
+        </ul>
 
         <h3>0.20 (15/11/2026)</h3>
         <ul>

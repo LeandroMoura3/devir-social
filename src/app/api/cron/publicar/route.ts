@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { publicarPost, publicarStory, type Via } from "@/lib/instagram";
-import { ehDomingoEmBrasilia, ordemDePublicacao, planoDoRobo, type LinhaPendente } from "@/lib/robo";
+import { ehDomingoEmBrasilia, ordemDePublicacao, planoDoRobo, proximaPublicacao, type LinhaPendente } from "@/lib/robo";
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { lista } from "@/lib/supabase/lista";
 import { comTentativas, registrarStory } from "@/lib/stories";
@@ -99,5 +99,32 @@ export async function GET(request: NextRequest) {
       avisos.push({ id: p.principal, erro: erro instanceof Error ? erro.message : String(erro) });
     }
   }
-  return NextResponse.json({ publicados, avisos, restantes: posts.length - publicados.length });
+  // Story "Resultado da semana" (regras v0.21): só as faixas do que saiu agora, depois dos avisos.
+  let resumo: { mediaId?: string; erro?: string } | null = null;
+  if (publicados.length > 0) {
+    try {
+      const saiu = new Set(publicados.flatMap((p) => p.ids));
+      const faixas = posts.flatMap((p) => [...p.imagens, ...p.soTexto]).filter((c) => saiu.has(c.id)).map((c) => c.faixa);
+      const conta = (f: string) => faixas.filter((x) => x === f).length;
+      const dia = (t: number) => new Date(t - 3 * 3_600_000).toISOString().slice(0, 10);
+      const agora = Date.now();
+      const busca = new URLSearchParams({
+        data: dia(agora),
+        proxima: dia(proximaPublicacao(agora).getTime()),
+        maioria: String(conta("maioria")),
+        minoria: String(conta("minoria")),
+        tribuna: String(conta("tribuna_livre")),
+        semquorum: String(conta("sem_quorum")),
+      });
+      const arte = `${request.nextUrl.origin}/api/stories/resumo?${busca}`;
+      const mediaId = await comTentativas(() =>
+        publicarStory({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagem: arte }),
+      );
+      await registrarStory(supabase, segredo, "resumo", null, null, mediaId);
+      resumo = { mediaId };
+    } catch (erro) {
+      resumo = { erro: erro instanceof Error ? erro.message : String(erro) };
+    }
+  }
+  return NextResponse.json({ publicados, avisos, resumo, restantes: posts.length - publicados.length });
 }

@@ -153,7 +153,7 @@ export async function carregarRegistro(id: number): Promise<Registro> {
 export type Story = {
   id: number;
   publicadoEm: string;
-  tipo: "aviso" | "institucional" | "republicacao";
+  tipo: "aviso" | "institucional" | "republicacao" | "resumo";
   conteudoId: number | null;
   grupo: string | null;
 };

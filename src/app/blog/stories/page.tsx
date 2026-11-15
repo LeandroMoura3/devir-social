@@ -20,7 +20,8 @@ export default function Stories() {
         </p>
         <ul>
           <li>
-            <strong>Domingo:</strong> logo depois do feed, um aviso de &quot;post novo&quot; para cada post publicado.
+            <strong>Domingo:</strong> logo depois do feed, um aviso de &quot;post novo&quot; para cada post publicado e,
+            no fim, o &quot;Resultado da semana&quot;, com quantos posts saíram em cada faixa.
           </li>
           <li>
             <strong>Quarta, 18h:</strong> um grupo dos Destaques, em rodízio, e um post antigo de volta. Volta quem tem a
@@ -46,7 +47,7 @@ function TabelaFila({ linhas, inicio }: { linhas: Candidato[]; inicio: number })
       <table className="w-full text-right text-sm tabular-nums">
         <thead className="bg-card text-xs text-muted">
           <tr>
-            {["Ordem", "Post", "Faixa", "Peso", "Já voltou", "Conta"].map((c) => (
+            {["Ordem", "Post", "Faixa", "Peso", "Já voltou", "Prioridade"].map((c) => (
               <th key={c} className="px-3 py-2 font-medium first:text-left">
                 {c}
               </th>
@@ -81,21 +82,24 @@ function ListaHistorico({ itens }: { itens: Story[] }) {
     <ul className="flex flex-col gap-1 text-sm">
       {itens.map((s) => (
         <li key={s.id}>
-          {formatarData(s.publicadoEm)} · {TIPO[s.tipo]} ·{" "}
+          {formatarData(s.publicadoEm)} · {TIPO[s.tipo]}
           {s.conteudoId ? (
-            <Link href={`/blog/conteudo/${s.conteudoId}`} className="text-accent">
-              #{s.conteudoId}
-            </Link>
-          ) : (
-            s.grupo
-          )}
+            <>
+              {" · "}
+              <Link href={`/blog/conteudo/${s.conteudoId}`} className="text-accent">
+                #{s.conteudoId}
+              </Link>
+            </>
+          ) : s.grupo ? (
+            ` · ${s.grupo}`
+          ) : null}
         </li>
       ))}
     </ul>
   );
 }
 
-const TIPO = { aviso: "post novo", institucional: "Destaque", republicacao: "de volta" } as const;
+const TIPO = { aviso: "post novo", institucional: "Destaque", republicacao: "de volta", resumo: "resultado da semana" } as const;
 
 async function Conteudo() {
   const [publicados, stories] = await Promise.all([carregarPublicados(), carregarStories()]);
@@ -125,6 +129,10 @@ async function Conteudo() {
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">Fila do rodízio</h2>
+        <p className="text-sm text-muted">
+          Prioridade = vezes que já voltou ÷ peso. A menor volta na próxima quarta; em empate, o de peso maior e, depois,
+          o mais antigo.
+        </p>
         {fila.length === 0 ? (
           <p className="text-sm text-muted">Nenhum post publicado ainda.</p>
         ) : (
