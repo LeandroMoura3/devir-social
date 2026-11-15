@@ -234,6 +234,10 @@ export default function Regras() {
           assim por diante. Quando os posts acabam, volta ao primeiro. Cada post tem no máximo 10 imagens.
         </p>
         <p>
+          <strong>Ordem no perfil:</strong> o Instagram mostra o post mais recente no topo. Por isso os posts são
+          publicados do menos para o mais apoiado: o da maioria mais votada sai por último e fica em primeiro.
+        </p>
+        <p>
           <strong>Stories:</strong> o app também publica Stories, só de posts que já saíram no feed (nunca de
           cancelados ou removidos):
         </p>
@@ -346,6 +350,15 @@ export default function Regras() {
             A legenda do Instagram deixa de trazer as contagens de apoio e protesto (item 9). Ficam a classificação, o
             número e o texto; os votos continuam neste blog, a um toque pelo rodapé (&quot;Texto completo, links e votos:
             link na bio → Verificar postagem&quot;).
+          </li>
+          <li>
+            Os posts passam a ser publicados do menos para o mais apoiado, para que o mais apoiado fique no topo do
+            perfil (item 8).
+          </li>
+          <li>
+            Os posts de 15/11 (#9 e #2), publicados no modelo anterior e sem nenhuma interação, foram apagados e
+            republicados no modelo novo e na ordem certa. As publicações originais continuam registradas, marcadas
+            como substituídas.
           </li>
         </ul>
 

@@ -60,7 +60,9 @@ export async function GET(request: NextRequest) {
   }
 
   const publicados: { ids: number[]; mediaId: string; principal?: number }[] = [];
-  for (const post of posts) {
+  // Ordem inversa (regras v0.18): o Instagram mostra o mais recente no topo, então o post mais apoiado sai por
+  // último para ficar em primeiro no perfil.
+  for (const post of [...posts].reverse()) {
     if (Date.now() - inicio > ORCAMENTO_MS) break;
     const ids = [...post.imagens, ...post.soTexto].map((c) => c.id);
     try {
