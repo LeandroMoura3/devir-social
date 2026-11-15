@@ -60,7 +60,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           </div>
         </div>
         <div style={{ display: "flex", marginTop: 70, fontSize: 64, fontWeight: 800, color: cor }}>
-          {`${NOME_FAIXA[post.faixa].toUpperCase()} · #${post.id}`}
+          {`#${post.id} - ${NOME_FAIXA[post.faixa].toUpperCase()}`}
         </div>
         <div style={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "center", width: "100%" }}>
           <img
