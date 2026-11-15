@@ -42,6 +42,11 @@ export function ehDomingoEmBrasilia(instante: number): boolean {
   return new Date(instante - 3 * 3_600_000).getUTCDay() === 0;
 }
 
+// Quarta no horário de Brasília: dia dos Stories (institucional + post de volta).
+export function ehQuartaEmBrasilia(instante: number): boolean {
+  return new Date(instante - 3 * 3_600_000).getUTCDay() === 3;
+}
+
 const HORA_PUBLICACAO = 18;
 const BRASILIA_MS = 3 * 3_600_000;
 

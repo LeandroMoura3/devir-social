@@ -148,3 +148,41 @@ export async function carregarRegistro(id: number): Promise<Registro> {
   }
   return registro;
 }
+
+// Stories publicados pelo robô (regras v0.17): histórico público, base do contador do rodízio.
+export type Story = {
+  id: number;
+  publicadoEm: string;
+  tipo: "aviso" | "institucional" | "republicacao";
+  conteudoId: number | null;
+  grupo: string | null;
+};
+
+export async function carregarStories(): Promise<Story[]> {
+  const supabase = await criarClientePublico();
+  const { data, error } = await supabase
+    .from("stories")
+    .select("id, publicado_em, tipo, conteudo_id, grupo")
+    .order("publicado_em", { ascending: false })
+    .overrideTypes<
+      { id: number; publicado_em: string; tipo: Story["tipo"]; conteudo_id: number | null; grupo: string | null }[],
+      { merge: false }
+    >();
+  if (error) throw new Error(`Falha ao carregar stories: ${JSON.stringify(error)}`);
+  return (data ?? []).map((l) => ({
+    id: l.id,
+    publicadoEm: l.publicado_em,
+    tipo: l.tipo,
+    conteudoId: l.conteudo_id,
+    grupo: l.grupo,
+  }));
+}
+
+// Candidatos do rodízio de quarta: só posts já publicados no Instagram, com o número de vezes que voltaram.
+export function candidatosDoRodizio(publicados: Publicado[], stories: Story[]) {
+  const vezes = new Map<number, number>();
+  for (const s of stories) if (s.tipo === "republicacao" && s.conteudoId) vezes.set(s.conteudoId, (vezes.get(s.conteudoId) ?? 0) + 1);
+  return publicados
+    .filter((p) => p.instagramEm && p.imagemPath)
+    .map((p) => ({ id: p.id, faixa: p.faixa, republicacoes: vezes.get(p.id) ?? 0, fechaEm: p.fechaEm }));
+}

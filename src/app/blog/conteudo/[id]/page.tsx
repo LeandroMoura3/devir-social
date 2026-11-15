@@ -1,6 +1,7 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { carregarDebate, carregarPublicados, carregarRegistro, linksDasImagens } from "@/lib/blog";
+import { carregarDebate, carregarPublicados, carregarRegistro, carregarStories, linksDasImagens } from "@/lib/blog";
 import { DebatePublico } from "../../../debate-publico";
 import { formatarData } from "@/lib/datas";
 import { NOME_FAIXA } from "@/lib/regras";
@@ -27,11 +28,13 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
   const publicados = await carregarPublicados();
   const conteudo = publicados.find((p) => p.id === id);
   if (!conteudo) notFound();
-  const [registro, imagens, debate] = await Promise.all([
+  const [registro, imagens, debate, stories] = await Promise.all([
     carregarRegistro(id),
     linksDasImagens(conteudo.imagemPath ? [conteudo.imagemPath] : []),
     carregarDebate(id),
+    carregarStories(),
   ]);
+  const voltas = stories.filter((s) => s.tipo === "republicacao" && s.conteudoId === id).reverse();
   const imagemUrl = conteudo.imagemPath ? imagens.get(conteudo.imagemPath) : undefined;
 
   return (
@@ -58,6 +61,15 @@ async function Registro({ params }: { params: Promise<{ id: string }> }) {
 
       <p className="text-sm text-muted">
         Aberto de {formatarData(conteudo.criadoEm)} a {formatarData(conteudo.fechaEm)}.
+        {conteudo.instagramEm &&
+          (voltas.length === 0
+            ? " Ainda não voltou nos Stories."
+            : ` Voltou nos Stories ${voltas.length} ${voltas.length === 1 ? "vez" : "vezes"} (${voltas.map((v) => formatarData(v.publicadoEm)).join(", ")}).`)}{" "}
+        {conteudo.instagramEm && (
+          <Link href="/blog/stories" className="underline">
+            Ver rodízio
+          </Link>
+        )}
       </p>
       <section className="cartao">
         <ResultadoVotos {...conteudo} votacao={registro} />

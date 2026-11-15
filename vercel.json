@@ -1,3 +1,12 @@
 {
-  "crons": [{ "path": "/api/cron/publicar", "schedule": "0 21 * * 0" }]
+  "crons": [
+    {
+      "path": "/api/cron/publicar",
+      "schedule": "0 21 * * 0"
+    },
+    {
+      "path": "/api/cron/stories",
+      "schedule": "0 21 * * 3"
+    }
+  ]
 }

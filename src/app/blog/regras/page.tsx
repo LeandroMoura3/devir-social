@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.16)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.17)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -233,6 +233,25 @@ export default function Regras() {
           <strong>Rodízio:</strong> o 1º da fila vai para o post da maioria mais votada, o 2º para o segundo post, e
           assim por diante. Quando os posts acabam, volta ao primeiro. Cada post tem no máximo 10 imagens.
         </p>
+        <p>
+          <strong>Stories:</strong> o app também publica Stories, só de posts que já saíram no feed (nunca de
+          cancelados ou removidos):
+        </p>
+        <ul>
+          <li>
+            <strong>Domingo:</strong> logo depois do feed, um aviso de &quot;post novo&quot; para cada post publicado.
+          </li>
+          <li>
+            <strong>Quarta, às 18h:</strong> um grupo dos Destaques, em rodízio (O que é, Como votar, Resultado,
+            Participar), e um post antigo de volta. Volta o post com a menor conta &quot;vezes que já voltou ÷
+            peso&quot;; em empate, o de peso maior e, depois, o mais antigo. O peso é o mesmo da legenda: maioria 4,
+            minoria 2, tribuna livre e sem quórum 1.
+          </li>
+          <li>
+            A fila do rodízio e o histórico de todos os Stories ficam na página{" "}
+            <Link href="/blog/stories">Stories</Link>.
+          </li>
+        </ul>
 
         <h3>9. Legenda</h3>
         <ul>
@@ -319,6 +338,14 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.17 (15/11/2026)</h3>
+        <ul>
+          <li>
+            Stories automáticos (item 8): aviso de post novo no domingo; na quarta, um grupo dos Destaques e um post
+            antigo de volta, em rodízio com peso por faixa. Fila e histórico públicos na página Stories.
+          </li>
+        </ul>
 
         <h3>0.16 (12/11/2026, vale para quem entrar a partir de 15/11/2026)</h3>
         <ul>

@@ -104,6 +104,24 @@ export async function publicarPost(
   return id;
 }
 
+// Story (imagem vertical). A API não aceita figurinhas (link, enquete, menção): sai só a imagem.
+export async function publicarStory(
+  { via = "instagram", usuarioId, token, imagem }: { via?: Via; usuarioId: string; token: string; imagem: string },
+  buscar: Fetch = fetch,
+  esperar: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+): Promise<string> {
+  const base = BASES[via];
+  const { id: containerId } = await chamar<{ id: string }>(buscar, base, `/${usuarioId}/media`, token, {
+    image_url: imagem,
+    media_type: "STORIES",
+  });
+  await aguardarProcessamento(buscar, base, containerId, token, esperar);
+  const { id } = await chamar<{ id: string }>(buscar, base, `/${usuarioId}/media_publish`, token, {
+    creation_id: containerId,
+  });
+  return id;
+}
+
 // Só no caminho "instagram": o token vale 60 dias e pode ser renovado depois de 24 horas de uso.
 export const RENOVAR_APOS_DIAS = 7;
 

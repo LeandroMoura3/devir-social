@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { publicarPost, type Via } from "@/lib/instagram";
+import { publicarPost, publicarStory, type Via } from "@/lib/instagram";
 import { ehDomingoEmBrasilia, planoDoRobo, type LinhaPendente } from "@/lib/robo";
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { lista } from "@/lib/supabase/lista";
+import { comTentativas, registrarStory } from "@/lib/stories";
 
 // Agendado na Vercel (vercel.json) para domingo, 18h de Brasília. A Vercel manda o CRON_SECRET no
 // cabeçalho Authorization; o mesmo segredo autoriza o robô no banco (migração 0014).
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const publicados: { ids: number[]; mediaId: string }[] = [];
+  const publicados: { ids: number[]; mediaId: string; principal?: number }[] = [];
   for (const post of posts) {
     if (Date.now() - inicio > ORCAMENTO_MS) break;
     const ids = [...post.imagens, ...post.soTexto].map((c) => c.id);
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
         p_media_id: mediaId,
       });
       if (error) throw new Error(`Publicado (${mediaId}), mas não registrado: ${error.message}`);
-      publicados.push({ ids, mediaId });
+      publicados.push({ ids, mediaId, principal: post.imagens[0]?.id });
     } catch (erro) {
       return NextResponse.json(
         { publicados, erro: erro instanceof Error ? erro.message : String(erro), parouEm: ids },
@@ -81,5 +82,21 @@ export async function GET(request: NextRequest) {
       );
     }
   }
-  return NextResponse.json({ publicados, restantes: posts.length - publicados.length });
+  // Stories de aviso (regras v0.17): só depois de todo o feed publicado e registrado. Uma falha aqui nunca
+  // desfaz nem interrompe o feed; fica registrada na resposta.
+  const avisos: { id: number; mediaId?: string; erro?: string }[] = [];
+  for (const p of publicados) {
+    if (!p.principal || Date.now() - inicio > ORCAMENTO_MS) continue;
+    try {
+      const arte = `${request.nextUrl.origin}/api/stories/arte/${p.principal}?tipo=aviso`;
+      const mediaId = await comTentativas(() =>
+        publicarStory({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagem: arte }),
+      );
+      await registrarStory(supabase, segredo, "aviso", p.principal, null, mediaId);
+      avisos.push({ id: p.principal, mediaId });
+    } catch (erro) {
+      avisos.push({ id: p.principal, erro: erro instanceof Error ? erro.message : String(erro) });
+    }
+  }
+  return NextResponse.json({ publicados, avisos, restantes: posts.length - publicados.length });
 }
