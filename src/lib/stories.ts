@@ -4,7 +4,7 @@ import type { criarClientePublico } from "@/lib/supabase/publico";
 export async function registrarStory(
   supabase: Awaited<ReturnType<typeof criarClientePublico>>,
   segredo: string,
-  tipo: "aviso" | "institucional" | "republicacao" | "resumo",
+  tipo: "aviso" | "institucional" | "republicacao" | "resumo" | "andamento",
   conteudoId: number | null,
   grupo: string | null,
   midia: string,

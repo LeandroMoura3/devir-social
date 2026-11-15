@@ -16,7 +16,7 @@ export default function Stories() {
       <article className="prosa">
         <h1 className="text-2xl font-semibold">Stories</h1>
         <p>
-          O robô publica Stories em dois dias (<Link href="/blog/regras">regras, item 8</Link>):
+          O robô publica um tipo de Story por dia, sempre às 18h (<Link href="/blog/regras">regras, item 8</Link>):
         </p>
         <ul>
           <li>
@@ -24,10 +24,18 @@ export default function Stories() {
             no fim, o &quot;Resultado da semana&quot;, com quantos posts saíram em cada faixa.
           </li>
           <li>
-            <strong>Quarta, 18h:</strong> um grupo dos Destaques, em rodízio, e um post antigo de volta. Volta quem tem a
-            menor conta &quot;vezes que já voltou ÷ peso&quot;; em empate, o de peso maior e, depois, o mais antigo.
-            Peso: maioria 8, minoria 4, tribuna livre e sem quórum 1. Assim, a maioria volta 8 vezes mais que a tribuna
-            livre (no feed, maioria e minoria costumam ganhar imagem, e a tribuna livre fica no texto).
+            <strong>Terça, 18h — explicação do Devir:</strong> um grupo dos Destaques, em rodízio (O que é, Como
+            votar, Resultado, Participar).
+          </li>
+          <li>
+            <strong>Quarta, 18h — post antigo de volta:</strong> um post já publicado volta, com o convite para
+            participar. Volta o post com a menor prioridade (vezes que já voltou ÷ peso); em empate, o de peso maior e,
+            depois, o mais antigo. Peso: maioria 8, minoria 4, tribuna livre e sem quórum 1 (no feed, maioria e minoria
+            costumam ganhar imagem, e a tribuna livre fica no texto).
+          </li>
+          <li>
+            <strong>Sexta, 18h — andamento da semana:</strong> quantos conteúdos estão em debate e quantos saem no
+            domingo, com o convite para participar. Só contagens: nada de tema, autor ou placar.
           </li>
         </ul>
       </article>
@@ -99,7 +107,7 @@ function ListaHistorico({ itens }: { itens: Story[] }) {
   );
 }
 
-const TIPO = { aviso: "post novo", institucional: "Destaque", republicacao: "de volta", resumo: "resultado da semana" } as const;
+const TIPO = { aviso: "post novo", institucional: "explicação do Devir", republicacao: "post antigo de volta", resumo: "resultado da semana", andamento: "andamento da semana" } as const;
 
 async function Conteudo() {
   const [publicados, stories] = await Promise.all([carregarPublicados(), carregarStories()]);
@@ -109,22 +117,26 @@ async function Conteudo() {
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">Próxima quarta</h2>
-        <p className="text-sm">
-          Destaque <strong>{grupo.nome}</strong>
-          {fila[0] ? (
-            <>
-              {" "}
-              e o post{" "}
-              <Link href={`/blog/conteudo/${fila[0].id}`} className="text-accent">
-                #{fila[0].id}
-              </Link>{" "}
-              de volta.
-            </>
-          ) : (
-            ". Ainda não há post publicado para voltar."
-          )}
-        </p>
+        <h2 className="text-lg font-semibold">Próximos</h2>
+        <ul className="list-disc pl-5 text-sm">
+          <li>
+            Terça: explicação do Devir, grupo <strong>{grupo.nome}</strong>.
+          </li>
+          <li>
+            Quarta:{" "}
+            {fila[0] ? (
+              <>
+                o post{" "}
+                <Link href={`/blog/conteudo/${fila[0].id}`} className="text-accent">
+                  #{fila[0].id}
+                </Link>{" "}
+                de volta.
+              </>
+            ) : (
+              "ainda não há post publicado para voltar."
+            )}
+          </li>
+        </ul>
       </section>
 
       <section className="flex flex-col gap-2">

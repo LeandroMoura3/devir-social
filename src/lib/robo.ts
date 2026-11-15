@@ -78,3 +78,16 @@ export function ordemDePublicacao<C extends ConteudoClassificado & { fechaEm: st
   }
   return [...posts].reverse();
 }
+
+// Agendamento diário único (regras v0.22): o dia da semana em Brasília decide a tarefa.
+//   domingo → publicação do feed (+ avisos e resultado); terça → explicação do Devir (Destaques em rodízio);
+//   quarta → post antigo de volta; sexta → andamento da semana. Nos outros dias, nada.
+export type TarefaDoDia = "publicar" | "explicacao" | "devolta" | "andamento";
+
+export function diaEmBrasilia(instante: number): number {
+  return new Date(instante - 3 * 3_600_000).getUTCDay();
+}
+
+export function tarefaDoDia(dia: number): TarefaDoDia | null {
+  return ({ 0: "publicar", 2: "explicacao", 3: "devolta", 5: "andamento" } as const)[dia as 0 | 2 | 3 | 5] ?? null;
+}

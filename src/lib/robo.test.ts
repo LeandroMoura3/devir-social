@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ehDomingoEmBrasilia, janelaManualAberta, ordemDePublicacao, planoDoRobo, proximaPublicacao, type LinhaPendente } from "./robo";
+import { diaEmBrasilia, ehDomingoEmBrasilia, tarefaDoDia, janelaManualAberta, ordemDePublicacao, planoDoRobo, proximaPublicacao, type LinhaPendente } from "./robo";
 
 function linha(id: number, favor: number, contra: number, extra: Partial<LinhaPendente> = {}): LinhaPendente {
   return {
@@ -76,5 +76,16 @@ describe("ordemDePublicacao", () => {
   it("sem maioria, o mais apoiado sai por último", () => {
     const plano = [post(item(5, "minoria", "2026-11-10T00:00:00Z")), post(item(6, "minoria", "2026-11-12T00:00:00Z"))];
     expect(ordemDePublicacao(plano).map((p) => p.imagens[0].id)).toEqual([6, 5]);
+  });
+});
+
+describe("tarefaDoDia", () => {
+  it("domingo publica, terça explica, quarta traz de volta, sexta mostra o andamento", () => {
+    expect([0, 1, 2, 3, 4, 5, 6].map(tarefaDoDia)).toEqual([
+      "publicar", null, "explicacao", "devolta", null, "andamento", null,
+    ]);
+  });
+  it("o dia é o de Brasília: sábado 22h em Brasília ainda é sábado (domingo 01h UTC)", () => {
+    expect(diaEmBrasilia(Date.parse("2026-11-22T01:00:00Z"))).toBe(6);
   });
 });

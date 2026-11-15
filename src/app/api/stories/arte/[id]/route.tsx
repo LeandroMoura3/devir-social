@@ -74,6 +74,26 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         <div style={{ display: "flex", fontSize: 38, color: "#4a4741", textAlign: "center" }}>
           {`Votos e debate: link na bio → Verificar postagem → código ${post.id}`}
         </div>
+        {/* Quarta (post de volta): a chamada para participar vai na própria moldura (regras v0.22). */}
+        {tipo === "republicacao" && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginTop: 32,
+              backgroundColor: "#e3388a",
+              color: "#ffffff",
+              padding: "24px 40px",
+              borderRadius: 48,
+              fontSize: 38,
+              gap: 4,
+            }}
+          >
+            <div>Quer votar ou publicar também?</div>
+            <div>link na bio → Participar</div>
+          </div>
+        )}
       </div>
     ),
     { width: 1080, height: 1920 },
