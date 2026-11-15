@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.17)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.18)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -257,8 +257,9 @@ export default function Regras() {
         <ul>
           <li>Cada post traz na legenda os textos de todos os seus conteúdos.</li>
           <li>
-            Cada texto aparece com sua classificação, seu número e os totais de apoio e protesto, com o detalhamento por sentimento (só os que receberam votos). No Instagram não aparecem
-            nomes nem indiferentes.
+            Cada texto aparece com sua classificação e seu número. As contagens de votos, os nomes e os indiferentes
+            não aparecem no Instagram: ficam neste blog, e o rodapé de cada legenda diz o código para conferir no
+            verificador.
           </li>
           <li>
             O espaço é dividido por peso: maioria 4, minoria 2, tribuna livre 1. O peso segue a classificação, não a
@@ -338,6 +339,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.18 (15/11/2026)</h3>
+        <ul>
+          <li>
+            A legenda do Instagram deixa de trazer as contagens de apoio e protesto (item 9). Ficam a classificação, o
+            número e o texto; os votos continuam neste blog, a um toque pelo rodapé (&quot;Texto completo, links e votos:
+            link na bio → Verificar postagem&quot;).
+          </li>
+        </ul>
 
         <h3>0.17 (15/11/2026)</h3>
         <ul>

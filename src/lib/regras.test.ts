@@ -179,7 +179,7 @@ describe("legenda", () => {
   it("textos curtos aparecem inteiros", () => {
     const m1 = conteudo("maioria", 20, { texto: "Mensagem curta" });
     const [post] = planejarPublicacao([m1]);
-    expect(post.legenda).toContain("Mensagem curta\napoio 20\nprotesto 0");
+    expect(post.legenda).toContain(`MAIORIA · #${m1.id}\nMensagem curta\n\nTexto completo`);
   });
 });
 
@@ -204,10 +204,11 @@ describe("detalhamento por sentimento", () => {
     expect(ladoDoVoto("indiferente")).toBe("indiferente");
   });
 
-  it("a legenda leva o detalhamento", () => {
+  it("a legenda não leva votos (regras v0.18: ficam no blog)", () => {
     const m1 = conteudo("maioria", 3, { detalhe: { me_representa: 2, expoe_injustica: 1 }, texto: "T" });
     const [post] = planejarPublicacao([m1]);
-    expect(post.legenda).toContain("T\napoio 3 (me representa 2 · expõe injustiça 1)\nprotesto 0");
+    expect(post.legenda).not.toContain("apoio");
+    expect(post.legenda).not.toContain("protesto");
   });
 });
 

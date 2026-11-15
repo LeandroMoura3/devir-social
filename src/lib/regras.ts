@@ -200,13 +200,9 @@ function rotulos(conteudos: ConteudoClassificado[]): string[] {
   });
 }
 
+// Regras v0.18: a legenda leva só a classificação, o número e o texto; os votos ficam no blog (rodapé).
 function bloco(rotulo: string, c: ConteudoClassificado, texto: string): string {
-  return [
-    `${rotulo} · #${c.id}`,
-    texto,
-    resumoDoLado("apoio", c.favor, c.detalhe),
-    resumoDoLado("protesto", c.contra, c.detalhe),
-  ].join("\n");
+  return [`${rotulo} · #${c.id}`, texto].join("\n");
 }
 
 function juntar(blocos: string[], ids: number[]): string {
