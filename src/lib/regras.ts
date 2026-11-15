@@ -206,7 +206,7 @@ export function linhaDeVotos(c: Pick<ConteudoClassificado, "favor" | "contra" | 
 }
 
 function bloco(rotulo: string, c: ConteudoClassificado, texto: string): string {
-  return [`${rotulo} · #${c.id}`, linhaDeVotos(c), "", texto].join("\n");
+  return [`#${c.id} - ${rotulo}`, linhaDeVotos(c), "", texto].join("\n");
 }
 
 function juntar(blocos: string[], ids: number[]): string {

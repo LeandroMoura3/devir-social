@@ -171,15 +171,15 @@ describe("legenda", () => {
     const t1 = conteudo("tribuna_livre", 2);
     const s1 = conteudo("sem_quorum", 1);
     const [post] = planejarPublicacao([m1, n1, t1, s1]);
-    expect(post.legenda).toContain(`TRIBUNA LIVRE 1 · #${t1.id}`);
-    expect(post.legenda).toContain(`SEM QUÓRUM 1 · #${s1.id}`);
+    expect(post.legenda).toContain(`#${t1.id} - TRIBUNA LIVRE 1`);
+    expect(post.legenda).toContain(`#${s1.id} - SEM QUÓRUM 1`);
     expect(post.legenda).not.toContain("TRIBUNA LIVRE 2");
   });
 
   it("textos curtos aparecem inteiros", () => {
     const m1 = conteudo("maioria", 20, { texto: "Mensagem curta" });
     const [post] = planejarPublicacao([m1]);
-    expect(post.legenda).toContain(`MAIORIA · #${m1.id}\napoio 20 · protesto 0\n\nMensagem curta\n\nTexto completo`);
+    expect(post.legenda).toContain(`#${m1.id} - MAIORIA\napoio 20 · protesto 0\n\nMensagem curta\n\nTexto completo`);
   });
 });
 
@@ -208,7 +208,7 @@ describe("detalhamento por sentimento", () => {
     const m1 = conteudo("maioria", 3, { detalhe: { me_representa: 2, expoe_injustica: 1 }, texto: "T" });
     const [post] = planejarPublicacao([m1]);
     expect(post.legenda).toContain(
-      `MAIORIA · #${m1.id}\napoio 3 (me representa 2 · expõe injustiça 1) · protesto 0\n\nT`,
+      `#${m1.id} - MAIORIA\napoio 3 (me representa 2 · expõe injustiça 1) · protesto 0\n\nT`,
     );
   });
 });

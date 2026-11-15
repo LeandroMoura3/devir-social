@@ -25,7 +25,7 @@ describe("planoDoRobo", () => {
     expect(post.imagens[0].faixa).toBe("maioria");
     expect(post.imagens[1].faixa).toBe("minoria");
     expect(post.imagens[0].imagemPath).toBe("pasta/1.jpg");
-    expect(post.legenda).toContain("MAIORIA · #1");
+    expect(post.legenda).toContain("#1 - MAIORIA");
   });
 
   it("sem pendentes, sem posts", () => {
