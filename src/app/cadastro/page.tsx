@@ -60,8 +60,8 @@ function TextoConsentimento() {
         <h2 className="font-semibold">O que fica visível para o público (Instagram e blog)</h2>
         <ul className="list-disc pl-5">
           <li>
-            <strong>No Instagram:</strong> os conteúdos e a classificação de cada um. Seu nome e as contagens de votos
-            não aparecem lá; ficam no blog.
+            <strong>No Instagram:</strong> os conteúdos, a classificação de cada um e os totais de apoio e protesto, com
+            o detalhamento por sentimento. Seu nome não aparece.
           </li>
           <li>
             <strong>No blog:</strong> o mesmo, mais o texto completo e <strong>o seu nome público como autor</strong>{" "}

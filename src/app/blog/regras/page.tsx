@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.18)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.19)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -262,9 +262,9 @@ export default function Regras() {
         <ul>
           <li>Cada post traz na legenda os textos de todos os seus conteúdos.</li>
           <li>
-            Cada texto aparece com sua classificação e seu número. As contagens de votos, os nomes e os indiferentes
-            não aparecem no Instagram: ficam neste blog, e o rodapé de cada legenda diz o código para conferir no
-            verificador.
+            Cada texto começa com sua classificação e seu número e, logo abaixo, os votos de apoio e de protesto numa
+            linha, com o detalhamento por sentimento (só os que receberam votos). No Instagram não aparecem nomes nem
+            indiferentes: ficam neste blog, e o rodapé de cada legenda diz o código para conferir no verificador.
           </li>
           <li>
             O espaço é dividido por peso: maioria 4, minoria 2, tribuna livre 1. O peso segue a classificação, não a
@@ -344,6 +344,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.19 (15/11/2026)</h3>
+        <ul>
+          <li>
+            Os votos voltam à legenda do Instagram, agora logo abaixo da classificação e do número, numa linha, antes
+            do texto (item 9). Os posts de 15/11 (#9 e #2), ainda sem interações, foram republicados de novo neste
+            modelo.
+          </li>
+        </ul>
 
         <h3>0.18 (15/11/2026)</h3>
         <ul>
