@@ -25,8 +25,8 @@ export default function Stories() {
           <li>
             <strong>Quarta, 18h:</strong> um grupo dos Destaques, em rodízio, e um post antigo de volta. Volta quem tem a
             menor conta &quot;vezes que já voltou ÷ peso&quot;; em empate, o de peso maior e, depois, o mais antigo.
-            Peso: maioria 4, minoria 2, tribuna livre e sem quórum 1. Assim, a maioria volta 4 vezes mais que a tribuna
-            livre.
+            Peso: maioria 8, minoria 4, tribuna livre e sem quórum 1. Assim, a maioria volta 8 vezes mais que a tribuna
+            livre (no feed, maioria e minoria costumam ganhar imagem, e a tribuna livre fica no texto).
           </li>
         </ul>
       </article>

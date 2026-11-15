@@ -3,8 +3,9 @@
 // pública /blog/stories.
 import type { Faixa } from "@/lib/regras";
 
-// Mesmos pesos da divisão da legenda (regra 9).
-export const PESO_STORY: Record<Faixa, number> = { maioria: 4, minoria: 2, tribuna_livre: 1, sem_quorum: 1 };
+// Regras v0.20: maioria 8, minoria 4, tribuna livre e sem quórum 1. Mais forte que a legenda (4:2:1) porque, no
+// feed, maioria e minoria costumam ganhar imagem e a tribuna livre costuma ficar só no texto.
+export const PESO_STORY: Record<Faixa, number> = { maioria: 8, minoria: 4, tribuna_livre: 1, sem_quorum: 1 };
 
 export type Candidato = { id: number; faixa: Faixa; republicacoes: number; fechaEm: string };
 

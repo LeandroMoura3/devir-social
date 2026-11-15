@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.19)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.20)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -249,8 +249,8 @@ export default function Regras() {
           <li>
             <strong>Quarta, às 18h:</strong> um grupo dos Destaques, em rodízio (O que é, Como votar, Resultado,
             Participar), e um post antigo de volta. Volta o post com a menor conta &quot;vezes que já voltou ÷
-            peso&quot;; em empate, o de peso maior e, depois, o mais antigo. O peso é o mesmo da legenda: maioria 4,
-            minoria 2, tribuna livre e sem quórum 1.
+            peso&quot;; em empate, o de peso maior e, depois, o mais antigo. Peso: maioria 8, minoria 4, tribuna livre
+            e sem quórum 1 (no feed, maioria e minoria costumam ganhar imagem, e a tribuna livre fica no texto).
           </li>
           <li>
             A fila do rodízio e o histórico de todos os Stories ficam na página{" "}
@@ -344,6 +344,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.20 (15/11/2026)</h3>
+        <ul>
+          <li>
+            Pesos do rodízio de Stories de quarta: maioria 8, minoria 4, tribuna livre e sem quórum 1 (antes, os mesmos
+            da legenda: 4, 2 e 1), porque no feed maioria e minoria costumam ganhar imagem e a tribuna livre fica no
+            texto (item 8). Nenhum post tinha voltado nos Stories ainda.
+          </li>
+        </ul>
 
         <h3>0.19 (15/11/2026)</h3>
         <ul>

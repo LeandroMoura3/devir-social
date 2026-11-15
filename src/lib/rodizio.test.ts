@@ -14,27 +14,27 @@ function simular(candidatos: Candidato[], semanas: number): Record<number, numbe
 }
 
 describe("rodízio com peso por faixa", () => {
-  it("maioria volta 4 vezes para cada vez da tribuna livre", () => {
+  it("maioria volta 8 vezes para cada vez da tribuna livre", () => {
     const vezes = simular(
       [
         { id: 1, faixa: "maioria", republicacoes: 0, fechaEm: "2026-11-05T00:00:00Z" },
         { id: 2, faixa: "tribuna_livre", republicacoes: 0, fechaEm: "2026-11-01T00:00:00Z" },
       ],
-      10,
+      18,
     );
-    expect(vezes).toEqual({ 1: 8, 2: 2 });
+    expect(vezes).toEqual({ 1: 16, 2: 2 });
   });
 
-  it("minoria volta o dobro da tribuna livre, e sem quórum pesa igual à tribuna", () => {
+  it("minoria volta 4 vezes mais que a tribuna livre, e sem quórum pesa igual à tribuna", () => {
     const vezes = simular(
       [
         { id: 1, faixa: "minoria", republicacoes: 0, fechaEm: "2026-11-01T00:00:00Z" },
         { id: 2, faixa: "tribuna_livre", republicacoes: 0, fechaEm: "2026-11-01T00:00:00Z" },
         { id: 3, faixa: "sem_quorum", republicacoes: 0, fechaEm: "2026-11-01T00:00:00Z" },
       ],
-      8,
+      12,
     );
-    expect(vezes).toEqual({ 1: 4, 2: 2, 3: 2 });
+    expect(vezes).toEqual({ 1: 8, 2: 2, 3: 2 });
   });
 
   it("empate: maior peso primeiro, depois o mais antigo", () => {
