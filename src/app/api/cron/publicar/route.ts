@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { publicarPost, publicarStory, type Via } from "@/lib/instagram";
-import { ehDomingoEmBrasilia, planoDoRobo, type LinhaPendente } from "@/lib/robo";
+import { ehDomingoEmBrasilia, ordemDePublicacao, planoDoRobo, type LinhaPendente } from "@/lib/robo";
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { lista } from "@/lib/supabase/lista";
 import { comTentativas, registrarStory } from "@/lib/stories";
@@ -60,9 +60,8 @@ export async function GET(request: NextRequest) {
   }
 
   const publicados: { ids: number[]; mediaId: string; principal?: number }[] = [];
-  // Ordem inversa (regras v0.18): o Instagram mostra o mais recente no topo, então o post mais apoiado sai por
-  // último para ficar em primeiro no perfil.
-  for (const post of [...posts].reverse()) {
+  // Ordem do feed (regras v0.18): maiorias por data de fechamento; sem maioria, o mais apoiado por último (topo).
+  for (const post of ordemDePublicacao(posts)) {
     if (Date.now() - inicio > ORCAMENTO_MS) break;
     const ids = [...post.imagens, ...post.soTexto].map((c) => c.id);
     try {

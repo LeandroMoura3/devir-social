@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ehDomingoEmBrasilia, janelaManualAberta, planoDoRobo, proximaPublicacao, type LinhaPendente } from "./robo";
+import { ehDomingoEmBrasilia, janelaManualAberta, ordemDePublicacao, planoDoRobo, proximaPublicacao, type LinhaPendente } from "./robo";
 
 function linha(id: number, favor: number, contra: number, extra: Partial<LinhaPendente> = {}): LinhaPendente {
   return {
@@ -58,5 +58,23 @@ describe("proximaPublicacao", () => {
     expect(proximaPublicacao(domingoCedo).toISOString()).toBe("2026-11-08T21:00:00.000Z");
     const domingoNoite = Date.parse("2026-11-08T22:00:00Z");
     expect(proximaPublicacao(domingoNoite).toISOString()).toBe("2026-11-15T21:00:00.000Z");
+  });
+});
+
+describe("ordemDePublicacao", () => {
+  const item = (id: number, faixa: "maioria" | "minoria" | "tribuna_livre", fechaEm: string) => ({
+    id, texto: "", favor: 0, contra: 0, criadoEm: fechaEm, fechaEm, faixa, imagemPath: null,
+  });
+  const post = (c: ReturnType<typeof item>) => ({ imagens: [c], soTexto: [], legenda: "" });
+
+  it("maiorias saem por data de fechamento (a mais recente fica no topo do perfil)", () => {
+    // Plano em ordem de apoio: #9 (3 apoios) antes do #2 (1 apoio).
+    const plano = [post(item(9, "maioria", "2026-11-15T20:03:00Z")), post(item(2, "maioria", "2026-11-11T20:10:00Z"))];
+    expect(ordemDePublicacao(plano).map((p) => p.imagens[0].id)).toEqual([2, 9]);
+  });
+
+  it("sem maioria, o mais apoiado sai por último", () => {
+    const plano = [post(item(5, "minoria", "2026-11-10T00:00:00Z")), post(item(6, "minoria", "2026-11-12T00:00:00Z"))];
+    expect(ordemDePublicacao(plano).map((p) => p.imagens[0].id)).toEqual([6, 5]);
   });
 });

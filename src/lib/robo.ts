@@ -15,7 +15,7 @@ export type LinhaPendente = {
   detalhe: Detalhe | null;
 };
 
-export type ItemRobo = ConteudoClassificado & { imagemPath: string | null };
+export type ItemRobo = ConteudoClassificado & { imagemPath: string | null; fechaEm: string };
 
 export function planoDoRobo(linhas: LinhaPendente[]): Post<ItemRobo>[] {
   return planejarPublicacao(
@@ -24,6 +24,7 @@ export function planoDoRobo(linhas: LinhaPendente[]): Post<ItemRobo>[] {
       texto: l.texto,
       imagemPath: l.imagem_path,
       criadoEm: l.criado_em,
+      fechaEm: l.fecha_em,
       favor: l.favor,
       contra: l.contra,
       detalhe: l.detalhe ?? {},
@@ -63,4 +64,17 @@ export function proximaPublicacao(instante: number): Date {
   const alvo = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + dias, HORA_PUBLICACAO);
   const resultado = alvo <= local.getTime() ? alvo + 7 * 86_400_000 : alvo;
   return new Date(resultado + BRASILIA_MS);
+}
+
+// Ordem em que os posts vão ao feed (regras v0.18). O Instagram mostra o mais recente no topo, então:
+//   posts de maioria → por data de fechamento, do mais antigo para o mais recente (feed cronológico);
+//   sem maioria (posts de minoria ou de tribuna) → do menos para o mais apoiado, para o mais apoiado ficar no topo.
+export function ordemDePublicacao<C extends ConteudoClassificado & { fechaEm: string }>(posts: Post<C>[]): Post<C>[] {
+  const principal = (p: Post<C>) => p.imagens[0] ?? p.soTexto[0];
+  if (posts.length > 0 && posts.every((p) => principal(p)?.faixa === "maioria")) {
+    return [...posts].sort(
+      (a, b) => Date.parse(principal(a).fechaEm) - Date.parse(principal(b).fechaEm) || principal(a).id - principal(b).id,
+    );
+  }
+  return [...posts].reverse();
 }

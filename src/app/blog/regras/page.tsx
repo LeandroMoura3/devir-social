@@ -234,8 +234,9 @@ export default function Regras() {
           assim por diante. Quando os posts acabam, volta ao primeiro. Cada post tem no máximo 10 imagens.
         </p>
         <p>
-          <strong>Ordem no perfil:</strong> o Instagram mostra o post mais recente no topo. Por isso os posts são
-          publicados do menos para o mais apoiado: o da maioria mais votada sai por último e fica em primeiro.
+          <strong>Ordem no perfil:</strong> o Instagram mostra o post mais recente no topo. Posts de maioria são
+          publicados por data de fechamento, do mais antigo para o mais recente. Sem maioria, os posts são publicados
+          do menos para o mais apoiado, e o mais apoiado fica em primeiro.
         </p>
         <p>
           <strong>Stories:</strong> o app também publica Stories, só de posts que já saíram no feed (nunca de
@@ -352,8 +353,8 @@ export default function Regras() {
             link na bio → Verificar postagem&quot;).
           </li>
           <li>
-            Os posts passam a ser publicados do menos para o mais apoiado, para que o mais apoiado fique no topo do
-            perfil (item 8).
+            Ordem no perfil (item 8): posts de maioria saem por data de fechamento (o mais recente fica no topo); sem
+            maioria, do menos para o mais apoiado.
           </li>
           <li>
             Os posts de 15/11 (#9 e #2), publicados no modelo anterior e sem nenhuma interação, foram apagados e
