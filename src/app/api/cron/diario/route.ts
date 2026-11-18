@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { diaEmBrasilia, tarefaDoDia } from "@/lib/robo";
+import { criarClientePublico } from "@/lib/supabase/publico";
 
 // Agendamento único (vercel.json, todo dia às 18h de Brasília; regras v0.22). O dia da semana decide a tarefa:
 //   domingo → /api/cron/publicar (feed + avisos + resultado da semana)
@@ -17,7 +18,23 @@ export async function GET(request: NextRequest) {
   const diaPedido = request.nextUrl.searchParams.get("dia");
   const dia = simular && diaPedido !== null ? Number(diaPedido) : diaEmBrasilia(Date.now());
   const tarefa = tarefaDoDia(dia);
-  if (!tarefa) return NextResponse.json({ dia, tarefa: null, mensagem: "Nada a publicar hoje." });
+  // Toda execução real fica registrada (Plano de publicação mostra as últimas), mesmo nos dias sem tarefa.
+  const registrar = async (status: number, resposta: unknown) => {
+    if (simular) return;
+    const supabase = await criarClientePublico();
+    await supabase.rpc("robo_registrar_execucao", {
+      p_segredo: segredo,
+      p_dia: dia,
+      p_tarefa: tarefa,
+      p_status: status,
+      p_resposta: resposta,
+    });
+  };
+  if (!tarefa) {
+    const corpo = { dia, tarefa: null, mensagem: "Nada a publicar hoje." };
+    await registrar(200, corpo);
+    return NextResponse.json(corpo);
+  }
 
   const destino = new URL(tarefa === "publicar" ? "/api/cron/publicar" : "/api/cron/stories", request.nextUrl.origin);
   if (tarefa !== "publicar") destino.searchParams.set("parte", tarefa);
@@ -26,7 +43,14 @@ export async function GET(request: NextRequest) {
     if (tarefa === "publicar") return NextResponse.json({ dia, tarefa, destino: destino.pathname, simulacao: true });
     destino.searchParams.set("simular", "1");
   }
-  const resposta = await fetch(destino, { headers: { authorization: autorizacao }, cache: "no-store" });
-  const corpo = await resposta.json().catch(() => ({}));
-  return NextResponse.json({ dia, tarefa, ...corpo }, { status: resposta.status });
+  try {
+    const resposta = await fetch(destino, { headers: { authorization: autorizacao }, cache: "no-store" });
+    const corpo = await resposta.json().catch(() => ({ erro: "resposta sem JSON" }));
+    await registrar(resposta.status, corpo);
+    return NextResponse.json({ dia, tarefa, ...corpo }, { status: resposta.status });
+  } catch (erro) {
+    const corpo = { erro: erro instanceof Error ? erro.message : String(erro) };
+    await registrar(500, corpo);
+    return NextResponse.json({ dia, tarefa, ...corpo }, { status: 500 });
+  }
 }

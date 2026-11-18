@@ -26,6 +26,9 @@ export default function PlanoPublicacao({ searchParams }: PageProps<"/admin/publ
       <Suspense fallback={null}>
         <Conferencia />
       </Suspense>
+      <Suspense fallback={null}>
+        <Execucoes />
+      </Suspense>
       <Suspense fallback={<p className="text-sm text-muted">Carregando…</p>}>
         <Plano />
       </Suspense>
@@ -205,5 +208,46 @@ async function Plano() {
         desde o fechamento da votação. Aqui falta só o Instagram.
       </p>
     </div>
+  );
+}
+
+const DIAS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+
+type Execucao = { iniciada_em: string; dia: number; tarefa: string | null; status: number | null; resposta: unknown };
+
+// Cada vez que o agendamento diário chama o robô fica registrada aqui (migração 0029).
+async function Execucoes() {
+  const { supabase } = await exigirAdmin();
+  const { data } = await supabase.rpc("execucoes_do_robo");
+  const execucoes = (data ?? []) as Execucao[];
+  return (
+    <details className="cartao text-sm">
+      <summary className="cursor-pointer font-semibold">
+        Execuções do robô{" "}
+        <span className="font-normal text-muted">
+          {execucoes[0]
+            ? `(última: ${formatarDataHora(execucoes[0].iniciada_em)}, ${execucoes[0].status === 200 ? "ok" : `erro ${execucoes[0].status}`})`
+            : "(nenhuma registrada ainda)"}
+        </span>
+      </summary>
+      <p className="mt-2 text-muted">
+        O agendamento roda todo dia às 18h. Se num dia de publicação não aparecer nada aqui, ele não disparou.
+      </p>
+      <ul className="mt-2 flex flex-col gap-2">
+        {execucoes.map((e) => (
+          <li key={e.iniciada_em} className="flex flex-col gap-0.5">
+            <span>
+              {formatarDataHora(e.iniciada_em)} · {DIAS[e.dia]} · {e.tarefa ?? "sem tarefa"} ·{" "}
+              <span className={e.status === 200 ? "text-accent" : "text-danger"}>
+                {e.status === 200 ? "ok" : `erro ${e.status}`}
+              </span>
+            </span>
+            {e.status !== 200 && (
+              <code className="whitespace-pre-wrap break-all text-xs text-muted">{JSON.stringify(e.resposta).slice(0, 400)}</code>
+            )}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
