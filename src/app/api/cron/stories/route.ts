@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { URL_PUBLICA } from "@/lib/config";
 import { candidatosDoRodizio, carregarPublicados, carregarStories } from "@/lib/blog";
 import { publicarStory, type Via } from "@/lib/instagram";
 import { diaEmBrasilia, proximaPublicacao, tarefaDoDia } from "@/lib/robo";
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ erro: `Pelas regras, "${parte}" não sai hoje.` }, { status: 409 });
   }
 
-  const origem = request.nextUrl.origin;
+  const origem = URL_PUBLICA;
   const supabase = await criarClientePublico();
   const [publicados, todos] = await Promise.all([carregarPublicados(), carregarStories()]);
   const deHoje = todos.filter((s) => mesmoDiaEmBrasilia(Date.parse(s.publicadoEm), agora));

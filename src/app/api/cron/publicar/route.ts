@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { URL_PUBLICA } from "@/lib/config";
 import { publicarPost, publicarStory, type Via } from "@/lib/instagram";
 import { ehDomingoEmBrasilia, ordemDePublicacao, planoDoRobo, proximaPublicacao, type LinhaPendente } from "@/lib/robo";
 import { criarClientePublico } from "@/lib/supabase/publico";
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
   for (const p of publicados) {
     if (!p.principal || Date.now() - inicio > ORCAMENTO_MS) continue;
     try {
-      const arte = `${request.nextUrl.origin}/api/stories/arte/${p.principal}?tipo=aviso`;
+      const arte = `${URL_PUBLICA}/api/stories/arte/${p.principal}?tipo=aviso`;
       const mediaId = await comTentativas(() =>
         publicarStory({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagem: arte }),
       );
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
         tribuna: String(conta("tribuna_livre")),
         semquorum: String(conta("sem_quorum")),
       });
-      const arte = `${request.nextUrl.origin}/api/stories/resumo?${busca}`;
+      const arte = `${URL_PUBLICA}/api/stories/resumo?${busca}`;
       const mediaId = await comTentativas(() =>
         publicarStory({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagem: arte }),
       );

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { URL_PUBLICA } from "@/lib/config";
 import { diaEmBrasilia, tarefaDoDia } from "@/lib/robo";
 import { criarClientePublico } from "@/lib/supabase/publico";
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(corpo);
   }
 
-  const destino = new URL(tarefa === "publicar" ? "/api/cron/publicar" : "/api/cron/stories", request.nextUrl.origin);
+  const destino = new URL(tarefa === "publicar" ? "/api/cron/publicar" : "/api/cron/stories", URL_PUBLICA);
   if (tarefa !== "publicar") destino.searchParams.set("parte", tarefa);
   if (simular) {
     // O domingo não tem modo simulação (publicaria de verdade); só informa para onde iria.
@@ -45,9 +46,12 @@ export async function GET(request: NextRequest) {
   }
   try {
     const resposta = await fetch(destino, { headers: { authorization: autorizacao }, cache: "no-store" });
-    const corpo = await resposta.json().catch(() => ({ erro: "resposta sem JSON" }));
-    await registrar(resposta.status, corpo);
-    return NextResponse.json({ dia, tarefa, ...corpo }, { status: resposta.status });
+    // Resposta que não é JSON (ex.: página de login da Vercel) é falha, mesmo com status 200.
+    const json = await resposta.json().catch(() => null);
+    const status = json ? resposta.status : 502;
+    const corpo = json ?? { erro: `resposta sem JSON de ${destino.host} (status ${resposta.status})` };
+    await registrar(status, corpo);
+    return NextResponse.json({ dia, tarefa, ...corpo }, { status });
   } catch (erro) {
     const corpo = { erro: erro instanceof Error ? erro.message : String(erro) };
     await registrar(500, corpo);
