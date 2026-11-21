@@ -5,6 +5,7 @@ import { ehDomingoEmBrasilia, ordemDePublicacao, planoDoRobo, proximaPublicacao,
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { lista } from "@/lib/supabase/lista";
 import { comTentativas, registrarStory } from "@/lib/stories";
+import { conectarBluesky, publicarFios, publicarTextoDoDia, textoResumo } from "@/lib/bluesky-robo";
 
 // Agendado na Vercel (vercel.json) para domingo, 18h de Brasília. A Vercel manda o CRON_SECRET no
 // cabeçalho Authorization; o mesmo segredo autoriza o robô no banco (migração 0014).
@@ -127,5 +128,35 @@ export async function GET(request: NextRequest) {
       resumo = { erro: erro instanceof Error ? erro.message : String(erro) };
     }
   }
-  return NextResponse.json({ publicados, avisos, resumo, restantes: posts.length - publicados.length });
+  // Bluesky (regras v0.23): depois de tudo do Instagram; uma falha aqui só fica registrada na resposta.
+  let bluesky: { feitos?: string[]; erro?: string } | null = null;
+  if (publicados.length > 0) {
+    try {
+      const sessao = await conectarBluesky(supabase, segredo);
+      if (sessao) {
+        const saiu = new Set(publicados.flatMap((p) => p.ids));
+        const postsQueSairam = ordemDePublicacao(posts).filter((p) => [...p.imagens, ...p.soTexto].some((c) => saiu.has(c.id)));
+        const feitos = await publicarFios(sessao, supabase, segredo, postsQueSairam);
+        const faixas = postsQueSairam.flatMap((p) => [...p.imagens, ...p.soTexto]).map((c) => c.faixa);
+        const conta = (f: string) => faixas.filter((x) => x === f).length;
+        const diaMes = (t: number) => new Date(t - 3 * 3_600_000).toISOString().slice(5, 10).split("-").reverse().join("/");
+        const agora = Date.now();
+        const r = await publicarTextoDoDia(
+          sessao,
+          supabase,
+          segredo,
+          "resumo",
+          textoResumo(
+            diaMes(agora),
+            { maioria: conta("maioria"), minoria: conta("minoria"), tribuna: conta("tribuna_livre"), semquorum: conta("sem_quorum") },
+            diaMes(proximaPublicacao(agora).getTime()),
+          ),
+        );
+        bluesky = { feitos: r ? [...feitos, "resultado da semana"] : feitos };
+      }
+    } catch (erro) {
+      bluesky = { erro: erro instanceof Error ? erro.message : String(erro) };
+    }
+  }
+  return NextResponse.json({ publicados, avisos, resumo, bluesky, restantes: posts.length - publicados.length });
 }

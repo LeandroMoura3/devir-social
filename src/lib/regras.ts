@@ -189,7 +189,7 @@ export function planejarPublicacao<C extends ConteudoClassificado>(conteudos: C[
   return posts.map((p) => ({ ...p, legenda: montarLegenda([...p.imagens, ...p.soTexto]) }));
 }
 
-function rotulos(conteudos: ConteudoClassificado[]): string[] {
+export function rotulos(conteudos: ConteudoClassificado[]): string[] {
   const contagem: Record<Faixa, number> = { maioria: 0, minoria: 0, tribuna_livre: 0, sem_quorum: 0 };
   return conteudos.map((c) => {
     contagem[c.faixa] += 1;

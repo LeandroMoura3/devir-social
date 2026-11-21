@@ -13,7 +13,7 @@ export default function Regras() {
     <div className="flex flex-col gap-6">
       <MenuBlog />
       <article className="prosa">
-        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.22)</h1>
+        <h1 className="text-2xl font-semibold">Regras do piloto (versão 0.23)</h1>
         <p className="text-sm text-muted">
           Estas regras estão implementadas no código aberto do app, em{" "}
           <a href="https://github.com/LeandroMoura3/devir-social/blob/main/src/lib/regras.ts">src/lib/regras.ts</a> e{" "}
@@ -268,6 +268,17 @@ export default function Regras() {
           </li>
         </ul>
 
+        <p>
+          <strong>Bluesky:</strong> os mesmos posts também saem no{" "}
+          <a href="https://bsky.app/profile/devir-social.bsky.social">Bluesky (@devir-social.bsky.social)</a>, adaptados ao
+          limite de 300 caracteres. Cada post do Instagram vira um fio: o post principal é a maioria (ou, sem maioria, a
+          minoria mais apoiada), com imagem; as demais maiorias e minorias do post vêm como respostas, com imagem; a
+          tribuna livre e o sem quórum fecham o fio só com os códigos e o link deste blog. Cada post leva a
+          classificação, os votos, a primeira linha do texto e o link do texto completo. No domingo sai também o
+          resultado da semana; na quarta, o post escolhido pelo rodízio é repostado; na sexta, o andamento da semana.
+          O explicativo do Devir fica fixado no topo do perfil.
+        </p>
+
         <h3>9. Legenda</h3>
         <ul>
           <li>Cada post traz na legenda os textos de todos os seus conteúdos.</li>
@@ -354,6 +365,15 @@ export default function Regras() {
         </ul>
 
         <h2 id="historico">E. Histórico de versões</h2>
+
+        <h3>0.23 (21/11/2026)</h3>
+        <ul>
+          <li>
+            Bluesky como canal de publicação (item 8): fio por post do Instagram, com a maioria no post principal, as
+            minorias como respostas e a tribuna livre só com códigos; resultado da semana, repost na quarta e
+            andamento na sexta.
+          </li>
+        </ul>
 
         <h3>0.22 (15/11/2026)</h3>
         <ul>

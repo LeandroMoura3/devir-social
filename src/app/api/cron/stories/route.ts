@@ -7,6 +7,8 @@ import { proximoDoRodizio, proximoGrupo } from "@/lib/rodizio";
 import { criarClientePublico } from "@/lib/supabase/publico";
 import { lista } from "@/lib/supabase/lista";
 import { comTentativas, mesmoDiaEmBrasilia, registrarStory as registrar } from "@/lib/stories";
+import { conectarBluesky, publicarTextoDoDia, textoAndamento, trazerDeVolta } from "@/lib/bluesky-robo";
+import { NOME_FAIXA } from "@/lib/regras";
 
 // Stories da semana (regras v0.22), chamados pelo agendamento diário (/api/cron/diario):
 //   ?parte=explicacao (terça) → um grupo dos Destaques, em rodízio (o seguinte ao último publicado);
@@ -44,6 +46,7 @@ export async function GET(request: NextRequest) {
   type Item = { imagem: string; tipo: "institucional" | "republicacao" | "andamento"; conteudoId: number | null; grupo: string | null };
   let itens: Item[] = [];
   let resumo: Record<string, unknown> = {};
+  let textoBluesky: string | null = null;
 
   if (parte === "explicacao") {
     const grupo = proximoGrupo(anteriores.find((s) => s.tipo === "institucional")?.grupo);
@@ -77,6 +80,8 @@ export async function GET(request: NextRequest) {
     });
     if (!jaSaiu) itens = [{ imagem: `${origem}/api/stories/andamento?${busca}`, tipo: "andamento", conteudoId: null, grupo: null }];
     resumo = { abertos: c.abertos, saemNoDomingo: c.fecham_ate_o_limite };
+    const diaMes = (t: number) => new Date(t - 3 * 3_600_000).toISOString().slice(5, 10).split("-").reverse().join("/");
+    textoBluesky = textoAndamento(c.abertos, c.fecham_ate_o_limite, diaMes(proxima.getTime()));
   }
 
   if (simular) return NextResponse.json({ simulacao: true, parte, ...resumo, imagens: itens.map((i) => i.imagem) });
@@ -85,10 +90,11 @@ export async function GET(request: NextRequest) {
     supabase.rpc("robo_conexao", { p_segredo: segredo }),
   );
   const conexao = conexoes.data?.[0];
-  if (!conexao) return NextResponse.json({ erro: "Instagram não conectado." }, { status: 500 });
 
   const feitos: string[] = [];
+  let erroInstagram: string | null = null;
   try {
+    if (!conexao) throw new Error("Instagram não conectado.");
     for (const item of itens) {
       const midia = await comTentativas(() =>
         publicarStory({ via: conexao.via, usuarioId: conexao.usuario_id, token: conexao.token, imagem: item.imagem }),
@@ -97,7 +103,32 @@ export async function GET(request: NextRequest) {
       feitos.push(`${item.tipo}: ${item.conteudoId ? `#${item.conteudoId}` : (item.grupo ?? "")} ${item.imagem.split("/").pop()}`.trim());
     }
   } catch (erro) {
-    return NextResponse.json({ parte, feitos, erro: erro instanceof Error ? erro.message : String(erro) }, { status: 500 });
+    // Não interrompe: o Bluesky roda mesmo se o Instagram falhar.
+    erroInstagram = erro instanceof Error ? erro.message : String(erro);
   }
-  return NextResponse.json({ parte, ...resumo, feitos });
+  // Bluesky (regras v0.23), depois do Instagram e sem interrompê-lo: quarta reposta o escolhido pelo rodízio;
+  // sexta publica o andamento em texto. Terça (explicação) não vai ao Bluesky: lá o explicativo fica fixado.
+  let bluesky: string | { erro: string } | null = null;
+  if (parte !== "explicacao") {
+    try {
+      const sessao = await conectarBluesky(supabase, segredo);
+      if (sessao && parte === "devolta") {
+        const alvo = proximoDoRodizio(candidatosDoRodizio(publicados, anteriores));
+        const conteudo = alvo && publicados.find((p) => p.id === alvo.id);
+        if (conteudo) {
+          const r = await trazerDeVolta(sessao, supabase, segredo, conteudo, NOME_FAIXA[conteudo.faixa].toUpperCase());
+          bluesky = r ? `de volta: #${conteudo.id}` : "já feito hoje";
+        }
+      } else if (sessao && textoBluesky) {
+        const r = await publicarTextoDoDia(sessao, supabase, segredo, "andamento", textoBluesky);
+        bluesky = r ? "andamento" : "já feito hoje";
+      }
+    } catch (erro) {
+      bluesky = { erro: erro instanceof Error ? erro.message : String(erro) };
+    }
+  }
+  return NextResponse.json(
+    { parte, ...resumo, feitos, bluesky, ...(erroInstagram ? { erro: erroInstagram } : {}) },
+    { status: erroInstagram ? 500 : 200 },
+  );
 }
